@@ -6,6 +6,7 @@
 
 **Controlled audits of trajectory-family overlap in video world-model evaluation**
 
+[[Workstream proposal]](docs/WORKSTREAM_PROPOSAL.md)
 [[Research plan]](docs/RESEARCH_PLAN.md)
 [[Evaluation protocol]](docs/EVALS.md)
 [[Reproduction]](docs/REPRODUCE.md)
