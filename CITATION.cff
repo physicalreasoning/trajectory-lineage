@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+title: "trajectory-lineage: controlled trajectory-family overlap audits"
+message: "If you reference this software, please cite the repository."
+type: software
+authors:
+  - name: Physical Reasoning
+repository-code: "https://github.com/physicalreasoning/trajectory-lineage"
+license: Apache-2.0
+keywords:
+  - world models
+  - training data
+  - video prediction
+  - data lineage
+  - evaluation leakage
+abstract: >-
+  A research scaffold for controlled experiments that separate exact-render,
+  same-trajectory, nearby-trajectory, and independent-event relationships in
+  video world-model evaluation. The repository is a conceptual pilot and does
+  not claim empirical findings or identify proprietary training data.
