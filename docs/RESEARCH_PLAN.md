@@ -33,6 +33,12 @@ the experiment can identify a causal effect of its own continued-training replac
 
 ## gate 2 · measurement headroom
 
+### registered memory positive control
+
+before training a neural predictor, run `experiments/memory_positive_control.json`. a nearest-trajectory predictor serves as an intentionally memory-sensitive upper bound. sixty-four independently generated blocks compare a source-family memory bank with an equally sized independent background bank on source-family and independent-population events.
+
+**registered pass:** mean 50% evaluation-reuse effect above `1/64`, normal-approximation 95% lower bound above zero, and zero source-bank loss for the source-memory policy. passing validates assay sensitivity only; it is not evidence about a neural world model.
+
 **run:** compare persistence, constant velocity, analytic measured-state prediction, and the candidate predictor on discarded data. validate center tracking on both ground-truth and generated outputs.
 
 **pass:** the predictor beats constant velocity on the easy collision task, the exposure positive control moves the bounded state score, and invalid-output penalties do not dominate the effect.

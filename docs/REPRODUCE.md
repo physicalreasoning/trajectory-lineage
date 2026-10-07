@@ -52,6 +52,14 @@ expected semantic output:
 
 exact hashes are intentionally omitted because they are implementation artifacts. the smoke writes `results/smoke.json` and `results/smoke_manifest.json`.
 
+## registered memory positive control
+
+```bash
+uv run python scripts/pilot_memory.py
+```
+
+this runs the configuration frozen in `experiments/memory_positive_control.json` and writes `results/memory_positive_control.json`. it uses a nearest-trajectory memory baseline, not a trained neural world model.
+
 ## scope
 
-these commands reproduce software contracts only. they do not train a predictor or produce evidence for the research hypothesis.
+the test and smoke commands reproduce software contracts only. the memory positive control can validate assay sensitivity, but it cannot produce evidence about a learned world model or practical benchmark contamination.
