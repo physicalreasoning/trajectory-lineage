@@ -1,60 +1,60 @@
-# evaluation protocol
+# Evaluation protocol
 
-## unit of independence
+## Unit of independence
 
-one independent training block contains an independently generated corpus, model initialization, base training, and paired continuation branches. branches sharing a base are paired conditions, not independent replications.
+One independent training block contains an independently generated corpus, model initialization, base training, and paired continuation branches. Branches sharing a base are paired conditions, not independent replications.
 
-frames, rerenders, windows, checkpoints, and repeated forecasts reduce measurement noise but do not increase the number of training-policy replications.
+Frames, rerenders, windows, checkpoints, and repeated forecasts reduce measurement noise but do not increase the number of training-policy replications.
 
-## bounded state score
+## Bounded state score
 
-primary measurement primitive:
+Primary measurement primitive:
 
-- track both disk centers through all forecast frames;
-- compute euclidean error in arena-width units;
-- cap each disk-frame error at one;
-- assign one to every invalid disk-frame; and
-- average only after penalties are applied.
+- Track both disk centers through all forecast frames;
+- Compute Euclidean error in arena-width units;
+- Cap each disk-frame error at one;
+- Assign one to every invalid disk-frame; and
+- Average only after penalties are applied.
 
-report localization, identity-switch, missing-object, extra-object, and penalty contributions separately.
+Report localization, identity-switch, missing-object, extra-object, and penalty contributions separately.
 
-## evaluation-reuse effect
+## Evaluation-reuse effect
 
-for paired block-level gains on source-family rerenders `g_source` and independently sampled events `g_population`, a reuse fraction `π` changes the measured gain by:
+For paired block-level gains on source-family rerenders `g_source` and independently sampled events `g_population`, a reuse fraction `π` changes the measured gain by:
 
 ```text
 reuse_effect = π × mean(g_source - g_population)
 ```
 
-this is an algebraic property of the declared mixture. scientific value requires an empirical difference in the two gains and a reason the mixture represents an evaluation practice that matters.
+This is an algebraic property of the declared mixture. Scientific value requires an empirical difference in the two gains and a reason the mixture represents an evaluation practice that matters.
 
-## required component reporting
+## Required component reporting
 
-never report only the mixture effect. always report:
+Never report only the mixture effect. Always report:
 
-- source branch and background branch losses on source-family rerenders;
-- both losses on independent events;
-- invalid-output penalty contributions;
-- distance to every consumed trajectory;
-- model-learning positive controls; and
-- cost and variance across independent blocks.
+- Source branch and background branch losses on source-family rerenders;
+- Both losses on independent events;
+- Invalid-output penalty contributions;
+- Distance to every consumed trajectory;
+- Model-learning positive controls; and
+- Cost and variance across independent blocks.
 
-## controls
+## Controls
 
-- persistence;
-- constant velocity;
-- measured-state analytic physics;
-- privileged true-state physics;
-- nearest trajectory by state distance;
-- exact pixel matching;
-- perceptual frame matching; and
-- temporal/motion alignment.
+- Persistence;
+- Constant velocity;
+- Measured-state analytic physics;
+- Privileged true-state physics;
+- Nearest trajectory by state distance;
+- Exact pixel matching;
+- Perceptual frame matching; and
+- Temporal/motion alignment.
 
-## what the measurements cannot tell us
+## What the measurements cannot tell us
 
-- that an undocumented model consumed a candidate video;
-- that same-trajectory gains are a distinct memorization mechanism;
-- that late continued training matches pretraining;
-- that one small predictor represents all video world models;
-- that excluding detected overlaps improves a retrained model; or
-- that a statistically detectable effect has practical benchmark importance.
+- That an undocumented model consumed a candidate video;
+- That same-trajectory gains are a distinct memorization mechanism;
+- That late continued training matches pretraining;
+- That one small predictor represents all video world models;
+- That excluding detected overlaps improves a retrained model; or
+- That a statistically detectable effect has practical benchmark importance.

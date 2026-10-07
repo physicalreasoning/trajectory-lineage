@@ -1,31 +1,31 @@
-# trajectory-lineage
+# Trajectory-lineage
 
-[![tests](https://github.com/physicalreasoning/trajectory-lineage/actions/workflows/tests.yml/badge.svg)](https://github.com/physicalreasoning/trajectory-lineage/actions/workflows/tests.yml)
-[![license](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-![python](https://img.shields.io/badge/python-3.11%2B-blue.svg)
+[![Tests](https://github.com/physicalreasoning/trajectory-lineage/actions/workflows/tests.yml/badge.svg)](https://github.com/physicalreasoning/trajectory-lineage/actions/workflows/tests.yml)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)
 
-**controlled audits of trajectory-family overlap in video world-model evaluation**
+**Controlled audits of trajectory-family overlap in video world-model evaluation**
 
-[[research plan]](docs/RESEARCH_PLAN.md)
-[[evaluation protocol]](docs/EVALS.md)
-[[reproduction]](docs/REPRODUCE.md)
-[[findings]](FINDINGS.md)
+[[Research plan]](docs/RESEARCH_PLAN.md)
+[[Evaluation protocol]](docs/EVALS.md)
+[[Reproduction]](docs/REPRODUCE.md)
+[[Findings]](FINDINGS.md)
 
-## status
+## Status
 
-**conceptual pilot. there are no empirical findings yet.**
+**Conceptual pilot. The registered memory positive control passes; no neural world model has been trained.**
 
-the broad claim that trajectory overlap causes benchmark contamination did not survive adversarial review. this repository begins with the narrower question that remained:
+The broad claim that trajectory overlap causes benchmark contamination did not survive adversarial review. This repository begins with the narrower question that remained:
 
-> in a frozen procedural collision setting, how much does deliberate reuse of source-family trajectories change the measured advantage of one controlled training policy over another?
+> In a frozen procedural collision setting, how much does deliberate reuse of source-family trajectories change the measured advantage of one controlled training policy over another?
 
-this is an evaluation assay, not a historical provenance detector. it cannot establish that a proprietary model trained on a particular video, website, or dataset.
+This is an evaluation assay, not a historical provenance detector. It cannot establish that a proprietary model trained on a particular video, website, or dataset.
 
-## why this exists
+## Why this exists
 
-video deduplication usually asks whether two files or frames look alike. world-model evaluation can have another dependency: two videos can contain different pixels while rendering the same stored physical trajectory.
+Video deduplication usually asks whether two files or frames look alike. World-model evaluation can have another dependency: two videos can contain different pixels while rendering the same stored physical trajectory.
 
-this repository makes those relationships explicit:
+This repository makes those relationships explicit:
 
 | relationship | meaning |
 |---|---|
@@ -34,47 +34,63 @@ this repository makes those relationships explicit:
 | `nearby_trajectory` | independently generated states linked by a declared similarity rule |
 | `independent` | no derivation edge or declared neighbor relation |
 
-known lineage lets us run a controlled experiment. it does not tell us what an undocumented model saw during pretraining.
+Known lineage lets us run a controlled experiment. It does not tell us what an undocumented model saw during pretraining.
 
-## what we will build
+## What we will build
 
-1. a deterministic collision generator with independent state and rendering layers;
-2. immutable trajectory, render, clip, split, and exposure manifests;
-3. matched continued-training branches with successful-update accounting;
-4. bounded autonomous-forecasting measurements that retain invalid outputs;
-5. an evaluation-reuse assay over independent events and source-family rerenders; and
-6. a findings record that preserves negative results and corrections.
+1. A deterministic collision generator with independent state and rendering layers;
+2. Immutable trajectory, render, clip, split, and exposure manifests;
+3. Matched continued-training branches with successful-update accounting;
+4. Bounded autonomous-forecasting measurements that retain invalid outputs;
+5. An evaluation-reuse assay over independent events and source-family rerenders; and
+6. A findings record that preserves negative results and corrections.
 
-## gate 0: recover before scaling
+## Gate 0: Recover before scaling
 
-before any confirmatory model run, the project must establish:
+Before any confirmatory model run, the project must establish:
 
-- an executable and frozen event population;
-- state-preserving rerenders with distinct pixel hashes;
-- a model that beats constant velocity on the easy task;
-- a deliberate-exposure positive control;
-- generated-output measurement validity;
-- measured wall time, memory, storage, and failure rate; and
-- a feasible preregistered inference plan.
+- An executable and frozen event population;
+- State-preserving rerenders with distinct pixel hashes;
+- A model that beats constant velocity on the easy task;
+- A deliberate-exposure positive control;
+- Generated-output measurement validity;
+- Measured wall time, memory, storage, and failure rate; and
+- A feasible preregistered inference plan.
 
-if these fail after two documented pilot revisions, the experiment stops rather than expanding.
+If these fail after two documented pilot revisions, the experiment stops rather than expanding.
 
-## current code
+## Current code
 
-this initial scaffold implements only the contracts needed before model training:
+This initial scaffold implements only the contracts needed before model training:
 
-- exact continuous-time equal-mass collisions;
-- deterministic state trajectories;
-- independent appearance rerendering;
-- lineage relationships and deterministic manifest writing;
-- bounded center-error measurement; and
-- the evaluation-reuse effect calculation.
+- Exact continuous-time equal-mass collisions;
+- Deterministic state trajectories;
+- Independent appearance rerendering;
+- Lineage relationships and deterministic manifest writing;
+- Bounded center-error measurement; and
+- The evaluation-reuse effect calculation.
 
-it intentionally does **not** include a trained predictor or claim a result.
+It intentionally does **not** include a trained neural predictor or claim a world-model result.
 
-## setup
+## First local pilot
 
-python 3.11+ and [uv](https://docs.astral.sh/uv/):
+The registered nearest-trajectory memory baseline ran across 64 independent blocks:
+
+| metric | result |
+|---|---:|
+| source-family gain | 0.03337 |
+| independent-population gain | 0.00012 |
+| 50% evaluation-reuse effect | 0.01662 |
+| normal 95% lower bound | 0.01613 |
+| registered threshold | 0.015625 |
+| runtime | 0.48 seconds |
+| gate | **pass** |
+
+This is the expected positive control: a predictor that literally stores source trajectories is perfect on those trajectories and provides essentially no advantage on independent events. It shows that the lineage, paired-policy, metric, and result pipeline can detect deliberate memory. It does not show that a learned video world model behaves this way.
+
+## Setup
+
+Python 3.11+ and [uv](https://docs.astral.sh/uv/):
 
 ```bash
 uv sync
@@ -83,7 +99,7 @@ uv run ruff check src scripts tests
 uv run python scripts/smoke.py
 ```
 
-expected smoke properties:
+Expected smoke properties:
 
 ```text
 same_trajectory_hash = true
@@ -91,7 +107,7 @@ different_render_hash = true
 relationship = same_trajectory
 ```
 
-## layout
+## Layout
 
 ```text
 src/trajectory_lineage/  simulator, lineage contracts, bounded metrics
@@ -107,15 +123,15 @@ docs/
 FINDINGS.md               append-only findings and corrections
 ```
 
-## non-goals
+## Non-goals
 
-- identifying hidden proprietary training records;
-- treating similarity as proof of membership;
-- claiming a special memorization mechanism;
-- extrapolating one small predictor to all video world models;
-- counting frames or rerenders as independent training runs; or
-- using a successful smoke test as paper evidence.
+- Identifying hidden proprietary training records;
+- Treating similarity as proof of membership;
+- Claiming a special memorization mechanism;
+- Extrapolating one small predictor to all video world models;
+- Counting frames or rerenders as independent training runs; or
+- Using a successful smoke test as paper evidence.
 
-## license
+## License
 
-Apache-2.0. generated datasets and model checkpoints will receive explicit, separate terms before release.
+Apache-2.0. Generated datasets and model checkpoints will receive explicit, separate terms before release.

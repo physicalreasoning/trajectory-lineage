@@ -1,45 +1,45 @@
-# reproduction
+# Reproduction
 
-## prerequisites
+## Prerequisites
 
-- python 3.11+
+- Python 3.11+
 - uv
 
-## install
+## Install
 
 ```bash
 uv sync
 ```
 
-## tests
+## Tests
 
 ```bash
 uv run pytest -q
 ```
 
-all tests should pass. they cover:
+All tests should pass. They cover:
 
-- exact equal-mass velocity exchange;
-- momentum and kinetic-energy conservation;
-- rejection of trajectories leaving the arena;
-- same-state/different-render hashes;
-- relationship precedence; and
-- bounded metric failure handling.
+- Exact equal-mass velocity exchange;
+- Momentum and kinetic-energy conservation;
+- Rejection of trajectories leaving the arena;
+- Same-state/different-render hashes;
+- Relationship precedence; and
+- Bounded metric failure handling.
 
-## lint and format
+## Lint and format
 
 ```bash
 uv run ruff check src scripts tests
 uv run ruff format --check src scripts tests
 ```
 
-## smoke
+## Smoke
 
 ```bash
 uv run python scripts/smoke.py
 ```
 
-expected semantic output:
+Expected semantic output:
 
 ```json
 {
@@ -50,16 +50,16 @@ expected semantic output:
 }
 ```
 
-exact hashes are intentionally omitted because they are implementation artifacts. the smoke writes `results/smoke.json` and `results/smoke_manifest.json`.
+Exact hashes are intentionally omitted because they are implementation artifacts. The smoke writes `results/smoke.json` and `results/smoke_manifest.json`.
 
-## registered memory positive control
+## Registered memory positive control
 
 ```bash
 uv run python scripts/pilot_memory.py
 ```
 
-this runs the configuration frozen in `experiments/memory_positive_control.json` and writes `results/memory_positive_control.json`. it uses a nearest-trajectory memory baseline, not a trained neural world model.
+This runs the configuration frozen in `experiments/memory_positive_control.json` and writes `results/memory_positive_control.json`. It uses a nearest-trajectory memory baseline, not a trained neural world model.
 
-## scope
+## Scope
 
-the test and smoke commands reproduce software contracts only. the memory positive control can validate assay sensitivity, but it cannot produce evidence about a learned world model or practical benchmark contamination.
+The test and smoke commands reproduce software contracts only. The memory positive control can validate assay sensitivity, but it cannot produce evidence about a learned world model or practical benchmark contamination.

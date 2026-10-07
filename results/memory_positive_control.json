@@ -1,0 +1,676 @@
+{
+  "aggregate": {
+    "blocks": 64,
+    "effect_standard_deviation": 0.0020325415194500274,
+    "effect_standard_error": 0.0002540676899312534,
+    "gate_passed": true,
+    "mean_evaluation_reuse_effect": 0.016624909830993146,
+    "mean_population_gain": 0.00011718476232375566,
+    "mean_source_gain": 0.03336700442431005,
+    "normal_95_lower_bound": 0.01612693715872789
+  },
+  "blocks": [
+    {
+      "block": 0,
+      "evaluation_reuse_effect": 0.014736644240741493,
+      "loss_background_on_population": 0.03769180697118297,
+      "loss_background_on_source": 0.03413528065574448,
+      "loss_source_on_population": 0.03302981479692148,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.004661992174261491,
+      "source_gain": 0.03413528065574448
+    },
+    {
+      "block": 1,
+      "evaluation_reuse_effect": 0.015403846090103264,
+      "loss_background_on_population": 0.03223156365920278,
+      "loss_background_on_source": 0.030543130341214322,
+      "loss_source_on_population": 0.032496125498194986,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.00026456183899220553,
+      "source_gain": 0.030543130341214322
+    },
+    {
+      "block": 2,
+      "evaluation_reuse_effect": 0.01833485500582032,
+      "loss_background_on_population": 0.030892284893514546,
+      "loss_background_on_source": 0.03584899814953269,
+      "loss_source_on_population": 0.031712996755622495,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.0008207118621079493,
+      "source_gain": 0.03584899814953269
+    },
+    {
+      "block": 3,
+      "evaluation_reuse_effect": 0.016865851520567177,
+      "loss_background_on_population": 0.03143236157268721,
+      "loss_background_on_source": 0.03186114314904834,
+      "loss_source_on_population": 0.033302921464773226,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.001870559892086017,
+      "source_gain": 0.03186114314904834
+    },
+    {
+      "block": 4,
+      "evaluation_reuse_effect": 0.019289917208201054,
+      "loss_background_on_population": 0.03057346768091465,
+      "loss_background_on_source": 0.03311348438835933,
+      "loss_source_on_population": 0.03603981770895743,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.005466350028042778,
+      "source_gain": 0.03311348438835933
+    },
+    {
+      "block": 5,
+      "evaluation_reuse_effect": 0.018756112032820526,
+      "loss_background_on_population": 0.030869598857097523,
+      "loss_background_on_source": 0.034444116015772214,
+      "loss_source_on_population": 0.03393770690696636,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.003068108049868838,
+      "source_gain": 0.034444116015772214
+    },
+    {
+      "block": 6,
+      "evaluation_reuse_effect": 0.01884243608938654,
+      "loss_background_on_population": 0.031634994008853834,
+      "loss_background_on_source": 0.03294010964668041,
+      "loss_source_on_population": 0.0363797565409465,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.004744762532092668,
+      "source_gain": 0.03294010964668041
+    },
+    {
+      "block": 7,
+      "evaluation_reuse_effect": 0.018852810100186194,
+      "loss_background_on_population": 0.03341828058982053,
+      "loss_background_on_source": 0.03631645885489099,
+      "loss_source_on_population": 0.03480744193530193,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.0013891613454814003,
+      "source_gain": 0.03631645885489099
+    },
+    {
+      "block": 8,
+      "evaluation_reuse_effect": 0.016908599784679887,
+      "loss_background_on_population": 0.03444991030539441,
+      "loss_background_on_source": 0.03757994873501759,
+      "loss_source_on_population": 0.030687161139736595,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.0037627491656578166,
+      "source_gain": 0.03757994873501759
+    },
+    {
+      "block": 9,
+      "evaluation_reuse_effect": 0.01422561895149444,
+      "loss_background_on_population": 0.03927975121621809,
+      "loss_background_on_source": 0.03727117552210724,
+      "loss_source_on_population": 0.030459813597099723,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.008819937619118364,
+      "source_gain": 0.03727117552210724
+    },
+    {
+      "block": 10,
+      "evaluation_reuse_effect": 0.023127872656367846,
+      "loss_background_on_population": 0.031533949128389346,
+      "loss_background_on_source": 0.04212802184595592,
+      "loss_source_on_population": 0.03566167259516912,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.004127723466779774,
+      "source_gain": 0.04212802184595592
+    },
+    {
+      "block": 11,
+      "evaluation_reuse_effect": 0.018982328485730126,
+      "loss_background_on_population": 0.030221485113582046,
+      "loss_background_on_source": 0.035222719563680976,
+      "loss_source_on_population": 0.03296342252136132,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.0027419374077792755,
+      "source_gain": 0.035222719563680976
+    },
+    {
+      "block": 12,
+      "evaluation_reuse_effect": 0.014444464763881646,
+      "loss_background_on_population": 0.0403842720673412,
+      "loss_background_on_source": 0.03737822660791889,
+      "loss_source_on_population": 0.031894974987185604,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.008489297080155597,
+      "source_gain": 0.03737822660791889
+    },
+    {
+      "block": 13,
+      "evaluation_reuse_effect": 0.01674880126063862,
+      "loss_background_on_population": 0.03424164264805791,
+      "loss_background_on_source": 0.035043741344194815,
+      "loss_source_on_population": 0.03269550382514033,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.0015461388229175768,
+      "source_gain": 0.035043741344194815
+    },
+    {
+      "block": 14,
+      "evaluation_reuse_effect": 0.016549889704448817,
+      "loss_background_on_population": 0.0367296140792695,
+      "loss_background_on_source": 0.033326100785028276,
+      "loss_source_on_population": 0.03650329270313886,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.00022632137613064207,
+      "source_gain": 0.033326100785028276
+    },
+    {
+      "block": 15,
+      "evaluation_reuse_effect": 0.017166549154618946,
+      "loss_background_on_population": 0.03130455130731229,
+      "loss_background_on_source": 0.032621968975479476,
+      "loss_source_on_population": 0.0330156806410707,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.0017111293337584155,
+      "source_gain": 0.032621968975479476
+    },
+    {
+      "block": 16,
+      "evaluation_reuse_effect": 0.01355959528760527,
+      "loss_background_on_population": 0.03954590276311523,
+      "loss_background_on_source": 0.03435692444583062,
+      "loss_source_on_population": 0.03230816889249515,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.007237733870620079,
+      "source_gain": 0.03435692444583062
+    },
+    {
+      "block": 17,
+      "evaluation_reuse_effect": 0.01704431207703017,
+      "loss_background_on_population": 0.036464250191312914,
+      "loss_background_on_source": 0.03728942101930734,
+      "loss_source_on_population": 0.033263453326065916,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.003200796865246998,
+      "source_gain": 0.03728942101930734
+    },
+    {
+      "block": 18,
+      "evaluation_reuse_effect": 0.017171466053110207,
+      "loss_background_on_population": 0.033863543150462735,
+      "loss_background_on_source": 0.033865248601439094,
+      "loss_source_on_population": 0.034341226655244056,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.0004776835047813205,
+      "source_gain": 0.033865248601439094
+    },
+    {
+      "block": 19,
+      "evaluation_reuse_effect": 0.016049278984699697,
+      "loss_background_on_population": 0.033938783256153265,
+      "loss_background_on_source": 0.032865969674576265,
+      "loss_source_on_population": 0.033171371550976395,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.0007674117051768709,
+      "source_gain": 0.032865969674576265
+    },
+    {
+      "block": 20,
+      "evaluation_reuse_effect": 0.017052845888380016,
+      "loss_background_on_population": 0.031674774271417815,
+      "loss_background_on_source": 0.03219824950124284,
+      "loss_source_on_population": 0.03358221654693501,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.0019074422755171946,
+      "source_gain": 0.03219824950124284
+    },
+    {
+      "block": 21,
+      "evaluation_reuse_effect": 0.01665918409426429,
+      "loss_background_on_population": 0.036587762141174186,
+      "loss_background_on_source": 0.035479677353354014,
+      "loss_source_on_population": 0.034426452976348755,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.0021613091648254312,
+      "source_gain": 0.035479677353354014
+    },
+    {
+      "block": 22,
+      "evaluation_reuse_effect": 0.017207798131889607,
+      "loss_background_on_population": 0.03273743705815441,
+      "loss_background_on_source": 0.03285838711563154,
+      "loss_source_on_population": 0.034294646206302085,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.0015572091481476716,
+      "source_gain": 0.03285838711563154
+    },
+    {
+      "block": 23,
+      "evaluation_reuse_effect": 0.01748192166487017,
+      "loss_background_on_population": 0.03337072734575673,
+      "loss_background_on_source": 0.03541917743039574,
+      "loss_source_on_population": 0.03291539324510133,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.00045533410065540236,
+      "source_gain": 0.03541917743039574
+    },
+    {
+      "block": 24,
+      "evaluation_reuse_effect": 0.01994057593451097,
+      "loss_background_on_population": 0.03168260641509041,
+      "loss_background_on_source": 0.03631586458468067,
+      "loss_source_on_population": 0.03524789369943168,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.003565287284341273,
+      "source_gain": 0.03631586458468067
+    },
+    {
+      "block": 25,
+      "evaluation_reuse_effect": 0.01400762806169395,
+      "loss_background_on_population": 0.035284607653927574,
+      "loss_background_on_source": 0.0316627939008549,
+      "loss_source_on_population": 0.031637069876460575,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.003647537777467,
+      "source_gain": 0.0316627939008549
+    },
+    {
+      "block": 26,
+      "evaluation_reuse_effect": 0.014158766429556872,
+      "loss_background_on_population": 0.03805233371565482,
+      "loss_background_on_source": 0.03328205956409723,
+      "loss_source_on_population": 0.033087807010671336,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.004964526704983485,
+      "source_gain": 0.03328205956409723
+    },
+    {
+      "block": 27,
+      "evaluation_reuse_effect": 0.01620303870351193,
+      "loss_background_on_population": 0.02894764252360587,
+      "loss_background_on_source": 0.03019459084779187,
+      "loss_source_on_population": 0.03115912908283786,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.002211486559231989,
+      "source_gain": 0.03019459084779187
+    },
+    {
+      "block": 28,
+      "evaluation_reuse_effect": 0.01800673694832438,
+      "loss_background_on_population": 0.030433716476028327,
+      "loss_background_on_source": 0.03253787959633314,
+      "loss_source_on_population": 0.033909310776343946,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.003475594300315618,
+      "source_gain": 0.03253787959633314
+    },
+    {
+      "block": 29,
+      "evaluation_reuse_effect": 0.016049721820886993,
+      "loss_background_on_population": 0.03423413094625155,
+      "loss_background_on_source": 0.03331519973891331,
+      "loss_source_on_population": 0.03301837484911223,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.0012157560971393228,
+      "source_gain": 0.03331519973891331
+    },
+    {
+      "block": 30,
+      "evaluation_reuse_effect": 0.013501468637192905,
+      "loss_background_on_population": 0.034910121198062374,
+      "loss_background_on_source": 0.02759667112230932,
+      "loss_source_on_population": 0.034316387350138866,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.0005937338479235083,
+      "source_gain": 0.02759667112230932
+    },
+    {
+      "block": 31,
+      "evaluation_reuse_effect": 0.014362219409550004,
+      "loss_background_on_population": 0.0343410368005172,
+      "loss_background_on_source": 0.029835284515790934,
+      "loss_source_on_population": 0.03323019110382627,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.0011108456966909264,
+      "source_gain": 0.029835284515790934
+    },
+    {
+      "block": 32,
+      "evaluation_reuse_effect": 0.014930288287980147,
+      "loss_background_on_population": 0.03732814651616244,
+      "loss_background_on_source": 0.03206655271014497,
+      "loss_source_on_population": 0.03512217038197776,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.0022059761341846756,
+      "source_gain": 0.03206655271014497
+    },
+    {
+      "block": 33,
+      "evaluation_reuse_effect": 0.015815296278182983,
+      "loss_background_on_population": 0.03191968739195196,
+      "loss_background_on_source": 0.031187143956366,
+      "loss_source_on_population": 0.032363135991951925,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.00044344859999996544,
+      "source_gain": 0.031187143956366
+    },
+    {
+      "block": 34,
+      "evaluation_reuse_effect": 0.01973289997635101,
+      "loss_background_on_population": 0.030823905846657847,
+      "loss_background_on_source": 0.03376210011179895,
+      "loss_source_on_population": 0.036527605687560916,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.005703699840903069,
+      "source_gain": 0.03376210011179895
+    },
+    {
+      "block": 35,
+      "evaluation_reuse_effect": 0.018381084489718445,
+      "loss_background_on_population": 0.033341286877116835,
+      "loss_background_on_source": 0.036860878095248704,
+      "loss_source_on_population": 0.03324257776130502,
+      "loss_source_on_source": 0.0,
+      "population_gain": 9.870911581181391e-05,
+      "source_gain": 0.036860878095248704
+    },
+    {
+      "block": 36,
+      "evaluation_reuse_effect": 0.01638209978382439,
+      "loss_background_on_population": 0.03265000235320707,
+      "loss_background_on_source": 0.03217557780168749,
+      "loss_source_on_population": 0.033238624119168364,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.0005886217659612919,
+      "source_gain": 0.03217557780168749
+    },
+    {
+      "block": 37,
+      "evaluation_reuse_effect": 0.01716916107719354,
+      "loss_background_on_population": 0.03340987839616154,
+      "loss_background_on_source": 0.03624203638044109,
+      "loss_source_on_population": 0.03150616417010753,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.0019037142260540096,
+      "source_gain": 0.03624203638044109
+    },
+    {
+      "block": 38,
+      "evaluation_reuse_effect": 0.013450388634321478,
+      "loss_background_on_population": 0.03333614045739371,
+      "loss_background_on_source": 0.029570678104481746,
+      "loss_source_on_population": 0.030666239621554924,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.00266990083583879,
+      "source_gain": 0.029570678104481746
+    },
+    {
+      "block": 39,
+      "evaluation_reuse_effect": 0.01739104136844907,
+      "loss_background_on_population": 0.03401402814800031,
+      "loss_background_on_source": 0.03454820725460104,
+      "loss_source_on_population": 0.03424790363029741,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.00023387548229709954,
+      "source_gain": 0.03454820725460104
+    },
+    {
+      "block": 40,
+      "evaluation_reuse_effect": 0.015938617651783678,
+      "loss_background_on_population": 0.033219321874727356,
+      "loss_background_on_source": 0.03364706100830088,
+      "loss_source_on_population": 0.03144949616999383,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.0017698257047335242,
+      "source_gain": 0.03364706100830088
+    },
+    {
+      "block": 41,
+      "evaluation_reuse_effect": 0.018802505180597076,
+      "loss_background_on_population": 0.031634596109743854,
+      "loss_background_on_source": 0.03333395252310942,
+      "loss_source_on_population": 0.03590565394782859,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.004271057838084735,
+      "source_gain": 0.03333395252310942
+    },
+    {
+      "block": 42,
+      "evaluation_reuse_effect": 0.014626654206105877,
+      "loss_background_on_population": 0.032908918327598784,
+      "loss_background_on_source": 0.031888175877468075,
+      "loss_source_on_population": 0.03027405086234246,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.002634867465256322,
+      "source_gain": 0.031888175877468075
+    },
+    {
+      "block": 43,
+      "evaluation_reuse_effect": 0.015556329101319866,
+      "loss_background_on_population": 0.03570404363101619,
+      "loss_background_on_source": 0.03261745925934213,
+      "loss_source_on_population": 0.03419924257431379,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.0015048010567023998,
+      "source_gain": 0.03261745925934213
+    },
+    {
+      "block": 44,
+      "evaluation_reuse_effect": 0.01417633433139276,
+      "loss_background_on_population": 0.03238221067822314,
+      "loss_background_on_source": 0.02787463188376761,
+      "loss_source_on_population": 0.032860247457241046,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.00047803677901790687,
+      "source_gain": 0.02787463188376761
+    },
+    {
+      "block": 45,
+      "evaluation_reuse_effect": 0.015886139377888714,
+      "loss_background_on_population": 0.033192884988718335,
+      "loss_background_on_source": 0.03213503637204138,
+      "loss_source_on_population": 0.03283012737245438,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.0003627576162639548,
+      "source_gain": 0.03213503637204138
+    },
+    {
+      "block": 46,
+      "evaluation_reuse_effect": 0.01809602702073971,
+      "loss_background_on_population": 0.032374161101522345,
+      "loss_background_on_source": 0.03378860481494832,
+      "loss_source_on_population": 0.034777610328053446,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.0024034492265311014,
+      "source_gain": 0.03378860481494832
+    },
+    {
+      "block": 47,
+      "evaluation_reuse_effect": 0.014492876331524872,
+      "loss_background_on_population": 0.034482595581941305,
+      "loss_background_on_source": 0.03013074782391277,
+      "loss_source_on_population": 0.03333760042107828,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.001144995160863027,
+      "source_gain": 0.03013074782391277
+    },
+    {
+      "block": 48,
+      "evaluation_reuse_effect": 0.02069619105527646,
+      "loss_background_on_population": 0.034531500976805116,
+      "loss_background_on_source": 0.04147239729046974,
+      "loss_source_on_population": 0.034451485796888295,
+      "loss_source_on_source": 0.0,
+      "population_gain": 8.001517991682028e-05,
+      "source_gain": 0.04147239729046974
+    },
+    {
+      "block": 49,
+      "evaluation_reuse_effect": 0.017006041747091125,
+      "loss_background_on_population": 0.03059564962896172,
+      "loss_background_on_source": 0.0285953636063903,
+      "loss_source_on_population": 0.03601236951675367,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.0054167198877919515,
+      "source_gain": 0.0285953636063903
+    },
+    {
+      "block": 50,
+      "evaluation_reuse_effect": 0.017466216811462192,
+      "loss_background_on_population": 0.034889097241574706,
+      "loss_background_on_source": 0.03578746937187227,
+      "loss_source_on_population": 0.03403406149262682,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.0008550357489478869,
+      "source_gain": 0.03578746937187227
+    },
+    {
+      "block": 51,
+      "evaluation_reuse_effect": 0.01652022395046019,
+      "loss_background_on_population": 0.03189883291979175,
+      "loss_background_on_source": 0.032272861736812694,
+      "loss_source_on_population": 0.03266641908389944,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.0007675861641076864,
+      "source_gain": 0.032272861736812694
+    },
+    {
+      "block": 52,
+      "evaluation_reuse_effect": 0.01767371929724857,
+      "loss_background_on_population": 0.03170995742352627,
+      "loss_background_on_source": 0.036343188899539525,
+      "loss_source_on_population": 0.03071420711848388,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.0009957503050423873,
+      "source_gain": 0.036343188899539525
+    },
+    {
+      "block": 53,
+      "evaluation_reuse_effect": 0.014626720897418293,
+      "loss_background_on_population": 0.03251223739676422,
+      "loss_background_on_source": 0.029881317810579084,
+      "loss_source_on_population": 0.03188436138102172,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.000627876015742497,
+      "source_gain": 0.029881317810579084
+    },
+    {
+      "block": 54,
+      "evaluation_reuse_effect": 0.016824102798459348,
+      "loss_background_on_population": 0.037382953451996076,
+      "loss_background_on_source": 0.037790247072991154,
+      "loss_source_on_population": 0.03324091197592362,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.004142041476072458,
+      "source_gain": 0.037790247072991154
+    },
+    {
+      "block": 55,
+      "evaluation_reuse_effect": 0.015720185002609834,
+      "loss_background_on_population": 0.03327055576205411,
+      "loss_background_on_source": 0.03144116800870378,
+      "loss_source_on_population": 0.033269757758569996,
+      "loss_source_on_source": 0.0,
+      "population_gain": 7.980034841120753e-07,
+      "source_gain": 0.03144116800870378
+    },
+    {
+      "block": 56,
+      "evaluation_reuse_effect": 0.01261261523217646,
+      "loss_background_on_population": 0.03215662988349151,
+      "loss_background_on_source": 0.025988633509800706,
+      "loss_source_on_population": 0.03139322683804372,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.0007634030454477872,
+      "source_gain": 0.025988633509800706
+    },
+    {
+      "block": 57,
+      "evaluation_reuse_effect": 0.014038736312020506,
+      "loss_background_on_population": 0.036722160466355236,
+      "loss_background_on_source": 0.034297342350785714,
+      "loss_source_on_population": 0.030502290739610534,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.006219869726744702,
+      "source_gain": 0.034297342350785714
+    },
+    {
+      "block": 58,
+      "evaluation_reuse_effect": 0.019883700162915526,
+      "loss_background_on_population": 0.032886374452030825,
+      "loss_background_on_source": 0.03879364978954147,
+      "loss_source_on_population": 0.0338601249883204,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.0009737505362895776,
+      "source_gain": 0.03879364978954147
+    },
+    {
+      "block": 59,
+      "evaluation_reuse_effect": 0.014789751160208954,
+      "loss_background_on_population": 0.029545302169054856,
+      "loss_background_on_source": 0.0266556534133082,
+      "loss_source_on_population": 0.03246915107616456,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.0029238489071097065,
+      "source_gain": 0.0266556534133082
+    },
+    {
+      "block": 60,
+      "evaluation_reuse_effect": 0.014945617097255497,
+      "loss_background_on_population": 0.03461993359800493,
+      "loss_background_on_source": 0.03143553928607848,
+      "loss_source_on_population": 0.03307562850643744,
+      "loss_source_on_source": 0.0,
+      "population_gain": 0.0015443050915674855,
+      "source_gain": 0.03143553928607848
+    },
+    {
+      "block": 61,
+      "evaluation_reuse_effect": 0.016309026642179043,
+      "loss_background_on_population": 0.03219927034110303,
+      "loss_background_on_source": 0.029575611179943083,
+      "loss_source_on_population": 0.035241712445518034,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.003042442104415004,
+      "source_gain": 0.029575611179943083
+    },
+    {
+      "block": 62,
+      "evaluation_reuse_effect": 0.01770099097219865,
+      "loss_background_on_population": 0.03155792181264175,
+      "loss_background_on_source": 0.031752570991502756,
+      "loss_source_on_population": 0.035207332765536295,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.0036494109528945468,
+      "source_gain": 0.031752570991502756
+    },
+    {
+      "block": 63,
+      "evaluation_reuse_effect": 0.018659491770442793,
+      "loss_background_on_population": 0.03211327678983833,
+      "loss_background_on_source": 0.032728401266688814,
+      "loss_source_on_population": 0.0367038590640351,
+      "loss_source_on_source": 0.0,
+      "population_gain": -0.004590582274196772,
+      "source_gain": 0.032728401266688814
+    }
+  ],
+  "config": {
+    "bank_size": 32,
+    "blocks": 64,
+    "claim_boundary": "A positive result validates an intentionally memory-sensitive assay only. It is not evidence about a trained neural world model or a practical benchmark.",
+    "frame_dt": 0.04,
+    "future_frames": 16,
+    "gate": {
+      "all_source_policy_source_bank_losses_below": 1e-12,
+      "mean_effect_above": 0.015625,
+      "normal_95_lower_bound_above": 0.0
+    },
+    "name": "memory_positive_control",
+    "observed_frames": 8,
+    "population_evaluation_size": 128,
+    "predictor": "nearest_trajectory",
+    "primary_endpoint": "mean block-level evaluation_reuse_effect",
+    "purpose": "Validate that the evaluation-reuse assay detects deliberate trajectory memory.",
+    "reuse_fraction": 0.5,
+    "seed": 20261006,
+    "status": "registered_before_run"
+  },
+  "seconds": 0.4808067089179531
+}

@@ -1,10 +1,10 @@
-# specification
+# Specification
 
-## state and rendering boundary
+## State and rendering boundary
 
-one physical trajectory is an immutable array of frame times, positions, and velocities. a renderer consumes that array and an appearance seed. it must not rerun or perturb physics.
+One physical trajectory is an immutable array of frame times, positions, and velocities. A renderer consumes that array and an appearance seed. It must not rerun or perturb physics.
 
-## identifiers
+## Identifiers
 
 - `trajectory_id`: stable logical identifier for one physical state sequence;
 - `trajectory_hash`: hash of dtype, shape, and state bytes;
@@ -15,41 +15,41 @@ one physical trajectory is an immutable array of frame times, positions, and vel
 - `split_id`: frozen role assignment; and
 - `exposure_id`: consumed-example and successful-update record.
 
-## relationship precedence
+## Relationship precedence
 
-1. identical render hash → `exact_render`;
-2. identical trajectory hash → `same_trajectory`;
-3. shared declared pair id → `nearby_trajectory`;
-4. otherwise → `independent`.
+1. Identical render hash → `exact_render`;
+2. Identical trajectory hash → `same_trajectory`;
+3. Shared declared pair ID → `nearby_trajectory`;
+4. Otherwise → `independent`.
 
-similarity does not create a derivation edge. a nearby trajectory is not a descendant.
+Similarity does not create a derivation edge. A nearby trajectory is not a descendant.
 
-## simulator contract
+## Simulator contract
 
-- unit-width arena;
-- two equal-radius and equal-mass disks;
-- exact continuous collision time;
-- elastic velocity exchange;
-- no wall contact in accepted trajectories;
-- deterministic states for fixed inputs; and
-- conservation of horizontal momentum and kinetic energy.
+- Unit-width arena;
+- Two equal-radius and equal-mass disks;
+- Exact continuous collision time;
+- Elastic velocity exchange;
+- No wall contact in accepted trajectories;
+- Deterministic states for fixed inputs; and
+- Conservation of horizontal momentum and kinetic energy.
 
-this initial one-line collision model is a contract test, not the final research population.
+This initial one-line collision model is a contract test, not the final research population.
 
-## metric contract
+## Metric contract
 
-center-position arrays use shape `[frames, disks, 2]` in arena-width units. errors are capped per disk-frame. invalid frames receive the cap and remain in the denominator.
+Center-position arrays use shape `[frames, disks, 2]` in arena-width units. Errors are capped per disk-frame. Invalid frames receive the cap and remain in the denominator.
 
-## reproducibility contract
+## Reproducibility contract
 
-every result should record:
+Every result should record:
 
-- git sha;
-- dependency lock hash;
-- full configuration;
-- data and manifest hashes;
-- random seeds;
-- requested and successful exposure counts;
-- model/checkpoint parentage;
-- evaluator version; and
-- failures and exclusions by reason.
+- Git SHA;
+- Dependency lock hash;
+- Full configuration;
+- Data and manifest hashes;
+- Random seeds;
+- Requested and successful exposure counts;
+- Model/checkpoint parentage;
+- Evaluator version; and
+- Failures and exclusions by reason.
