@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620">
+<style>
+text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #17242b; }
+.title { font-family: Georgia, serif; font-size: 32px; font-weight: 700; }
+.subtitle { font-size: 15px; fill: #627078; }
+.label { font-size: 14px; font-weight: 700; }
+.small { font-size: 12px; fill: #627078; }
+.value { font-family: ui-monospace, SFMono-Regular, monospace; font-size: 13px; }
+</style>
+<rect width="100%" height="100%" fill="#f7f4eb" rx="24"/>
+<text x="56" y="62" class="title">One Event Can Produce Many Videos</text>
+<text x="56" y="92" class="subtitle">The audit separates pixel reuse, trajectory reuse, local generalization, and independent events.</text>
+<rect x="54" y="128" width="260" height="150" rx="18" fill="#dcefed" stroke="#0b6d73" stroke-width="2"/>
+<text x="78" y="160" class="label">Training exposure</text>
+<line x1="82" y1="220" x2="286" y2="220" stroke="#718187" stroke-width="3"/>
+<circle cx="125" cy="220" r="17" fill="#0b6d73"/>
+<circle cx="242" cy="220" r="17" fill="#dda12c"/>
+<path d="M143 205 C175 173 207 173 225 205" fill="none" stroke="#718187" stroke-width="2" stroke-dasharray="5 5"/>
+<text x="78" y="258" class="small">source trajectory S</text>
+<line x1="330" y1="202" x2="404" y2="202" stroke="#718187" stroke-width="3"/>
+<polygon points="404,202 392,195 392,209" fill="#718187"/>
+<rect x="418" y="146" width="250" height="112" rx="18" fill="#fffdf8" stroke="#0b6d73" stroke-width="2"/>
+<text x="448" y="187" class="label">Continued training</text>
+<text x="448" y="216" class="small">matched updates and checkpoints</text>
+<line x1="684" y1="202" x2="754" y2="202" stroke="#718187" stroke-width="3"/>
+<polygon points="754,202 742,195 742,209" fill="#718187"/>
+<rect x="768" y="128" width="378" height="150" rx="18" fill="#f4dfd3" stroke="#b0522f" stroke-width="2"/>
+<text x="792" y="160" class="label">Evaluation populations</text>
+<text x="792" y="193" class="small">same trajectory · unseen appearance</text>
+<text x="792" y="219" class="small">nearby trajectory · new event</text>
+<text x="792" y="245" class="small">unrestricted independent event</text>
+<text x="56" y="338" class="title">The Quantity We Measure</text>
+<rect x="54" y="372" width="1092" height="156" rx="18" fill="#fffdf8" stroke="#d8d3c6" stroke-width="2"/>
+<text x="82" y="414" class="label">Source-specific generalization gap</text>
+<text x="82" y="455" style="font-family:ui-monospace,monospace;font-size:22px">(gain on unseen rerenders) − (gain on independent events)</text>
+<text x="82" y="495" class="subtitle">A positive value means the training policy benefits more from reused physical events than from new ones.</text>
+<rect x="54" y="554" width="1092" height="2" fill="#d8d3c6"/>
+<text x="56" y="590" class="small">Controlled lineage provides the ground truth. It is not inferred from model outputs.</text>
+</svg>

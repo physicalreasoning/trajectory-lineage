@@ -23,6 +23,12 @@ The broad claim that trajectory overlap causes benchmark contamination did not s
 
 This is an evaluation assay, not a historical provenance detector. It cannot establish that a proprietary model trained on a particular video, website, or dataset.
 
+<p align="center">
+  <img src="assets/overview.svg" width="900" alt="Trajectory-lineage audit overview">
+</p>
+
+> **Figure 1.** A visually new video can still reuse a physical event encountered during training. The audit compares gains on unseen rerenders with gains on independently sampled events.
+
 ## Why this exists
 
 Video deduplication usually asks whether two files or frames look alike. World-model evaluation can have another dependency: two videos can contain different pixels while rendering the same stored physical trajectory.
@@ -91,6 +97,12 @@ The registered nearest-trajectory memory baseline ran across 64 independent bloc
 
 This is the expected positive control: a predictor that literally stores source trajectories is perfect on those trajectories and provides essentially no advantage on independent events. It shows that the lineage, paired-policy, metric, and result pipeline can detect deliberate memory. It does not show that a learned video world model behaves this way.
 
+<p align="center">
+  <img src="assets/memory-positive-control.svg" width="820" alt="Memory positive-control results">
+</p>
+
+> **Figure 2.** The pre-specified memory positive control passes across 64 independent simulation blocks.
+
 ## PhyWorld baseline
 
 The public PhyWorld collision evaluation set is integrated as an external validation source. With the first 4 of 32 state frames observed, one-nearest-neighbor trajectory prediction outperforms constant-velocity extrapolation on the within-group split and both inspected cross-group transfers.
@@ -100,6 +112,12 @@ The public PhyWorld collision evaluation set is integrated as an external valida
 | Within `00000` | 0.2577 | 0.1653 |
 | `00000` → `00001` | 0.4729 | 0.2329 |
 | `00000` → `00002` | 0.5090 | 0.2604 |
+
+<p align="center">
+  <img src="assets/phyworld-baselines.svg" width="820" alt="PhyWorld state-baseline results">
+</p>
+
+> **Figure 3.** Nearest-trajectory retrieval is a stronger baseline than constant-velocity extrapolation on all three evaluated PhyWorld splits.
 
 See [Data Sources](docs/DATA.md), [Findings](FINDINGS.md), and the committed machine-readable result for the full protocol and uncertainty intervals.
 
