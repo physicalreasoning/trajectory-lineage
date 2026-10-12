@@ -1,0 +1,103 @@
+{
+  "config": {
+    "bootstrap_resamples": 2000,
+    "bootstrap_seed": 20261013,
+    "comparisons": [
+      "one-nearest-neighbor minus constant velocity within group 00000",
+      "one-nearest-neighbor minus constant velocity from group 00000 to group 00001",
+      "one-nearest-neighbor minus constant velocity from group 00000 to group 00002"
+    ],
+    "cross_group_tests": [
+      "00001",
+      "00002"
+    ],
+    "cross_group_train": "00000",
+    "dataset_path": "data/external/phyworld/collision_eval.hdf5",
+    "dataset_sha256": "63904280119e7f73af782713c64350ebe9c4bf318ca93c1a0130e5c0714ad865",
+    "future_frames": 28,
+    "name": "phyworld_state_baselines",
+    "nearest_neighbors": 1,
+    "observed_frames": 4,
+    "primary_metric": "mean normalized center error over future frames",
+    "source_world_scale": 10.0,
+    "split_seed": 20261012,
+    "status": "registered_before_run",
+    "within_group": "00000",
+    "within_group_train_fraction": 0.8
+  },
+  "dataset_sha256": "63904280119e7f73af782713c64350ebe9c4bf318ca93c1a0130e5c0714ad865",
+  "results": [
+    {
+      "constant_velocity": {
+        "mean_error": 0.2576824152427729,
+        "median_error": 0.24781446660469686,
+        "p90_error": 0.525169693934066
+      },
+      "name": "within_00000",
+      "nearest_minus_constant": {
+        "bootstrap_95_interval": [
+          -0.11997674134758883,
+          -0.06622241513682164
+        ],
+        "fraction_nearest_better": 0.5828877005347594,
+        "mean": -0.09236133906492922
+      },
+      "nearest_trajectory": {
+        "mean_error": 0.1653210761778437,
+        "mean_feature_distance": 0.19472770210692267,
+        "median_error": 0.13636085761966582,
+        "p90_error": 0.3164796188405071
+      },
+      "test_examples": 187,
+      "train_examples": 745
+    },
+    {
+      "constant_velocity": {
+        "mean_error": 0.4729431794189457,
+        "median_error": 0.47642873866217483,
+        "p90_error": 0.6711070202024918
+      },
+      "name": "00000_to_00001",
+      "nearest_minus_constant": {
+        "bootstrap_95_interval": [
+          -0.26778160527423117,
+          -0.21367932661219144
+        ],
+        "fraction_nearest_better": 0.8615384615384616,
+        "mean": -0.24007959743245508
+      },
+      "nearest_trajectory": {
+        "mean_error": 0.23286358198649057,
+        "mean_feature_distance": 0.2185569122727713,
+        "median_error": 0.2179733062768308,
+        "p90_error": 0.4287525757349064
+      },
+      "test_examples": 260,
+      "train_examples": 932
+    },
+    {
+      "constant_velocity": {
+        "mean_error": 0.5090087533824502,
+        "median_error": 0.5104916155338287,
+        "p90_error": 0.6125660883741719
+      },
+      "name": "00000_to_00002",
+      "nearest_minus_constant": {
+        "bootstrap_95_interval": [
+          -0.2627286022654903,
+          -0.2332747894101842
+        ],
+        "fraction_nearest_better": 0.927765237020316,
+        "mean": -0.2486353012594099
+      },
+      "nearest_trajectory": {
+        "mean_error": 0.2603734521230403,
+        "mean_feature_distance": 0.26812532097271224,
+        "median_error": 0.21449107088716715,
+        "p90_error": 0.497359698273138
+      },
+      "test_examples": 443,
+      "train_examples": 932
+    }
+  ]
+}

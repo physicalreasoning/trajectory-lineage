@@ -70,6 +70,24 @@ uv run python scripts/inspect_phyworld.py
 
 The command validates group alignment, tensor shapes, finite values, and the file checksum. It writes `results/phyworld_collision_eval_manifest.json`.
 
+## PhyWorld State Baselines
+
+After downloading and validating the collision evaluation set:
+
+```bash
+uv run python scripts/phyworld_state_baselines.py
+```
+
+The command runs the configuration frozen in `experiments/phyworld_state_baselines.json` and writes `results/phyworld_state_baselines.json`.
+
+Expected mean normalized center errors:
+
+| Split | Constant velocity | Nearest trajectory |
+|---|---:|---:|
+| Within `00000` | 0.2577 | 0.1653 |
+| `00000` → `00001` | 0.4729 | 0.2329 |
+| `00000` → `00002` | 0.5090 | 0.2604 |
+
 ## Scope
 
-The test and smoke commands reproduce software contracts only. The memory positive control validates assay sensitivity, while the PhyWorld inspection validates external data compatibility.
+The test and smoke commands reproduce software contracts only. The memory positive control validates assay sensitivity, while the PhyWorld inspection and state baselines validate external data compatibility and baseline headroom.
