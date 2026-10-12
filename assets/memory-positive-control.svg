@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="520" viewBox="0 0 1100 520">
+<style>
+text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #17242b; }
+.title { font-family: Georgia, serif; font-size: 32px; font-weight: 700; }
+.subtitle { font-size: 15px; fill: #627078; }
+.label { font-size: 14px; font-weight: 700; }
+.small { font-size: 12px; fill: #627078; }
+.value { font-family: ui-monospace, SFMono-Regular, monospace; font-size: 13px; }
+</style>
+<rect width="100%" height="100%" fill="#f7f4eb" rx="24"/>
+<text x="52" y="58" class="title">Memory Positive Control</text>
+<text x="52" y="88" class="subtitle">Nearest-trajectory retrieval · 64 independent simulation blocks</text>
+<text x="52" y="145" class="label">Source-family gain</text>
+<rect x="290" y="123" width="650" height="28" rx="14" fill="#e7e3d8"/>
+<rect x="290" y="123" width="542.21" height="28" rx="14" fill="#0b6d73"/>
+<text x="958" y="145" class="value">0.033367</text>
+<text x="52" y="227" class="label">Independent-population gain</text>
+<rect x="290" y="205" width="650" height="28" rx="14" fill="#e7e3d8"/>
+<rect x="290" y="205" width="1.90" height="28" rx="14" fill="#b0522f"/>
+<text x="958" y="227" class="value">0.000117</text>
+<text x="52" y="309" class="label">50% evaluation-reuse effect</text>
+<rect x="290" y="287" width="650" height="28" rx="14" fill="#e7e3d8"/>
+<rect x="290" y="287" width="270.15" height="28" rx="14" fill="#dda12c"/>
+<text x="958" y="309" class="value">0.016625</text>
+<line x1="543.91" y1="112" x2="543.91" y2="330" stroke="#17242b" stroke-width="2" stroke-dasharray="5 5"/>
+<text x="551.91" y="325" class="small">pre-specified 1/64 threshold</text>
+<rect x="52" y="388" width="996" height="90" rx="18" fill="#dcefed" stroke="#0b6d73" stroke-width="2"/>
+<text x="78" y="427" class="label" fill="#2f7a4c">Gate: PASS</text>
+<text x="78" y="457" class="subtitle">95% lower bound: 0.016127 · threshold: 0.015625</text>
+</svg>
