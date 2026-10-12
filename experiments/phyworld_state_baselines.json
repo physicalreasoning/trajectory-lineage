@@ -1,0 +1,23 @@
+{
+  "name": "phyworld_state_baselines",
+  "status": "registered_before_run",
+  "dataset_path": "data/external/phyworld/collision_eval.hdf5",
+  "dataset_sha256": "63904280119e7f73af782713c64350ebe9c4bf318ca93c1a0130e5c0714ad865",
+  "source_world_scale": 10.0,
+  "observed_frames": 4,
+  "future_frames": 28,
+  "within_group": "00000",
+  "within_group_train_fraction": 0.8,
+  "cross_group_train": "00000",
+  "cross_group_tests": ["00001", "00002"],
+  "split_seed": 20261012,
+  "bootstrap_seed": 20261013,
+  "bootstrap_resamples": 2000,
+  "nearest_neighbors": 1,
+  "primary_metric": "mean normalized center error over future frames",
+  "comparisons": [
+    "one-nearest-neighbor minus constant velocity within group 00000",
+    "one-nearest-neighbor minus constant velocity from group 00000 to group 00001",
+    "one-nearest-neighbor minus constant velocity from group 00000 to group 00002"
+  ]
+}
