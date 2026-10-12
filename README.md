@@ -91,6 +91,18 @@ The registered nearest-trajectory memory baseline ran across 64 independent bloc
 
 This is the expected positive control: a predictor that literally stores source trajectories is perfect on those trajectories and provides essentially no advantage on independent events. It shows that the lineage, paired-policy, metric, and result pipeline can detect deliberate memory. It does not show that a learned video world model behaves this way.
 
+## PhyWorld baseline
+
+The public PhyWorld collision evaluation set is integrated as an external validation source. With the first 4 of 32 state frames observed, one-nearest-neighbor trajectory prediction outperforms constant-velocity extrapolation on the within-group split and both inspected cross-group transfers.
+
+| Split | Constant velocity | Nearest trajectory |
+|---|---:|---:|
+| Within `00000` | 0.2577 | 0.1653 |
+| `00000` → `00001` | 0.4729 | 0.2329 |
+| `00000` → `00002` | 0.5090 | 0.2604 |
+
+See [Data Sources](docs/DATA.md), [Findings](FINDINGS.md), and the committed machine-readable result for the full protocol and uncertainty intervals.
+
 ## Setup
 
 Python 3.11+ and [uv](https://docs.astral.sh/uv/):
