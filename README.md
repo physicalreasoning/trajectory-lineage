@@ -7,6 +7,7 @@
 **Controlled audits of trajectory-family overlap in video world-model evaluation**
 
 [[Workstream proposal]](docs/WORKSTREAM_PROPOSAL.md)
+[[Data sources]](docs/DATA.md)
 [[Research plan]](docs/RESEARCH_PLAN.md)
 [[Evaluation protocol]](docs/EVALS.md)
 [[Reproduction]](docs/REPRODUCE.md)
@@ -68,8 +69,9 @@ This initial scaffold implements only the contracts needed before model training
 - Deterministic state trajectories;
 - Independent appearance rerendering;
 - Lineage relationships and deterministic manifest writing;
-- Bounded center-error measurement; and
-- The evaluation-reuse effect calculation.
+- Bounded center-error measurement;
+- The evaluation-reuse effect calculation; and
+- A validated loader and manifest generator for the PhyWorld collision evaluation set.
 
 It intentionally does **not** include a trained neural predictor or claim a world-model result.
 

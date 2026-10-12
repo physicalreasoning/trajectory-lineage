@@ -5,6 +5,7 @@ description = "Controlled audits of trajectory-family overlap in video world-mod
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "h5py>=3.10",
     "numpy>=1.26",
 ]
 

@@ -60,6 +60,16 @@ uv run python scripts/pilot_memory.py
 
 This runs the configuration frozen in `experiments/memory_positive_control.json` and writes `results/memory_positive_control.json`. It uses a nearest-trajectory memory baseline, not a trained neural world model.
 
+## PhyWorld Dataset Inspection
+
+After downloading the collision evaluation set using `docs/DATA.md`:
+
+```bash
+uv run python scripts/inspect_phyworld.py
+```
+
+The command validates group alignment, tensor shapes, finite values, and the file checksum. It writes `results/phyworld_collision_eval_manifest.json`.
+
 ## Scope
 
-The test and smoke commands reproduce software contracts only. The memory positive control can validate assay sensitivity, but it cannot produce evidence about a learned world model or practical benchmark contamination.
+The test and smoke commands reproduce software contracts only. The memory positive control validates assay sensitivity, while the PhyWorld inspection validates external data compatibility.
