@@ -1,0 +1,45 @@
+{
+  "examples_per_group": {
+    "00000": 932,
+    "00001": 260,
+    "00002": 443
+  },
+  "examples_total": 1635,
+  "file_bytes": 15832960,
+  "frames_per_example": 32,
+  "groups": [
+    "00000",
+    "00001",
+    "00002"
+  ],
+  "init_ranges": {
+    "radius_1": [
+      0.3,
+      2.0
+    ],
+    "radius_2": [
+      0.3,
+      2.0
+    ],
+    "velocity_1": [
+      0.0,
+      6.0
+    ],
+    "velocity_2": [
+      0.0,
+      6.0
+    ]
+  },
+  "init_width": 4,
+  "path": "data/external/phyworld/collision_eval.hdf5",
+  "position_shape": [
+    -1,
+    32,
+    2,
+    2
+  ],
+  "sha256": "63904280119e7f73af782713c64350ebe9c4bf318ca93c1a0130e5c0714ad865",
+  "video_bytes_max": 14644,
+  "video_bytes_mean": 8151.532110091744,
+  "video_bytes_min": 2852
+}
