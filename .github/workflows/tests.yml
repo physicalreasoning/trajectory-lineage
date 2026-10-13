@@ -22,3 +22,13 @@ jobs:
       - run: uv run ruff check src scripts tests
       - run: uv run ruff format --check src scripts tests
       - run: uv run pytest -q
+
+  model-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.11"
+      - run: uv sync --locked --extra models --no-config --default-index https://pypi.org/simple
+      - run: uv run --extra models pytest tests/test_convlstm.py -q

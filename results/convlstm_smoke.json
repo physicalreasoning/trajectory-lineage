@@ -1,0 +1,100 @@
+{
+  "aggregate": {
+    "constant_velocity_center_error": {
+      "mean": 0.04882337898015976,
+      "sample_standard_deviation": 0.0049255167857985005,
+      "standard_error": 0.0028437484421787846
+    },
+    "gate_passed": true,
+    "model_center_error": {
+      "mean": 0.029653877019882202,
+      "sample_standard_deviation": 0.001603117390644624,
+      "standard_error": 0.0009255602570312441
+    },
+    "nearest_trajectory_center_error": {
+      "mean": 0.029033209645572284,
+      "sample_standard_deviation": 0.0010406972494315363,
+      "standard_error": 0.0006008468371042007
+    },
+    "persistence_center_error": {
+      "mean": 0.09886039048433304,
+      "sample_standard_deviation": 0.000617111972378184,
+      "standard_error": 0.00035628976337268546
+    }
+  },
+  "config": {
+    "batch_size": 32,
+    "claim_boundary": "This is a feasibility smoke test on generated collisions, not a source-family exposure experiment.",
+    "frame_dt": 0.04,
+    "future_frames": 16,
+    "gates": {
+      "all_seed_errors_finite": true,
+      "model_mean_error_below_constant_velocity": true,
+      "model_mean_error_below_persistence": true
+    },
+    "hidden_channels": 16,
+    "image_size": 64,
+    "learning_rate": 0.001,
+    "name": "convlstm_smoke",
+    "observed_frames": 8,
+    "primary_metric": "mean Euclidean center error over future frames",
+    "purpose": "Test whether a compact pixel-conditioned ConvLSTM state predictor learns the controlled collision task.",
+    "reported_baselines": [
+      "persistence",
+      "constant_velocity",
+      "nearest_trajectory"
+    ],
+    "seeds": [
+      20261012,
+      20261013,
+      20261014
+    ],
+    "status": "registered_before_run",
+    "test_examples": 128,
+    "train_examples": 512,
+    "training_steps": 300
+  },
+  "device": "mps",
+  "runs": [
+    {
+      "constant_velocity_center_error": 0.053746841847896576,
+      "device": "mps",
+      "final_loss_mean_20": 0.0005271194604574703,
+      "initial_loss": 0.023376964032649994,
+      "model_center_error": 0.027883633971214294,
+      "nearest_trajectory_center_error": 0.0278989681679599,
+      "nearest_trajectory_mean_feature_distance": 0.009968055292993144,
+      "parameters": 1085552,
+      "persistence_center_error": 0.09814789146184921,
+      "seed": 20261012,
+      "training_seconds": 10.79919924994465
+    },
+    {
+      "constant_velocity_center_error": 0.048827484250068665,
+      "device": "mps",
+      "final_loss_mean_20": 0.0008092496660538018,
+      "initial_loss": 0.021189620718359947,
+      "model_center_error": 0.031007682904601097,
+      "nearest_trajectory_center_error": 0.02925656743142671,
+      "nearest_trajectory_mean_feature_distance": 0.009902419693946887,
+      "parameters": 1085552,
+      "persistence_center_error": 0.09920736402273178,
+      "seed": 20261013,
+      "training_seconds": 10.278065417078324
+    },
+    {
+      "constant_velocity_center_error": 0.04389581084251404,
+      "device": "mps",
+      "final_loss_mean_20": 0.0006864585986477323,
+      "initial_loss": 0.02247757837176323,
+      "model_center_error": 0.030070314183831215,
+      "nearest_trajectory_center_error": 0.029944093337330245,
+      "nearest_trajectory_mean_feature_distance": 0.010566141398784354,
+      "parameters": 1085552,
+      "persistence_center_error": 0.09922591596841812,
+      "seed": 20261014,
+      "training_seconds": 10.342573834001087
+    }
+  ],
+  "total_seconds": 35.51931612496264
+}

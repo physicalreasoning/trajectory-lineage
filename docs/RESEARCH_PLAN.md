@@ -45,6 +45,8 @@ Before training a neural predictor, run `experiments/memory_positive_control.jso
 
 **Stop:** Two documented pilot revisions fail any condition.
 
+**Smoke result, 2026-10-12:** The three-seed ConvLSTM mean centre error was 0.02965, compared with 0.09886 for persistence, 0.04882 for constant velocity, and 0.02903 for nearest-trajectory retrieval. The registered gate against persistence and constant velocity passed. Retrieval remains the stronger mean baseline and stays in the next experiment.
+
 ## Gate 3 · Cost and variance
 
 **Run:** Complete discarded independent training blocks and record wall time, memory, storage, failure rate, component losses, and block-level effects.

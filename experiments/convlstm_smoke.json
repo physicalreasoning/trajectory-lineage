@@ -1,0 +1,28 @@
+{
+  "name": "convlstm_smoke",
+  "status": "registered_before_run",
+  "purpose": "Test whether a compact pixel-conditioned ConvLSTM state predictor learns the controlled collision task.",
+  "seeds": [20261012, 20261013, 20261014],
+  "train_examples": 512,
+  "test_examples": 128,
+  "observed_frames": 8,
+  "future_frames": 16,
+  "image_size": 64,
+  "frame_dt": 0.04,
+  "batch_size": 32,
+  "training_steps": 300,
+  "learning_rate": 0.001,
+  "hidden_channels": 16,
+  "primary_metric": "mean Euclidean center error over future frames",
+  "reported_baselines": [
+    "persistence",
+    "constant_velocity",
+    "nearest_trajectory"
+  ],
+  "gates": {
+    "model_mean_error_below_persistence": true,
+    "model_mean_error_below_constant_velocity": true,
+    "all_seed_errors_finite": true
+  },
+  "claim_boundary": "This is a feasibility smoke test on generated collisions, not a source-family exposure experiment."
+}

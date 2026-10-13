@@ -121,6 +121,19 @@ The public PhyWorld collision evaluation set is integrated as an external valida
 
 See [Data Sources](docs/DATA.md), [Findings](FINDINGS.md), and the committed machine-readable result for the full protocol and uncertainty intervals.
 
+## ConvLSTM smoke
+
+A compact pixel-conditioned ConvLSTM was trained for 300 updates on 512 generated collision videos and evaluated on 128 independently generated videos, across three seeds. It consumes 8 RGB frames and predicts 16 future object-centre states.
+
+| Predictor | Mean centre error |
+|---|---:|
+| Persistence | 0.09886 |
+| Constant velocity | 0.04882 |
+| Nearest trajectory | **0.02903** |
+| ConvLSTM | 0.02965 |
+
+The ConvLSTM reduces error by 39.3% relative to constant velocity and lands within 2.1% of nearest-trajectory retrieval. The next experiment applies matched source-family, nearby-trajectory, and background continuation policies to this learned predictor.
+
 ## Setup
 
 Python 3.11+ and [uv](https://docs.astral.sh/uv/):
