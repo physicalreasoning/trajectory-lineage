@@ -49,7 +49,18 @@
         "p90_error": 0.3164796188405071
       },
       "test_examples": 187,
-      "train_examples": 745
+      "train_examples": 745,
+      "visible_only_sensitivity": {
+        "bootstrap_95_interval": [
+          0.03168307160047136,
+          0.05190280411070581
+        ],
+        "constant_velocity_mean_error": 0.06430552818052059,
+        "excluded_examples": 0,
+        "included_examples": 187,
+        "nearest_minus_constant_mean": 0.041065026436623575,
+        "nearest_trajectory_mean_error": 0.10537055461714415
+      }
     },
     {
       "constant_velocity": {
@@ -73,7 +84,18 @@
         "p90_error": 0.4287525757349064
       },
       "test_examples": 260,
-      "train_examples": 932
+      "train_examples": 932,
+      "visible_only_sensitivity": {
+        "bootstrap_95_interval": [
+          0.039157535606083115,
+          0.05737018342217122
+        ],
+        "constant_velocity_mean_error": 0.05973408612434141,
+        "excluded_examples": 0,
+        "included_examples": 260,
+        "nearest_minus_constant_mean": 0.04858489145325552,
+        "nearest_trajectory_mean_error": 0.10831897757759693
+      }
     },
     {
       "constant_velocity": {
@@ -97,7 +119,18 @@
         "p90_error": 0.497359698273138
       },
       "test_examples": 443,
-      "train_examples": 932
+      "train_examples": 932,
+      "visible_only_sensitivity": {
+        "bootstrap_95_interval": [
+          0.051290559876927634,
+          0.06947821633203398
+        ],
+        "constant_velocity_mean_error": 0.06344830948839991,
+        "excluded_examples": 1,
+        "included_examples": 442,
+        "nearest_minus_constant_mean": 0.06051000982228723,
+        "nearest_trajectory_mean_error": 0.12395831931068713
+      }
     }
   ]
 }

@@ -62,11 +62,23 @@ The task observes 4 of 32 ground-truth state frames and predicts the remaining 2
 
 Errors are mean Euclidean disk-center distances across future frames, normalized by the source world scale. Negative differences favor nearest-trajectory prediction.
 
-**Finding:** Constant velocity is not a sufficient baseline for the collision set. A one-nearest-neighbor predictor substantially reduces average future-state error in the within-group split and both inspected cross-group transfers.
+**Initial finding:** On the registered all-state metric, one-nearest-neighbor prediction substantially reduces average future-state error in the within-group split and both inspected cross-group transfers.
 
-**Research consequence:** The learned pixel predictor must be compared with both baselines. Beating constant velocity alone is too weak; the next model gate should require improvement over, or a clearly different generalization profile from, nearest-trajectory retrieval.
+**Visibility sensitivity analysis:** The source trajectories continue after objects leave the nominal scene. Restricting the score to frames where both disks are fully visible reverses the baseline ordering:
 
-**Limits:** The analysis uses source-provided state arrays rather than decoded pixels. The HDF5 groups are reported by identifier because the downloaded file does not encode a semantic split name in its group keys. Bootstrap intervals describe variation across dataset examples, not independently trained models.
+| Split | Included examples | Constant velocity | Nearest trajectory | Nearest minus constant [bootstrap 95% interval] |
+|---|---:|---:|---:|---:|
+| Within `00000` | 187 | 0.0643 | 0.1054 | +0.0411 [+0.0317, +0.0519] |
+| `00000` → `00001` | 260 | 0.0597 | 0.1083 | +0.0486 [+0.0392, +0.0574] |
+| `00000` → `00002` | 442 | 0.0634 | 0.1240 | +0.0605 [+0.0513, +0.0695] |
+
+One group-`00002` example has no future frame in which both disks remain fully visible and is excluded from this sensitivity calculation. Each included example is first averaged over its eligible frames, then examples are weighted equally.
+
+**Finding:** The evaluation window determines which simple baseline wins. Retrieval is stronger for full-state extrapolation, especially after objects leave view; constant velocity is stronger while both disks remain visible.
+
+**Research consequence:** The learned predictor must be reported separately on visible dynamics, off-screen continuation, and invalid outputs. “Beats constant velocity” and “beats retrieval” are not one common capability gate.
+
+**Limits:** The analysis uses source-provided state arrays rather than decoded pixels. The HDF5 groups are reported by identifier because the downloaded file does not encode a semantic split name in its group keys. Bootstrap intervals describe variation across dataset examples with fixed retrieval banks and partitions, not independently trained models.
 
 Source: `results/phyworld_state_baselines.json`.
 

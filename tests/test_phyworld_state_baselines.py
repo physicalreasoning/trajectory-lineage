@@ -41,3 +41,25 @@ def test_per_example_error_normalizes_by_world_scale() -> None:
     error = _MODULE.per_example_error(predicted, target, world_scale=10.0)
 
     assert error[0] == 0.1
+
+
+def test_visible_only_errors_exclude_examples_without_visible_frames() -> None:
+    target = np.array(
+        [
+            [[[2.0, 5.0], [8.0, 5.0]], [[-1.0, 5.0], [11.0, 5.0]]],
+            [[[-1.0, 5.0], [11.0, 5.0]], [[-2.0, 5.0], [12.0, 5.0]]],
+        ]
+    )
+    predicted = target.copy()
+    predicted[0, 0, :, 0] += 1.0
+    radii = np.full((2, 2), 0.5)
+
+    errors, included = _MODULE.visible_only_errors(
+        predicted,
+        target,
+        radii,
+        world_scale=10.0,
+    )
+
+    assert included.tolist() == [True, False]
+    assert errors.tolist() == [0.1]

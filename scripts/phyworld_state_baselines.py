@@ -59,6 +59,28 @@ def per_example_error(predicted: FloatArray, target: FloatArray, world_scale: fl
     return errors.mean(axis=(1, 2))
 
 
+def visible_only_errors(
+    predicted: FloatArray,
+    target: FloatArray,
+    radii: FloatArray,
+    world_scale: float,
+) -> tuple[FloatArray, NDArray[np.bool_]]:
+    """Average each example over frames where both disks are fully visible."""
+
+    visible = (
+        (target[..., 0] - radii[:, None, :] >= 0.0)
+        & (target[..., 0] + radii[:, None, :] <= world_scale)
+        & (target[..., 1] - radii[:, None, :] >= 0.0)
+        & (target[..., 1] + radii[:, None, :] <= world_scale)
+    ).all(axis=2)
+    included = visible.any(axis=1)
+    errors = np.linalg.norm(predicted - target, axis=-1) / world_scale
+    per_example = np.array(
+        [errors[index, mask].mean() for index, mask in enumerate(visible) if mask.any()]
+    )
+    return per_example, included
+
+
 def paired_bootstrap(
     difference: FloatArray,
     *,
@@ -95,6 +117,21 @@ def evaluate_split(
     constant_error = per_example_error(constant, target, world_scale)
     nearest_error = per_example_error(nearest, target, world_scale)
     difference = nearest_error - constant_error
+    visible_constant, included_constant = visible_only_errors(
+        constant,
+        target,
+        test_initial[:, :2],
+        world_scale,
+    )
+    visible_nearest, included_nearest = visible_only_errors(
+        nearest,
+        target,
+        test_initial[:, :2],
+        world_scale,
+    )
+    if not np.array_equal(included_constant, included_nearest):
+        raise RuntimeError("visible-frame inclusion differs between predictors")
+    visible_difference = visible_nearest - visible_constant
     return {
         "name": name,
         "train_examples": len(train_positions),
@@ -118,6 +155,18 @@ def evaluate_split(
                 resamples=bootstrap_resamples,
             ),
             "fraction_nearest_better": float(np.mean(difference < 0.0)),
+        },
+        "visible_only_sensitivity": {
+            "included_examples": int(included_constant.sum()),
+            "excluded_examples": int((~included_constant).sum()),
+            "constant_velocity_mean_error": float(visible_constant.mean()),
+            "nearest_trajectory_mean_error": float(visible_nearest.mean()),
+            "nearest_minus_constant_mean": float(visible_difference.mean()),
+            "bootstrap_95_interval": paired_bootstrap(
+                visible_difference,
+                seed=bootstrap_seed + 10_000,
+                resamples=bootstrap_resamples,
+            ),
         },
     }
 
