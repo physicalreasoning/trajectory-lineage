@@ -69,3 +69,22 @@ Errors are mean Euclidean disk-center distances across future frames, normalized
 **Limits:** The analysis uses source-provided state arrays rather than decoded pixels. The HDF5 groups are reported by identifier because the downloaded file does not encode a semantic split name in its group keys. Bootstrap intervals describe variation across dataset examples, not independently trained models.
 
 Source: `results/phyworld_state_baselines.json`.
+
+## 3 · ConvLSTM visual-state smoke passes its learning gate (2026-10-12)
+
+`scripts/convlstm_smoke.py` ran the configuration frozen in `experiments/convlstm_smoke.json` on three seeds. Each run trained a 1,085,552-parameter ConvLSTM for 300 updates on 512 generated collision videos and evaluated 128 independently generated videos. The model received 8 RGB frames and predicted the next 16 object-centre states.
+
+| Predictor | Mean centre error | Seed SD |
+|---|---:|---:|
+| Persistence | 0.09886 | 0.00062 |
+| Constant velocity | 0.04882 | 0.00493 |
+| Nearest trajectory | **0.02903** | 0.00104 |
+| ConvLSTM | 0.02965 | 0.00160 |
+
+**The registered smoke gate passes.** Mean ConvLSTM error is below persistence and constant velocity on all three deterministic training seeds. Total runtime was 35.5 seconds on Apple MPS.
+
+**Finding:** A compact pixel-conditioned recurrent model learns enough collision structure to reduce centre error by 39.3% relative to the privileged constant-velocity baseline. It does not beat the state-space retrieval baseline on the three-seed mean: ConvLSTM error is 0.00062 higher, approximately 2.1% relative to retrieval.
+
+**Research consequence:** The model is usable for the discarded exposure pilot, but retrieval remains the stronger baseline. The next experiment should compare matched continuation branches and preserve the per-seed model-versus-retrieval result rather than using only the easier persistence and constant-velocity gates.
+
+Source: `results/convlstm_smoke.json`.

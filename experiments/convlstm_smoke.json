@@ -14,6 +14,11 @@
   "learning_rate": 0.001,
   "hidden_channels": 16,
   "primary_metric": "mean Euclidean center error over future frames",
+  "reported_baselines": [
+    "persistence",
+    "constant_velocity",
+    "nearest_trajectory"
+  ],
   "gates": {
     "model_mean_error_below_persistence": true,
     "model_mean_error_below_constant_velocity": true,

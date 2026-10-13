@@ -88,6 +88,26 @@ Expected mean normalized center errors:
 | `00000` → `00001` | 0.4729 | 0.2329 |
 | `00000` → `00002` | 0.5090 | 0.2604 |
 
+## ConvLSTM Smoke
+
+Install the optional model dependencies and run the frozen three-seed configuration:
+
+```bash
+uv sync --locked --extra models --no-config --default-index https://pypi.org/simple
+uv run --extra models python scripts/convlstm_smoke.py
+```
+
+Expected mean centre errors:
+
+| Predictor | Error |
+|---|---:|
+| Persistence | 0.09886 |
+| Constant velocity | 0.04882 |
+| Nearest trajectory | 0.02903 |
+| ConvLSTM | 0.02965 |
+
+The command writes `results/convlstm_smoke.json` with the full configuration and per-seed results.
+
 ## Scope
 
-The test and smoke commands reproduce software contracts only. The memory positive control validates assay sensitivity, while the PhyWorld inspection and state baselines validate external data compatibility and baseline headroom.
+The software checks, memory positive control, PhyWorld state baselines, and ConvLSTM smoke establish the measurement and feasibility path for the later matched-exposure experiment.

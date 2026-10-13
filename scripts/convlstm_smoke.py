@@ -12,6 +12,7 @@ from typing import Any
 import numpy as np
 import torch
 
+from trajectory_lineage import NearestTrajectoryPredictor, bounded_center_error
 from trajectory_lineage.convlstm import ConvLSTMStatePredictor
 from trajectory_lineage.simulator import InitialState, render, simulate
 
@@ -148,6 +149,23 @@ def run_seed(
         constant_velocity_baseline(test_states, observed_frames),
         test_target,
     )
+    nearest = NearestTrajectoryPredictor().fit(
+        train_states[:, :observed_frames].numpy(),
+        train_states[:, observed_frames:].numpy(),
+    )
+    nearest_prediction, nearest_distance = nearest.predict(test_states[:, :observed_frames].numpy())
+    nearest_error = float(
+        np.mean(
+            [
+                bounded_center_error(one_prediction, one_target)
+                for one_prediction, one_target in zip(
+                    nearest_prediction,
+                    test_target.numpy(),
+                    strict=True,
+                )
+            ]
+        )
+    )
 
     return {
         "seed": seed,
@@ -159,6 +177,8 @@ def run_seed(
         "model_center_error": model_error,
         "persistence_center_error": persistence_error,
         "constant_velocity_center_error": constant_velocity_error,
+        "nearest_trajectory_center_error": nearest_error,
+        "nearest_trajectory_mean_feature_distance": float(nearest_distance.mean()),
     }
 
 
@@ -170,6 +190,7 @@ def run(config: dict[str, Any]) -> dict[str, Any]:
     model_errors = np.array([row["model_center_error"] for row in runs])
     persistence_errors = np.array([row["persistence_center_error"] for row in runs])
     constant_errors = np.array([row["constant_velocity_center_error"] for row in runs])
+    nearest_errors = np.array([row["nearest_trajectory_center_error"] for row in runs])
     gates = config["gates"]
     passed = (
         (not gates["all_seed_errors_finite"] or np.isfinite(model_errors).all())
@@ -198,6 +219,7 @@ def run(config: dict[str, Any]) -> dict[str, Any]:
             "model_center_error": summary(model_errors),
             "persistence_center_error": summary(persistence_errors),
             "constant_velocity_center_error": summary(constant_errors),
+            "nearest_trajectory_center_error": summary(nearest_errors),
             "gate_passed": bool(passed),
         },
         "runs": runs,
