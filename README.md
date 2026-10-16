@@ -136,18 +136,19 @@ A compact pixel-conditioned ConvLSTM was trained for 300 updates on 512 generate
 
 The ConvLSTM reduces error by 39.3% relative to constant velocity and lands within 2.1% of nearest-trajectory retrieval. The next experiment applies matched source-family, nearby-trajectory, and background continuation policies to this learned predictor.
 
-## Detector smoke
+## Duplicate-detector audit
 
-A 64-family synthetic smoke test now covers the first overlap-detector ladder:
+A registered benchmark (native 224 px, 8 transformations, 14 detector variants, calibrated query-level false removal, conventional-copy positive control) found:
 
-| Detector | Same-trajectory recall | Independent false positives |
-|---|---:|---:|
-| Exact video hash | 0% | 0% |
-| Color-invariant silhouette | 100% | 0% |
-| Foreground-centroid motion | 100% | 0% |
-| Oracle state trajectory | 100% | 0% |
+| Detector at 1% false removal | Re-encoded copy | Same trajectory, new appearance | + texture, crop, mirror, time shift |
+|---|---:|---:|---:|
+| Exact hash | 0% | 0% | 0% |
+| SSCD, aligned + normalized (passes copy gate) | 58% (84% at 5%) | 12% | 0–4% |
+| Centroid tracks + mirror/time search (fails gate: JPEG breaks extraction) | 0% | 100% | 100% except crop (0%) |
 
-This clean test establishes the detector interfaces and ground-truth accounting. The full audit adds compression, clutter, camera changes, nearby trajectories, and learned perceptual and optical-flow baselines.
+A working copy detector largely misses trajectory reuse; trajectory-aware matching recovers it when extraction is reliable; and calibrating only on unrestricted negatives removes most independent events that lie closer to a training trajectory than any other training clip. See `FINDINGS.md` §6 and `docs/DETECTORS.md`.
+
+The matched learned-model exposure confirmation is specified and pending collaborator sign-off (`FINDINGS.md` §5, `docs/EFFECT_SIZE.md`).
 
 ## Setup
 
