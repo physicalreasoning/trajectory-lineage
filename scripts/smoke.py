@@ -23,6 +23,7 @@ def main() -> None:
             render_id="trajectory-0001-render-0007",
             render_hash=hash_array(first),
             appearance_seed=7,
+            independently_generated=True,
         ),
         LineageRecord(
             trajectory_id="trajectory-0001",
@@ -30,6 +31,7 @@ def main() -> None:
             render_id="trajectory-0001-render-0019",
             render_hash=hash_array(second),
             appearance_seed=19,
+            independently_generated=True,
         ),
     ]
 

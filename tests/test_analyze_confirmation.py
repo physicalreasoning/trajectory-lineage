@@ -34,39 +34,35 @@ def records(
     seed: int = 0,
     start: int = 0,
 ) -> list[dict]:
+    """Synthetic blocks whose component errors imply the requested contrasts."""
+
     rng = np.random.default_rng(seed)
     runs = []
     for offset in range(n):
         source = s + rng.normal(0, sd)
         harm = h + rng.normal(0, sd)
-        b_src, b_ind = 0.05 + rng.normal(0, 0.001), 0.04 + rng.normal(0, 0.001)
+        identity = q + rng.normal(0, sd)
+        b_src, b_ind = 0.06 + rng.normal(0, 0.001), 0.05 + rng.normal(0, 0.001)
+        c_src, c_ind = b_src - source, b_ind + harm
         errors = {
-            arm: {"source": 0.04, "exact": 0.04, "independent": 0.04} for arm in analyzer.ARMS
-        }
-        errors["B"] = {"source": b_src, "exact": b_src, "independent": b_ind}
-        errors["C"] = {
-            "source": b_src - source,
-            "exact": b_src - source,
-            "independent": b_ind + harm,
+            "B": {"source": b_src, "exact": b_src, "independent": b_ind},
+            "C": {"source": c_src, "exact": c_src, "independent": c_ind},
+            "D": {"source": c_src + identity, "exact": c_src, "independent": c_ind},
+            "D2": {"source": c_src + identity, "exact": c_src, "independent": c_ind},
+            "E": {
+                "source": b_src,
+                "exact": b_src - (exact + rng.normal(0, sd)),
+                "independent": b_ind,
+            },
         }
         runs.append(
             {
                 "block_index": start + offset,
                 "status": "completed",
-                "base_competent": competent,
                 "errors": errors,
-                "contrasts": {
-                    "C_source_gain": source,
-                    "C_independent_gain": -harm,
-                    "C_independent_harm": harm,
-                    "C_reuse_gap": (b_src - (b_src - source)) - (b_ind - (b_ind + harm)),
-                    "C_minus_D_gap": q + rng.normal(0, sd),
-                    "C_minus_D2_gap": q + rng.normal(0, sd),
-                    "C_apparent_improvement": source,
-                    "B_apparent_improvement": 0.0,
-                    "E_exact_gain": exact + rng.normal(0, sd),
-                    "E_transfer_loss": 0.001,
-                },
+                "screen_base_error": 0.03 if competent else 0.06,
+                "screen_constant_velocity_error": 0.05,
+                "contrasts": {},
             }
         )
     return runs
@@ -108,29 +104,23 @@ def test_reverse_gap_and_no_positive_crossing() -> None:
     assert result["primary"]["break_even_prevalence"]["status"] == "no positive crossing"
 
 
-def test_execution_failures_make_result_inconclusive_but_keep_estimates() -> None:
+def test_any_unresolved_failure_blocks_decisive_claims() -> None:
     runs = records(s=0.015, h=0.0, n=40)
-    for run in runs[:3]:
-        run.update({"status": "algorithmic_failure", "error": "x"})
+    runs[0] = {"block_index": 0, "status": "algorithmic_failure", "error": "x"}
     result = analyzer.analyze(runs, config_for(40))
-    assert result["primary_claim"].startswith("inconclusive (execution")
-    assert result["all_completed_blocks"]["blocks"] == 37
+    assert result["primary"]["primary_claim"] == "consequential reuse advantage"
+    assert result["primary_claim"] == "inconclusive (unresolved block failures)"
+    assert result["all_completed_blocks"]["blocks"] == 39
 
 
-def test_failure_sensitive_claim_is_downgraded() -> None:
-    runs = records(s=0.0108, h=0.0, n=60, sd=0.0002)
-    runs[1]["contrasts"]["C_source_gain"] = 0.0
-    runs[1]["errors"]["C"]["source"] = runs[1]["errors"]["B"]["source"]
-    runs[1]["contrasts"]["C_reuse_gap"] = runs[1]["contrasts"]["C_independent_harm"]
-    runs[0].update({"status": "algorithmic_failure", "error": "x"})
-    complete = [run for run in runs if run["status"] == "completed"]
-    without_failure = analyzer.analyze_blocks(
-        complete, config_for(60)["decision_contract"], np.random.default_rng(0)
-    )
-    result = analyzer.analyze(runs, config_for(60))
-    assert result["primary"]["gap_magnitude"] == without_failure["gap_magnitude"]
-    assert result["failure_robustness"] != [result["primary"]["primary_claim"]]
-    assert result["primary_claim"] == "inconclusive (failure-sensitive)"
+def test_tampered_contrasts_and_screen_flags_are_recomputed() -> None:
+    runs = records(s=-0.005, h=0.020, n=64)
+    for run in runs:
+        run["contrasts"] = {"C_source_gain": 0.02, "C_independent_harm": 0.0}
+        run["base_competent"] = "false"
+    result = analyzer.analyze(runs, config_for(64))
+    assert result["primary_claim"] == "differential gap without safeguards"
+    assert result["screened"] == 64
 
 
 def test_screen_failures_are_excluded_from_primary_but_reported() -> None:
@@ -151,13 +141,17 @@ def test_duplicated_or_missing_blocks_are_rejected() -> None:
         analyzer.analyze(runs[:9], config_for(10))
 
 
-def test_inconsistent_or_nonfinite_records_are_rejected() -> None:
+def test_invalid_errors_and_item_losses_are_rejected() -> None:
     runs = records(s=0.015, h=0.0, n=10)
-    runs[2]["contrasts"]["C_reuse_gap"] += 0.01
+    runs[2]["errors"]["C"]["source"] = 1.5
     with pytest.raises(analyzer.RecordError):
         analyzer.analyze(runs, config_for(10))
     runs = records(s=0.015, h=0.0, n=10)
-    runs[3]["contrasts"]["C_minus_D_gap"] = float("nan")
+    runs[3]["errors"]["D"]["source"] = float("nan")
+    with pytest.raises(analyzer.RecordError):
+        analyzer.analyze(runs, config_for(10))
+    runs = records(s=0.015, h=0.0, n=10)
+    runs[4]["item_losses"] = {"C": {"source": [0.9, 0.9]}}
     with pytest.raises(analyzer.RecordError):
         analyzer.analyze(runs, config_for(10))
 

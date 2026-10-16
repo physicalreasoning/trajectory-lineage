@@ -31,4 +31,4 @@ jobs:
         with:
           python-version: "3.11"
       - run: uv sync --locked --extra models --no-config --default-index https://pypi.org/simple
-      - run: uv run --extra models pytest tests/test_convlstm.py tests/test_exposure_experiment.py tests/test_analyze_confirmation.py -q
+      - run: uv run --extra models pytest tests/test_convlstm.py tests/test_exposure_experiment.py tests/test_analyze_confirmation.py tests/test_freeze.py -q

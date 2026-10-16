@@ -24,7 +24,7 @@ import torch
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from freeze import FreezeError, git_state  # noqa: E402
+from freeze import FreezeError, changed_since, git_state, run_identity  # noqa: E402
 from freeze import validate as validate_freeze  # noqa: E402
 
 from trajectory_lineage.convlstm import ConvLSTMStatePredictor
@@ -444,7 +444,11 @@ def check_freeze(manifest_path: Path, config_path: Path) -> None:
 
     try:
         validate_freeze(
-            json.loads(manifest_path.read_text()), config_path, ANALYZER, state=git_state
+            json.loads(manifest_path.read_text()),
+            config_path,
+            ANALYZER,
+            state=git_state,
+            changes=changed_since,
         )
     except FreezeError as error:
         raise SystemExit(f"refusing to unblind: {error}") from error
@@ -517,7 +521,8 @@ def main() -> None:
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
     if args.unblind is not None:
-        args.unblind.write_text(json.dumps(runs, indent=2, sort_keys=True) + "\n")
+        export = {"identity": run_identity(args.freeze_manifest, args.config), "runs": runs}
+        args.unblind.write_text(json.dumps(export, indent=2, sort_keys=True) + "\n")
     print(json.dumps({k: v for k, v in report.items() if k != "config"}, indent=2))
 
 

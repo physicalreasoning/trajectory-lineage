@@ -110,6 +110,15 @@ def test_unblinding_requires_complete_manifest(tmp_path: Path, monkeypatch) -> N
     config_path.write_text(json.dumps(config))
     (tmp_path / "exposure_pilot_v9.json").write_text(json.dumps({"experiment_seed": 7}))
     monkeypatch.setattr(experiment, "git_state", lambda: ("abc123", True))
+    monkeypatch.setattr(experiment, "changed_since", lambda commit: None)
+    import freeze
+
+    monkeypatch.setattr(freeze, "EXPERIMENTS", tmp_path)
+    monkeypatch.setattr(
+        freeze.validate,
+        "__kwdefaults__",
+        dict(freeze.validate.__kwdefaults__, experiments=tmp_path),
+    )
     valid = {
         "config_sha256": experiment.config_hash(config_path),
         "code_commit": "abc123",

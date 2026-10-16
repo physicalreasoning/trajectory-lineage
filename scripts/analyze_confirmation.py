@@ -9,7 +9,7 @@ prevalence effect:
 
 * gap magnitude (consequential, prevalence-dependent, negligible, reverse, inconclusive);
 * safeguards (source gain supported, independent harm bounded, consequential harm);
-* robustness: decisive claims must survive least-favorable imputation of failed blocks.
+* completeness: decisive claims require every registered block to complete.
 * identity specificity (same trajectory versus closer independent neighbor), Holm-adjusted.
 """
 
@@ -52,31 +52,65 @@ class RecordError(Exception):
     """Raised when block records do not form exactly the registered experiment."""
 
 
-def validate_records(runs: list[dict[str, Any]], scheduled: int) -> None:
-    """Require exactly one terminal, internally consistent record per registered block."""
+def recompute_contrasts(errors: dict[str, dict[str, float]]) -> dict[str, float]:
+    """Every contrast the decision uses, derived only from component errors."""
+
+    def gain(arm: str, population: str) -> float:
+        return errors["B"][population] - errors[arm][population]
+
+    source, independent = gain("C", "source"), gain("C", "independent")
+    return {
+        "C_source_gain": source,
+        "C_independent_gain": independent,
+        "C_independent_harm": -independent,
+        "C_reuse_gap": source - independent,
+        "C_minus_D_gap": (errors["D"]["source"] - errors["C"]["source"])
+        - (errors["D"]["independent"] - errors["C"]["independent"]),
+        "C_minus_D2_gap": (errors["D2"]["source"] - errors["C"]["source"])
+        - (errors["D2"]["independent"] - errors["C"]["independent"]),
+        "C_apparent_improvement": errors["C"]["independent"] - errors["C"]["source"],
+        "B_apparent_improvement": errors["B"]["independent"] - errors["B"]["source"],
+        "E_exact_gain": errors["B"]["exact"] - errors["E"]["exact"],
+        "E_transfer_loss": errors["E"]["source"] - errors["E"]["exact"],
+    }
+
+
+def validate_records(runs: list[dict[str, Any]], scheduled: int) -> list[dict[str, Any]]:
+    """Require one terminal record per registered block; rebuild contrasts and the screen.
+
+    Stored contrasts and screen flags are never trusted: contrasts are recomputed from component
+    errors, the screen from its recorded errors, and per-item losses must average to the errors.
+    """
 
     indices = [run.get("block_index") for run in runs]
     if sorted(indices) != list(range(scheduled)):
         raise RecordError(
             f"expected block indices 0..{scheduled - 1} exactly once; got {len(runs)} records"
         )
+    rebuilt = []
     for run in runs:
         if run.get("status") not in STATUSES:
             raise RecordError(f"block {run.get('block_index')} has unknown status")
         if run["status"] != "completed":
+            rebuilt.append(dict(run))
             continue
         errors = run["errors"]
         values = [errors[arm][population] for arm in ARMS for population in POPULATIONS]
-        values += list(run["contrasts"].values())
-        if not all(math.isfinite(float(value)) for value in values):
-            raise RecordError(f"block {run['block_index']} has nonfinite values")
-        if any(not 0 <= errors[arm][population] <= 1 for arm in ARMS for population in POPULATIONS):
+        if not all(math.isfinite(float(value)) and 0 <= value <= 1 for value in values):
             raise RecordError(f"block {run['block_index']} has errors outside the bounded metric")
-        gap = (errors["B"]["source"] - errors["C"]["source"]) - (
-            errors["B"]["independent"] - errors["C"]["independent"]
-        )
-        if abs(gap - run["contrasts"]["C_reuse_gap"]) > 1e-9:
-            raise RecordError(f"block {run['block_index']} contrasts disagree with its errors")
+        for arm, populations in run.get("item_losses", {}).items():
+            for population, items in populations.items():
+                if abs(float(np.mean(items)) - errors[arm][population]) > 1e-5:
+                    raise RecordError(f"block {run['block_index']} item losses disagree")
+        screen_error = run.get("screen_base_error")
+        screen_cv = run.get("screen_constant_velocity_error")
+        if not all(isinstance(value, (int, float)) for value in (screen_error, screen_cv)):
+            raise RecordError(f"block {run['block_index']} lacks competence-screen errors")
+        record = dict(run)
+        record["contrasts"] = recompute_contrasts(errors)
+        record["base_competent"] = bool(screen_error < screen_cv)
+        rebuilt.append(record)
+    return rebuilt
 
 
 def fieller(numerator: np.ndarray, denominator: np.ndarray, alpha: float) -> dict[str, Any]:
@@ -233,27 +267,12 @@ def analyze_blocks(
     }
 
 
-def worst_case_records(
-    runs: list[dict[str, Any]], failed: int, direction: str
-) -> list[dict[str, Any]]:
-    """Append imputed records for failed blocks using least favorable observed contrasts."""
-
-    if failed == 0:
-        return runs
-    contrasts = {field: [run["contrasts"][field] for run in runs] for field in FIELDS.values()}
-    worst = {
-        field: (min(values) if direction == "low" else max(values))
-        for field, values in contrasts.items()
-    }
-    worst["C_independent_harm"] = max(contrasts["C_independent_harm"])
-    worst["C_independent_gain"] = -worst["C_independent_harm"]
-    worst["E_exact_gain"] = min(contrasts["E_exact_gain"])
-    imputed = [
-        {"block_index": -1, "status": "imputed", "contrasts": dict(worst)} for _ in range(failed)
-    ]
-    for record in imputed:
-        record["errors"] = runs[0]["errors"]
-    return runs + imputed
+DECISIVE = {
+    "consequential reuse advantage",
+    "prevalence_dependent reuse advantage",
+    "negligible differential gap",
+    "reverse gap",
+}
 
 
 def analyze(
@@ -262,12 +281,11 @@ def analyze(
     contract = config["decision_contract"]
     scheduled = int(config["blocks"])
     if check_records:
-        validate_records(runs, scheduled)
+        runs = validate_records(runs, scheduled)
     completed = [run for run in runs if run["status"] == "completed"]
     failures = [run for run in runs if run["status"] != "completed"]
     screened = [run for run in completed if run.get("base_competent", False)]
     rng = np.random.default_rng(int(config["experiment_seed"]))
-    max_failure = float(contract.get("max_failure_fraction", 0.05))
     minimum = int(contract.get("minimum_screened_blocks", 2))
     result: dict[str, Any] = {
         "scheduled": scheduled,
@@ -289,27 +307,28 @@ def analyze(
         result["all_completed_blocks"] = analyze_blocks(
             completed, contract, rng, failed=len(failures)
         )
-    if len(failures) > max_failure * scheduled:
-        result["primary_claim"] = "inconclusive (execution failures exceed the declared limit)"
-        return result
     if len(screened) < minimum:
         result["primary_claim"] = "inconclusive (too few screened blocks)"
         return result
     claim = result["primary"]["primary_claim"]
-    if failures:
-        robust = {
-            analyze_blocks(
-                worst_case_records(screened, len(failures), direction),
-                contract,
-                rng,
-            )["primary_claim"]
-            for direction in ("low", "high")
-        }
-        result["failure_robustness"] = sorted(robust)
-        if robust != {claim}:
-            claim = "inconclusive (failure-sensitive)"
+    if failures and claim in DECISIVE:
+        # The metric is bounded in [0, 1]: one missing block could move mean harm by up to
+        # 1/scheduled, which exceeds the harm margin, so no observed-data imputation is
+        # conservative. Decisive claims therefore require every block to complete; deterministic
+        # infrastructure failures can be rerun with identical seeds before analysis.
+        claim = "inconclusive (unresolved block failures)"
+        result["secondary_qualified"] = "secondary decisions are reported but not claimed"
     result["primary_claim"] = claim
     return result
+
+
+def check_identity(export: dict[str, Any], manifest_path: Path, config_path: Path) -> list:
+    from freeze import run_identity
+
+    expected = run_identity(manifest_path, config_path)
+    if export.get("identity") != expected:
+        raise SystemExit("raw records were not produced by the frozen, approved run")
+    return export["runs"]
 
 
 def main() -> None:
@@ -327,7 +346,8 @@ def main() -> None:
         validate_freeze(json.loads(args.freeze_manifest.read_text()), args.config, Path(__file__))
     except FreezeError as error:
         raise SystemExit(f"refusing to analyze: {error}") from error
-    result = analyze(json.loads(args.records.read_text()), json.loads(args.config.read_text()))
+    runs = check_identity(json.loads(args.records.read_text()), args.freeze_manifest, args.config)
+    result = analyze(runs, json.loads(args.config.read_text()))
     args.out.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
     print(json.dumps({key: result[key] for key in ("primary_claim", "scheduled", "screened")}))
 

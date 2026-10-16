@@ -16,6 +16,10 @@ from pathlib import Path
 from typing import Callable
 
 PLACEHOLDERS = {"full name", "name", "tbd", "todo", "x", "a", "approver"}
+REQUIRED_ROLES = ("paper_lead", "evaluation_science")
+REPOSITORY = Path(__file__).resolve().parents[1]
+EXPERIMENTS = REPOSITORY / "experiments"
+APPROVAL_PATHS = ("approvals/",)
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
@@ -38,6 +42,35 @@ def git_state() -> tuple[str, bool]:
     except (OSError, subprocess.CalledProcessError):
         return "unavailable", False
     return commit, status == ""
+
+
+def changed_since(commit: str) -> list[str] | None:
+    """Tracked files changed between ``commit`` and HEAD, or None if not an ancestor."""
+
+    try:
+        subprocess.check_call(
+            ["git", "merge-base", "--is-ancestor", commit, "HEAD"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        output = subprocess.check_output(["git", "diff", "--name-only", commit, "HEAD"], text=True)
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    return [line for line in output.splitlines() if line]
+
+
+def code_matches(frozen: str, state: Callable[[], tuple[str, bool]], changes) -> bool:
+    """HEAD equals the frozen commit, or differs from it only by approval records."""
+
+    head, clean = state()
+    if not clean:
+        return False
+    if head == frozen:
+        return True
+    changed = changes(frozen)
+    return changed is not None and all(
+        any(path.startswith(prefix) for prefix in APPROVAL_PATHS) for path in changed
+    )
 
 
 def pilot_registry(experiments: Path, config: dict) -> set[int]:
@@ -65,21 +98,21 @@ def validate(
     analyzer_path: Path,
     *,
     state: Callable[[], tuple[str, bool]] = git_state,
-    experiments: Path | None = None,
+    changes: Callable[[str], list[str] | None] = changed_since,
+    experiments: Path = EXPERIMENTS,
 ) -> None:
     config = json.loads(config_path.read_text())
     if config.get("role") != "confirmatory":
         raise FreezeError("only a confirmatory configuration can be unblinded")
     if manifest.get("config_sha256") != sha256(config_path):
         raise FreezeError("manifest does not match the configuration")
-    commit, clean = state()
-    if manifest.get("code_commit") != commit or not clean:
-        raise FreezeError("code differs from the frozen commit or the tree is modified")
+    if not code_matches(str(manifest.get("code_commit")), state, changes):
+        raise FreezeError(
+            "code differs from the frozen commit (only files under approvals/ may change)"
+        )
     if manifest.get("analyzer_sha256") != sha256(analyzer_path):
         raise FreezeError("analysis code differs from the frozen analyzer")
-    roles = config.get("required_signoff_roles") or []
-    if not roles:
-        raise FreezeError("configuration declares no required sign-off roles")
+    roles = list(dict.fromkeys([*REQUIRED_ROLES, *(config.get("required_signoff_roles") or [])]))
     signoffs = manifest.get("signoffs", {})
     for role in roles:
         if not valid_name(signoffs.get(role)):
@@ -88,9 +121,21 @@ def validate(
         raise FreezeError("signoff_date must be YYYY-MM-DD")
     if len(str(manifest.get("decision_statement", "")).strip()) < 40:
         raise FreezeError("manifest must record the agreed decision behind the thresholds")
-    registry = pilot_registry(experiments or config_path.parent, config)
+    registry = pilot_registry(experiments, config)
     excluded = {int(seed) for seed in manifest.get("excluded_pilot_seeds", [])}
     if not registry <= excluded:
         raise FreezeError(f"manifest omits registered pilot seeds {sorted(registry - excluded)}")
     if int(config["experiment_seed"]) in registry | excluded:
         raise FreezeError("confirmation seed collides with a pilot seed")
+
+
+def run_identity(manifest_path: Path, config_path: Path) -> dict:
+    """Identifiers written into raw exports and checked again at analysis time."""
+
+    config = json.loads(config_path.read_text())
+    return {
+        "config_sha256": sha256(config_path),
+        "experiment_seed": int(config["experiment_seed"]),
+        "manifest_sha256": sha256(manifest_path),
+        "code_commit": json.loads(manifest_path.read_text()).get("code_commit"),
+    }

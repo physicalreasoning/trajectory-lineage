@@ -44,9 +44,9 @@ def hash_array(value: NDArray[Any]) -> str:
 class LineageRecord:
     """Identities, content hashes, and provenance for one rendered clip.
 
-    ``independently_generated`` is true only when the generating process documents that the
-    trajectory was sampled independently (as in the simulator); records without that guarantee
-    (for example, third-party video) resolve to ``UNRESOLVED`` rather than ``INDEPENDENT``.
+    ``independently_generated`` defaults to false and must be asserted by a generator that
+    documents independent sampling (as the simulator does); records without that assertion (for
+    example, third-party video) resolve to ``UNRESOLVED`` rather than ``INDEPENDENT``.
     """
 
     trajectory_id: str
@@ -56,7 +56,7 @@ class LineageRecord:
     appearance_seed: int
     parent_trajectory_id: str | None = None
     related_pair_id: str | None = None
-    independently_generated: bool = True
+    independently_generated: bool = False
 
     def relationship_to(self, other: "LineageRecord") -> Relationship:
         if self.render_id == other.render_id:

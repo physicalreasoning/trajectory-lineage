@@ -49,3 +49,9 @@ def test_content_equality_does_not_imply_lineage() -> None:
     assert base.content_equality(same_pixels)["render_bytes_equal"]
     assert base.relationship_to(same_state) == Relationship.INDEPENDENT
     assert base.content_equality(same_state)["state_equal"]
+
+
+def test_missing_independence_assertion_is_unresolved() -> None:
+    plain = LineageRecord("t1", "state-a", "t1-r1", "pixels-a", 1)
+    other = LineageRecord("t2", "state-b", "t2-r1", "pixels-b", 2)
+    assert plain.relationship_to(other) == Relationship.UNRESOLVED

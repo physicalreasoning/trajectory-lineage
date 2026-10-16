@@ -1,5 +1,5 @@
 {
-  "_instructions": "Copy to a new file after sign-off. Fill every field; the runner refuses to unblind unless all checks pass. Do not edit the configuration or analyzer afterwards. Commit the manifest together with the approval record.",
+  "_instructions": "After sign-off: set code_commit to the frozen code commit, fill every field, save the manifest and the approval record under approvals/, and commit only those files. The runner and analyzer accept HEAD differing from code_commit only by files under approvals/.",
   "config_sha256": "sha256 of experiments/exposure_confirmation.json",
   "code_commit": "git rev-parse HEAD on a clean tree",
   "analyzer_sha256": "sha256 of scripts/analyze_confirmation.py",
