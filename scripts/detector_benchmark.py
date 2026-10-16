@@ -148,6 +148,7 @@ def build_split(config: dict[str, Any], seed: int) -> dict[str, Any]:
     easy = [sample_event(rng, spec) for _ in range(int(config["easy_negative_queries"]))]
     background = [sample_event(rng, spec) for _ in range(int(config["background_clips"]))]
     return {
+        "hard_targets": hard_targets,
         "background": background,
         "rng": rng,
         "gallery": gallery,
@@ -453,6 +454,42 @@ def _raw_scores(
     }
 
 
+def expected_tracks(event, transform: str, config: dict[str, Any]) -> np.ndarray:
+    """Ground-truth disk centers in the centroid descriptor's units (pixel / width), by x."""
+
+    size = int(config["image_size"])
+    frames = int(config["clip_frames"])
+    start = int(config["time_shift_frames"]) if transform == "time_shift" else 0
+    pixels = event.trajectory.positions[start : start + frames] * (size - 1)
+    if transform == "mirror":
+        pixels = pixels.copy()
+        pixels[..., 0] = size - 1 - pixels[..., 0]
+    if transform == "crop":
+        keep = int(round(size * 0.8))
+        offset = (size - keep) // 2
+        pixels = (pixels - offset + 0.5) * size / keep - 0.5
+    order = np.argsort(pixels[..., 0], axis=1)
+    sorted_pixels = np.take_along_axis(pixels, order[..., None], axis=1)
+    return sorted_pixels / size
+
+
+def track_rmse_pixels(descriptors: np.ndarray, events, transform: str, config) -> dict[str, Any]:
+    size = int(config["image_size"])
+    errors, failures = [], 0
+    for row, event in zip(descriptors, events, strict=True):
+        if np.isnan(row).any():
+            failures += 1
+            continue
+        tracks = row.reshape(-1, 2, 2)
+        truth = expected_tracks(event, transform, config)
+        errors.append(float(np.sqrt(np.square((tracks - truth) * size).mean())))
+    return {
+        "median_rmse_px": float(np.median(errors)) if errors else None,
+        "fraction_within_2px": float(np.mean(np.array(errors) <= 2.0)) if errors else None,
+        "extraction_failures": failures,
+    }
+
+
 def run_split(config: dict[str, Any], seed: int, encoders: LearnedEncoders) -> dict[str, Any]:
     split = build_split(config, seed)
     rng = split["rng"]
@@ -477,8 +514,17 @@ def run_split(config: dict[str, Any], seed: int, encoders: LearnedEncoders) -> d
     for transform in TRANSFORMS:
         scores[transform] = {}
         for role, events in roles.items():
+            gallery_seeds = split["gallery_seeds"]
             if transform == "copy_reencode" and role == "positive":
-                seeds = [split["gallery_seeds"][index] for index in split["positive_sources"]]
+                seeds = [gallery_seeds[index] for index in split["positive_sources"]]
+            elif transform == "copy_reencode" and role == "hard":
+                # Same appearance as the target gallery clip: only the trajectory differs.
+                seeds = [gallery_seeds[index] for index in split["hard_targets"]]
+            elif transform == "copy_reencode":
+                # Easy negatives borrow a gallery palette so appearance alone cannot match.
+                seeds = [
+                    int(gallery_seeds[int(rng.integers(0, len(gallery_seeds)))]) for _ in events
+                ]
             else:
                 seeds = [int(rng.integers(0, 2**31 - 1)) for _ in events]
             clips = (
@@ -507,6 +553,9 @@ def run_split(config: dict[str, Any], seed: int, encoders: LearnedEncoders) -> d
                     record["rank"] = (1 + greater + 0.5 * ties).numpy()
                 entry[name] = record
             entry["_centroid_failures"] = int(np.isnan(query["centroid"]).any(axis=1).sum())
+            entry["_centroid_track_validation"] = track_rmse_pixels(
+                query["centroid"], events, transform, config
+            )
             scores[transform][role] = entry
             print(f"  {transform:13s} {role:9s} n={len(events)}", flush=True)
     return {
@@ -605,15 +654,26 @@ def summarize(config, calibration, test) -> dict[str, Any]:
         }
         for transform in TRANSFORMS
     }
-    return {"detectors": summary, "centroid_extraction_failures_test": failures}
+    validation = {
+        transform: {
+            role: test["scores"][transform][role]["_centroid_track_validation"]
+            for role in ("positive", "hard", "easy")
+        }
+        for transform in TRANSFORMS
+    }
+    return {
+        "detectors": summary,
+        "centroid_extraction_failures_test": failures,
+        "centroid_track_validation_test": validation,
+    }
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--config", type=Path, default=Path("experiments/detector_benchmark_v3.json")
+        "--config", type=Path, default=Path("experiments/detector_benchmark_v4.json")
     )
-    parser.add_argument("--out", type=Path, default=Path("results/detector_benchmark_v3.json"))
+    parser.add_argument("--out", type=Path, default=Path("results/detector_benchmark_v4.json"))
     parser.add_argument(
         "--scale", type=float, default=1.0, help="Shrink query counts for smoke runs."
     )
@@ -629,6 +689,22 @@ def main() -> None:
         ):
             config[key] = max(4, int(config[key] * args.scale))
     device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+    import subprocess
+
+    def git(*command: str) -> str:
+        try:
+            return subprocess.check_output(["git", *command], text=True).strip()
+        except (OSError, subprocess.CalledProcessError):
+            return "unavailable"
+
+    provenance = {
+        "git_commit": git("rev-parse", "HEAD"),
+        "git_dirty": git("status", "--porcelain", "--untracked-files=no") != "",
+        "config_sha256": hashlib.sha256(args.config.read_bytes()).hexdigest(),
+        "sscd_url": SSCD_URL,
+        "dinov2": "facebookresearch/dinov2 dinov2_vits14 (torch.hub)",
+        "raft": "torchvision Raft_Small_Weights.DEFAULT",
+    }
     encoders = LearnedEncoders(device)
     started = time.perf_counter()
     print("calibration split", flush=True)
@@ -637,6 +713,7 @@ def main() -> None:
     test = run_split(config, int(config["splits"]["test"]), encoders)
     result = {
         "config": config,
+        "provenance": provenance,
         "device": str(device),
         "torch": torch.__version__,
         "seconds": time.perf_counter() - started,

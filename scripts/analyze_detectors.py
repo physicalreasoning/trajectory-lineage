@@ -171,10 +171,10 @@ def markdown(result: dict[str, Any], alpha: str = "0.01") -> str:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--scores", type=Path, default=Path("results/detector_benchmark_v3_scores.json.gz")
+        "--scores", type=Path, default=Path("results/detector_benchmark_v4_scores.json.gz")
     )
     parser.add_argument(
-        "--out", type=Path, default=Path("results/detector_benchmark_v3_analysis.json")
+        "--out", type=Path, default=Path("results/detector_benchmark_v4_analysis.json")
     )
     parser.add_argument("--draws", type=int, default=1000)
     args = parser.parse_args()
