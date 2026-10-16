@@ -138,15 +138,15 @@ The ConvLSTM reduces error by 39.3% relative to constant velocity and lands with
 
 ## Duplicate-detector audit
 
-A registered benchmark (native 224 px, 8 transformations, 14 detector variants, calibrated query-level false removal, conventional-copy positive control) found:
+A registered benchmark (native 224 px, 8 transformations, 14 detector variants, calibrated query-level false removal, a conventional-copy positive control, and an independent-seed replication) found that perceptual similarity tracks appearance, not trajectory:
 
-| Detector at 1% false removal | Re-encoded copy | Same trajectory, new appearance | + texture, crop, mirror, time shift |
+| Detector | Re-encoded copy (5%) | Same trajectory, new appearance (1%) | Different nearby trajectory, same appearance, removed (1%) |
 |---|---:|---:|---:|
 | Exact hash | 0% | 0% | 0% |
-| SSCD, aligned + normalized (passes copy gate) | 58% (84% at 5%) | 12% | 0–4% |
-| Centroid tracks + mirror/time search (fails gate: JPEG breaks extraction) | 0% | 100% | 100% except crop (0%) |
+| SSCD, aligned + normalized (passes copy gate) | 85% | 12% | 31% |
+| Centroid tracks + mirror/time search (fails gate: JPEG corrupts extraction) | 0% | 100% | 0% |
 
-A working copy detector largely misses trajectory reuse; trajectory-aware matching recovers it when extraction is reliable; and calibrating only on unrestricted negatives removes most independent events that lie closer to a training trajectory than any other training clip. See `FINDINGS.md` §6 and `docs/DETECTORS.md`.
+Trajectory-aware matching recovers rerenders under appearance, texture, mirror, and time-shift changes when extraction is reliable, and calibrating only on unrestricted negatives removes most independent events that lie closer to a training trajectory than any other training clip. See `FINDINGS.md` §6 and `docs/DETECTORS.md`.
 
 The matched learned-model exposure confirmation is specified and pending collaborator sign-off (`FINDINGS.md` §5, `docs/EFFECT_SIZE.md`).
 
