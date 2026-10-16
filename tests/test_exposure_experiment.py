@@ -30,6 +30,7 @@ TINY = {
     "error_cap": 1.0,
     "nearby": {"reservoir_size": 4000, "low_quantile": 0.001, "high_quantile": 0.01},
     "closer_nearby": {"low_fraction": 0.25, "high_fraction": 0.5, "box_multiplier": 3.0},
+    "screen_examples": 8,
     "sd_upper_limit_confidence": 0.8,
 }
 
@@ -100,19 +101,64 @@ def test_failed_blocks_count_against_positive_control() -> None:
     assert len(report["infrastructure_failures"]) == 2
 
 
-def test_unblinding_requires_matching_signed_manifest(tmp_path: Path) -> None:
+def test_unblinding_requires_complete_manifest(tmp_path: Path, monkeypatch) -> None:
+    config = dict(TINY, required_signoff_roles=["paper_lead", "evaluation_science"])
+    config["excluded_pilot_seeds"] = [5]
     config_path = tmp_path / "config.json"
-    config_path.write_text(json.dumps(TINY))
+    config_path.write_text(json.dumps(config))
+    monkeypatch.setattr(experiment, "git_state", lambda: ("abc123", True))
+    valid = {
+        "config_sha256": experiment.config_hash(config_path),
+        "code_commit": "abc123",
+        "analyzer_sha256": experiment.config_hash(experiment.ANALYZER),
+        "signoffs": {"paper_lead": "Jiankai Sun", "evaluation_science": "Yining Hua"},
+        "excluded_pilot_seeds": [5],
+    }
     manifest = tmp_path / "freeze.json"
-    manifest.write_text(json.dumps({"config_sha256": "wrong", "signed_off_by": ["x"]}))
-    with pytest.raises(SystemExit):
-        experiment.check_freeze(manifest, config_path)
-    manifest.write_text(
-        json.dumps({"config_sha256": experiment.config_hash(config_path), "signed_off_by": []})
-    )
-    with pytest.raises(SystemExit):
-        experiment.check_freeze(manifest, config_path)
-    manifest.write_text(
-        json.dumps({"config_sha256": experiment.config_hash(config_path), "signed_off_by": ["a"]})
-    )
+    manifest.write_text(json.dumps(valid))
     experiment.check_freeze(manifest, config_path)
+    for key, bad in (
+        ("config_sha256", "wrong"),
+        ("code_commit", "other"),
+        ("analyzer_sha256", "wrong"),
+        ("signoffs", {"paper_lead": "a"}),
+        ("excluded_pilot_seeds", []),
+    ):
+        manifest.write_text(json.dumps(dict(valid, **{key: bad})))
+        with pytest.raises(SystemExit):
+            experiment.check_freeze(manifest, config_path)
+    monkeypatch.setattr(experiment, "git_state", lambda: ("abc123", False))
+    manifest.write_text(json.dumps(valid))
+    with pytest.raises(SystemExit):
+        experiment.check_freeze(manifest, config_path)
+
+
+def test_failure_policy_classifies_and_retries(monkeypatch) -> None:
+    calls = {"count": 0}
+
+    def flaky(*args, **kwargs):
+        calls["count"] += 1
+        raise RuntimeError("MPS backend out of memory")
+
+    monkeypatch.setattr(experiment, "run_block", flaky)
+    run = experiment.run_with_policy(TINY, 0, None, None)
+    assert run["status"] == "infrastructure_failure" and calls["count"] == 2
+
+    def broken(*args, **kwargs):
+        raise ValueError("bad sampler")
+
+    monkeypatch.setattr(experiment, "run_block", broken)
+    run = experiment.run_with_policy(TINY, 0, None, None)
+    assert run["status"] == "algorithmic_failure" and len(run["attempts"]) == 1
+
+
+def test_item_losses_are_retained_per_render() -> None:
+    spec = experiment.spec_from(TINY)
+    run = experiment.run_block(TINY, 0, spec, torch.device("cpu"))
+    renders = TINY["source_trajectories"] * TINY["heldout_renders_per_source"]
+    assert len(run["item_losses"]["C"]["source"]) == renders
+    assert len(run["item_losses"]["B"]["independent"]) == TINY["independent_eval_examples"]
+    assert run["source_family_of_render"][:2] == [0, 0]
+    assert run["errors"]["C"]["source"] == pytest.approx(
+        sum(run["item_losses"]["C"]["source"]) / renders, rel=1e-5
+    )

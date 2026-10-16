@@ -1,0 +1,59 @@
+{
+  "name": "exposure_pilot_v5",
+  "status": "registered_before_run",
+  "role": "discarded_effect_blinded_variance_pilot",
+  "purpose": "Estimate contrast dispersion, runtime, and assay sensitivity under the exact confirmatory protocol without releasing effect locations.",
+  "blocks": 8,
+  "experiment_seed": 2026101605,
+  "observed_frames": 8,
+  "future_frames": 16,
+  "image_size": 64,
+  "frame_dt": 0.04,
+  "base_train_examples": 512,
+  "source_trajectories": 64,
+  "heldout_renders_per_source": 4,
+  "independent_eval_examples": 512,
+  "batch_size": 32,
+  "base_training_steps": 300,
+  "continuation_steps": 100,
+  "arm_examples_per_batch": 8,
+  "replay_examples_per_batch": 24,
+  "learning_rate": 0.001,
+  "hidden_channels": 16,
+  "error_cap": 1.0,
+  "nearby": {
+    "construction": "independently simulated reservoir events assigned one-to-one by maximum bipartite matching inside a state-distance quantile band",
+    "reservoir_size": 20000,
+    "low_quantile": 0.001,
+    "high_quantile": 0.01
+  },
+  "arms": {
+    "B": "64 independent replacement trajectories under fresh appearances",
+    "C": "the 64 source trajectories under appearances unique within the block",
+    "D": "one independent neighbor per source, closer than anything in base training: RMS state distance in [0.25, 0.5] x the source's nearest base-training distance",
+    "D2": "one reservoir-selected independent neighbor per source in the 0.1st-1st percentile band of pairwise independent distances (comparable to base-training nearest neighbors)",
+    "E": "the exact renders forming the exact population (diagnostic reference, not a ceiling)"
+  },
+  "populations": {
+    "source": "4 held-out renders per source trajectory, unseen by every arm",
+    "exact": "the render E trains on; unseen by B, C, and D",
+    "independent": "512 independently sampled trajectories under fresh appearances"
+  },
+  "exposure_dose": "800 arm-slot presentations over 64 sources per arm: 12 or 13 presentations per source",
+  "primary_metric": "mean over examples of per-disk-frame Euclidean center error, capped at 1 arena width; nonfinite outputs receive the cap",
+  "sd_upper_limit_confidence": 0.8,
+  "seed_derivation": "numpy SeedSequence(entropy=experiment_seed, spawn_key=(block_index,)) spawned into data, schedule, base_batches, torch roles",
+  "positive_control": "E exact-population gain over B positive in at least 75% of scheduled blocks",
+  "claim_boundary": "Discarded. No effect estimate from this run may be inspected or reported.",
+  "base_competence_screen": "Pre-treatment screen on a separate 256-event competence population (never scored in contrasts): a block enters the primary analysis iff its base model's bounded error there is below constant velocity's. All blocks reported; intent-to-treat over all completed blocks is a sensitivity analysis.",
+  "closer_nearby": {
+    "construction": "box-conditioned band distribution: uniform initial-state prior restricted to a sensitivity-scaled box (edge offset alone gives 6x the band maximum; capped at the full parameter range) and conditioned on RMS state distance in [0.25, 0.5] x the source's nearest base-training distance",
+    "low_fraction": 0.25,
+    "high_fraction": 0.5,
+    "box_multiplier": 6.0,
+    "containment_validation": "results/closer_sampler_validation.json (box enlargement 6 vs 9, reservoir agreement, capped fractions); empirical, not a proof"
+  },
+  "supersedes": "v4 capped box half-widths at half the parameter range, which excluded valid band members (round-2 counterexample); v4 also screened competence on the scored independent population.",
+  "screen_examples": 256,
+  "failure_policy": "Infrastructure errors (OSError, MemoryError, device/MPS runtime errors) retry once with identical seeds; other exceptions are algorithmic failures. All failures are recorded."
+}

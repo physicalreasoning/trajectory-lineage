@@ -1,0 +1,12 @@
+{
+  "_instructions": "Copy to a new file after sign-off. Fill every field; the runner refuses to unblind unless all checks pass. Do not edit the configuration or analyzer afterwards.",
+  "config_sha256": "sha256 of experiments/exposure_confirmation.json",
+  "code_commit": "git rev-parse HEAD on a clean tree",
+  "analyzer_sha256": "sha256 of scripts/analyze_confirmation.py",
+  "signoffs": {
+    "paper_lead": "full name",
+    "evaluation_science": "full name"
+  },
+  "signoff_date": "YYYY-MM-DD",
+  "excluded_pilot_seeds": [2026101603, 2026101604, 2026101605, 2026101624]
+}

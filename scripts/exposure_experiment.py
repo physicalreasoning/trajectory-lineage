@@ -82,6 +82,9 @@ def build_block(config: dict[str, Any], rng: np.random.Generator, spec: EventSpe
     replacement = [sample_event(rng, spec) for _ in sources]
     replacement_videos = [render_event(event, spec, seeds.draw()) for event in replacement]
 
+    screen = [sample_event(rng, spec) for _ in range(int(config["screen_examples"]))]
+    screen_videos = [render_event(event, spec, seeds.draw()) for event in screen]
+
     # D: independent neighbors closer than anything in base training, relative to each source's
     # nearest base-training distance r_i.
     closer_config = config["closer_nearby"]
@@ -126,6 +129,7 @@ def build_block(config: dict[str, Any], rng: np.random.Generator, spec: EventSpe
         + len(replacement)
         + len(nearby)
         + len(banded)
+        + len(screen)
     )
     if len(seeds) != expected_renders:
         raise RuntimeError("appearance seeds are not unique across the block")
@@ -148,7 +152,11 @@ def build_block(config: dict[str, Any], rng: np.random.Generator, spec: EventSpe
         "base_nearest_distances": base_nearest.tolist(),
         "box_offsets": box_offsets,
         "replacement_distances": replacement_distances,
-        "independent_events": independent,
+        "screen": to_tensors(screen_videos, screen, spec),
+        "screen_events": screen,
+        "source_family_of_render": [
+            index for index in range(len(sources)) for _ in range(renders_per_source)
+        ],
     }
 
 
@@ -172,11 +180,19 @@ def bounded_errors(prediction: torch.Tensor, target: torch.Tensor, cap: float) -
     return distance.clamp(max=cap).mean(dim=(1, 2))
 
 
-def evaluate(model, video, target, device, cap: float) -> float:
+def evaluate_items(model, video, target, device, cap: float) -> torch.Tensor:
     model.eval()
     with torch.no_grad():
         prediction = model(video.to(device)).cpu()
-    return float(bounded_errors(prediction, target, cap).mean())
+    return bounded_errors(prediction, target, cap)
+
+
+def evaluate(model, video, target, device, cap: float) -> float:
+    return float(evaluate_items(model, video, target, device, cap).mean())
+
+
+def rounded(values: torch.Tensor) -> list[float]:
+    return [float(f"{value:.7g}") for value in values.tolist()]
 
 
 def train_steps(model, optimizer, batches, device) -> list[float]:
@@ -236,8 +252,9 @@ def run_block(
     base_errors = {
         population: evaluate(model, *block[population], device, cap) for population in POPULATIONS
     }
-    independent_cv_error = constant_velocity_error(block["independent_events"], spec, cap)
-    base_competent = base_errors["independent"] < independent_cv_error
+    screen_error = evaluate(model, *block["screen"], device, cap)
+    screen_cv_error = constant_velocity_error(block["screen_events"], spec, cap)
+    base_competent = screen_error < screen_cv_error
 
     arm_schedule, replay_schedule = matched_arm_schedule(
         np.random.default_rng(streams["schedule"]),
@@ -249,6 +266,7 @@ def run_block(
     )
 
     errors: dict[str, dict[str, float]] = {}
+    items: dict[str, dict[str, list[float]]] = {}
     final_losses: dict[str, float] = {}
     for arm in ARMS:
         content = block["arms"][arm_content_override or arm]
@@ -269,18 +287,25 @@ def run_block(
             )
         losses = train_steps(arm_model, arm_optimizer, batches, device)
         final_losses[arm] = float(np.mean(losses[-10:]))
-        errors[arm] = {
-            population: evaluate(arm_model, *block[population], device, cap)
+        item_losses = {
+            population: evaluate_items(arm_model, *block[population], device, cap)
             for population in POPULATIONS
         }
+        errors[arm] = {
+            population: float(values.mean()) for population, values in item_losses.items()
+        }
+        items[arm] = {population: rounded(values) for population, values in item_losses.items()}
 
     presentations = np.bincount(arm_schedule.ravel(), minlength=int(config["source_trajectories"]))
     return {
         "block_index": block_index,
         "status": "completed",
         "errors": errors,
+        "item_losses": items,
+        "source_family_of_render": block["source_family_of_render"],
         "base_errors": base_errors,
-        "independent_constant_velocity_error": independent_cv_error,
+        "screen_base_error": screen_error,
+        "screen_constant_velocity_error": screen_cv_error,
         "base_competent": bool(base_competent),
         "contrasts": reuse_contrasts(errors),
         "build_seconds": build_seconds,
@@ -343,9 +368,14 @@ def blinded_report(config: dict[str, Any], runs: list[dict[str, Any]]) -> dict[s
         "infrastructure_failures": [
             {"block_index": run["block_index"], "error": run["error"]}
             for run in runs
-            if run["status"] != "completed"
+            if run["status"] == "infrastructure_failure"
         ],
-        "positive_control_passed": bool(exact_positive >= 0.75 * len(runs)),
+        "algorithmic_failures": [
+            {"block_index": run["block_index"], "error": run["error"]}
+            for run in runs
+            if run["status"] == "algorithmic_failure"
+        ],
+        "positive_control_passed": bool(completed) and exact_positive >= 0.75 * len(runs),
         "dispersion": dispersion,
         "pretreatment_balance": {
             "base_source_minus_independent_mean": float(np.mean(balance)) if balance else None,
@@ -396,16 +426,85 @@ def blinded_report(config: dict[str, Any], runs: list[dict[str, Any]]) -> dict[s
     }
 
 
+ANALYZER = Path(__file__).with_name("analyze_confirmation.py")
+
+
 def config_hash(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def git_state() -> tuple[str, bool]:
+    """Return the HEAD commit and whether tracked files are unmodified."""
+
+    try:
+        commit = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+        status = subprocess.check_output(
+            ["git", "status", "--porcelain", "--untracked-files=no"], text=True
+        ).strip()
+    except (OSError, subprocess.CalledProcessError):
+        return "unavailable", False
+    return commit, status == ""
+
+
 def check_freeze(manifest_path: Path, config_path: Path) -> None:
+    """Refuse unblinding unless the manifest binds configuration, code, analyzer, and sign-off."""
+
     manifest = json.loads(manifest_path.read_text())
+    config = json.loads(config_path.read_text())
     if manifest.get("config_sha256") != config_hash(config_path):
         raise SystemExit("freeze manifest does not match the configuration; refusing to unblind")
-    if not manifest.get("signed_off_by"):
-        raise SystemExit("freeze manifest lacks collaborator sign-off; refusing to unblind")
+    commit, clean = git_state()
+    if manifest.get("code_commit") != commit or not clean:
+        raise SystemExit("code differs from the frozen commit or the tree is modified")
+    if manifest.get("analyzer_sha256") != config_hash(ANALYZER):
+        raise SystemExit("analysis code differs from the frozen analyzer")
+    signoffs = manifest.get("signoffs", {})
+    for role in config.get("required_signoff_roles", []):
+        name = signoffs.get(role)
+        if not isinstance(name, str) or len(name.strip()) < 3:
+            raise SystemExit(f"missing sign-off for role {role!r}; refusing to unblind")
+    excluded = set(manifest.get("excluded_pilot_seeds", []))
+    if not set(config.get("excluded_pilot_seeds", [])) <= excluded:
+        raise SystemExit("manifest does not exclude every declared pilot seed")
+    if int(config["experiment_seed"]) in excluded:
+        raise SystemExit("confirmation seed is listed as a pilot seed")
+
+
+INFRASTRUCTURE_MARKERS = ("mps", "out of memory", "cuda", "device")
+
+
+def is_infrastructure(error: BaseException) -> bool:
+    if isinstance(error, (OSError, MemoryError)):
+        return True
+    return isinstance(error, RuntimeError) and any(
+        marker in str(error).lower() for marker in INFRASTRUCTURE_MARKERS
+    )
+
+
+def run_with_policy(config, block_index, spec, device) -> dict[str, Any]:
+    """Run a block; retry once on infrastructure errors; record every failure by class."""
+
+    attempts = []
+    for _ in range(2):
+        try:
+            run = run_block(config, block_index, spec, device)
+            run["attempts"] = attempts + ["completed"]
+            return run
+        except Exception as error:  # noqa: BLE001 - classified and recorded below
+            attempts.append(repr(error))
+            if not is_infrastructure(error):
+                return {
+                    "block_index": block_index,
+                    "status": "algorithmic_failure",
+                    "error": repr(error),
+                    "attempts": attempts,
+                }
+    return {
+        "block_index": block_index,
+        "status": "infrastructure_failure",
+        "error": attempts[-1],
+        "attempts": attempts,
+    }
 
 
 def main() -> None:
@@ -427,14 +526,7 @@ def main() -> None:
     device = torch.device(device_name)
     runs = []
     for block_index in range(int(config["blocks"])):
-        try:
-            run = run_block(config, block_index, spec, device)
-        except Exception as error:  # noqa: BLE001 - recorded as an infrastructure failure
-            run = {
-                "block_index": block_index,
-                "status": "infrastructure_failure",
-                "error": repr(error),
-            }
+        run = run_with_policy(config, block_index, spec, device)
         runs.append(run)
         print(f"block {block_index + 1}/{config['blocks']}: {run['status']}", flush=True)
 

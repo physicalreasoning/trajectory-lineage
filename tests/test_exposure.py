@@ -216,3 +216,24 @@ def test_closer_neighbor_lies_inside_relative_band() -> None:
     assert distance < float(nearest_distances([source], base)[0])
     assert 0 <= offset <= 1
     assert neighbor.state != source.state
+
+
+def test_reviewer_counterexample_lies_inside_closer_box() -> None:
+    """Round-2 counterexample: a valid band member whose radius offset exceeded a half-range cap."""
+
+    from trajectory_lineage.exposure import STATE_RANGES, Event, closer_neighbor_box
+    from trajectory_lineage.simulator import InitialState, simulate
+
+    spec = EventSpec()
+    source_state = InitialState(0.17, 0.74, 0.60, -0.06, 0.50, 0.0405)
+    candidate_state = InitialState(0.17693333, 0.73306667, 0.57315217, -0.03315217, 0.50, 0.0535)
+    source = Event(source_state, simulate(source_state, frames=spec.frames, dt=spec.frame_dt))
+    candidate = simulate(candidate_state, frames=spec.frames, dt=spec.frame_dt)
+    distance = state_trajectory_distance(source.trajectory.positions, candidate.positions)
+    assert 0.00272601 <= distance <= 0.00545202
+    half_widths = closer_neighbor_box(source, spec, max_distance=0.00545202, box_multiplier=6.0)
+    offsets = np.abs(
+        np.array([getattr(candidate_state, name) for name in STATE_RANGES])
+        - np.array([getattr(source_state, name) for name in STATE_RANGES])
+    )
+    assert np.all(offsets <= half_widths)

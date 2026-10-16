@@ -45,12 +45,12 @@
     "exact_hash": "SHA-256 of clip bytes",
     "silhouette": "color-invariant 8x8 foreground occupancy per frame, negative RMS distance",
     "centroid_motion": "two-color foreground centroid tracks, negative RMS distance; extraction failure never matches",
-    "sscd_pooled": "SSCD sscd_disc_mixup frame embeddings at 224 px, mean-pooled, cosine",
+    "sscd_pooled": "SSCD sscd_disc_mixup frame embeddings on native 224 px frames, mean-pooled, cosine",
     "sscd_aligned": "SSCD frame embeddings, mean of time-aligned per-frame cosines",
-    "dinov2_pooled": "DINOv2 ViT-S/14 CLS embeddings at 224 px, mean-pooled, cosine",
+    "dinov2_pooled": "DINOv2 ViT-S/14 CLS embeddings on native 224 px frames, mean-pooled, cosine",
     "dinov2_aligned": "DINOv2 frame embeddings, mean of time-aligned per-frame cosines",
-    "raft_flow": "torchvision RAFT-small flow between sampled frames at 128 px, 8x8 average-pooled field, cosine",
-    "oracle_state": "negative RMS state distance using simulator provenance (reference only)",
+    "raft_flow": "torchvision RAFT-small flow between sampled frames at native 224 px, 8x8 average-pooled field, cosine",
+    "oracle_state": "privileged state-distance reference: negative RMS state distance from simulator records (not a provenance oracle)",
     "centroid_invariant": "centroid tracks searched over mirroring and integer time offsets up to 3 frames (overlapping frames only)",
     "raft_flow_invariant": "RAFT flow descriptor searched over mirroring (grid flip, negated x-flow) and offsets up to 1 sampled step",
     "sscd_aligned_norm": "sscd_aligned minus the query's mean top-10 similarity to 500 unrelated background clips (VSC-style score normalization)",
@@ -81,12 +81,14 @@
     "Motion descriptors recover appearance-only rerenders; invariance search recovers mirror and time-shift recall at some cost in false removal.",
     "Closer-than-gallery hard negatives produce higher false removal than easy negatives for motion and state-based detectors."
   ],
-  "claim_boundary": "Synthetic 64x64 collisions. Pretrained perceptual models receive upsampled frames outside their training distribution. Results characterize detector behavior on lineage ground truth; they do not measure exposure effects.",
+  "claim_boundary": "Synthetic collisions rendered natively at 224 px; full 24-frame clips compared with full training clips (curation setting). Results characterize detector behavior on provenance ground truth; they do not measure exposure effects and do not transfer automatically to the 64 px, 8-frame model inputs.",
   "supersedes": "v2 rendered at 64 px. Upsampling to 224 px magnified JPEG blocks so that a re-encoded exact copy had median SSCD cosine 0.64 to its source, below a recolored rerender (0.94); the copy positive control failed, so v2 perceptual results are uninterpretable for trajectory claims. v2 also had a 1/64 mirror-mapping offset in centroid_invariant and an untied rank statistic. v3 renders natively at 224 px (no resampling for SSCD/DINOv2; RAFT at native resolution).",
   "invariant_max_shift_frames": 3,
   "invariant_max_shift_flow_steps": 1,
   "background_clips": 500,
   "background_top_k": 10,
   "interpretive_gate": "Conclusions about a perceptual detector on trajectory reuse require it to pass the copy_reencode positive control: AUROC versus easy negatives >= 0.95 and recall >= 0.80 at the 5% operating point. Detectors failing the gate are reported as not functional in this domain.",
-  "size_note": "Easy negatives reduced from 1000 to 600 per transform before running (native 224 px is ~3.8x slower); pooled calibration still uses 4,800 negatives."
+  "size_note": "Easy negatives reduced from 1000 to 600 per transform before running (native 224 px is ~3.8x slower); pooled calibration still uses 4,800 negatives.",
+  "outputs": "results/detector_benchmark_v3.json (summary) and results/detector_benchmark_v3_scores.json.gz (per-query scores for frontier, bootstrap, and gate analyses by scripts/analyze_detectors.py)",
+  "restart_note": "First v3 launch was stopped at about 40% because it saved only summaries; restarted with identical configuration and seeds plus per-query score export."
 }

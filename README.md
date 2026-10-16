@@ -17,7 +17,7 @@
 
 ## Status
 
-**Conceptual pilot. The registered memory positive control passes; no neural world model has been trained.**
+**Research in progress. The memory positive control passes and a 1.09M-parameter ConvLSTM predictor has been trained; the matched learned-model exposure confirmation is specified and awaiting collaborator sign-off, and no learned-model reuse effect has been estimated or released.**
 
 The broad claim that trajectory overlap causes benchmark contamination did not survive adversarial review. This repository begins with the narrower question that remained:
 

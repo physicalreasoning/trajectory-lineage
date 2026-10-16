@@ -31,7 +31,7 @@ from trajectory_lineage.exposure import block_streams, render_event, sample_even
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", type=Path, default=Path("experiments/exposure_pilot_v3.json"))
+    parser.add_argument("--config", type=Path, default=Path("experiments/exposure_pilot_v5.json"))
     parser.add_argument("--blocks", type=int, default=24)
     parser.add_argument("--experiment-seed", type=int, default=2026101624)
     parser.add_argument("--device", choices=("mps", "cpu"), default=None)

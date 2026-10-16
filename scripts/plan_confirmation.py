@@ -11,6 +11,7 @@ import argparse
 import json
 import math
 from pathlib import Path
+from statistics import NormalDist
 
 import numpy as np
 
@@ -65,7 +66,13 @@ def t_cdf(value: float, df: int) -> float:
 def t_quantile(probability: float, df: int) -> float:
     if not 0 < probability < 1:
         raise ValueError("probability must lie between zero and one")
-    low, high = -50.0, 50.0
+    if df < 1:
+        raise ValueError("degrees of freedom must be at least one")
+    low, high = -1.0, 1.0
+    while t_cdf(low, df) > probability:
+        low *= 2
+    while t_cdf(high, df) < probability:
+        high *= 2
     for _ in range(200):
         middle = (low + high) / 2
         if t_cdf(middle, df) < probability:
@@ -117,7 +124,14 @@ def simulate(
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--pilot", type=Path, default=Path("results/exposure_pilot_v4_blinded.json")
+        "--pilot",
+        type=Path,
+        nargs="+",
+        default=[
+            Path("results/exposure_pilot_v4_blinded.json"),
+            Path("results/exposure_pilot_v5_blinded.json"),
+        ],
+        help="One or more effect-blinded pilots; S, H, and G variances are pooled across them.",
     )
     parser.add_argument(
         "--config", type=Path, default=Path("experiments/exposure_confirmation.json")
@@ -125,25 +139,33 @@ def main() -> None:
     parser.add_argument("--out", type=Path, default=Path("results/confirmation_power.json"))
     parser.add_argument("--simulations", type=int, default=20_000)
     args = parser.parse_args()
-    pilot = json.loads(args.pilot.read_text())
+    pilots = [json.loads(path.read_text()) for path in args.pilot]
     config = json.loads(args.config.read_text())
     contract = config["decision_contract"]
-    blocks = int(config["blocks"])
-    dispersion = pilot["dispersion"]
+    blocks = int(config.get("planning_analyzed_blocks", config["blocks"]))
 
-    def sd(name: str, key: str) -> float:
-        return float(dispersion[name][key])
+    def pooled_variance(name: str) -> tuple[float, int]:
+        total, degrees = 0.0, 0
+        for pilot in pilots:
+            entry = pilot["dispersion"][name]
+            df = int(entry["blocks"]) - 1
+            total += df * float(entry["standard_deviation"]) ** 2
+            degrees += df
+        return total / degrees, degrees
 
-    var_s, var_h, var_g = (
-        sd("C_source_gain", "standard_deviation") ** 2,
-        sd("C_independent_harm", "standard_deviation") ** 2,
-        sd("C_reuse_gap", "standard_deviation") ** 2,
+    (var_s, df), (var_h, _), (var_g, _) = (
+        pooled_variance("C_source_gain"),
+        pooled_variance("C_independent_harm"),
+        pooled_variance("C_reuse_gap"),
     )
     covariance_sh = (var_g - var_s - var_h) / 2
     correlation = covariance_sh / math.sqrt(var_s * var_h)
-    inflation = sd("C_reuse_gap", "standard_deviation_upper_limit") / sd(
-        "C_reuse_gap", "standard_deviation"
+    confidence = float(pilots[0]["dispersion"]["C_reuse_gap"]["upper_limit_confidence"])
+    chi_square = (
+        df
+        * (1 - 2 / (9 * df) + NormalDist().inv_cdf(1 - confidence) * math.sqrt(2 / (9 * df))) ** 3
     )
+    inflation = math.sqrt(df / chi_square)
     base_cov = np.array([[var_s, covariance_sh], [covariance_sh, var_h]]) * inflation**2
 
     rng = np.random.default_rng(20261016)
@@ -191,8 +213,10 @@ def main() -> None:
             )
     result = {
         "blocks": blocks,
-        "pilot": str(args.pilot),
-        "pilot_config_sha256": pilot.get("config_sha256"),
+        "pilots": [str(path) for path in args.pilot],
+        "pilot_config_sha256": [pilot.get("config_sha256") for pilot in pilots],
+        "pooled_degrees_of_freedom": df,
+        "pooled_sd": {"S": math.sqrt(var_s), "H": math.sqrt(var_h), "G": math.sqrt(var_g)},
         "derived_sh_correlation": correlation,
         "upper_limit_inflation": inflation,
         "t_critical": t_quantile(1 - float(contract["alpha_one_sided"]), blocks - 1),

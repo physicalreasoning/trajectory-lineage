@@ -2,7 +2,7 @@
   "name": "exposure_confirmation",
   "status": "draft_pending_signoff",
   "role": "confirmatory",
-  "blocks": 256,
+  "blocks": 352,
   "experiment_seed": 2026101664,
   "observed_frames": 8,
   "future_frames": 16,
@@ -52,17 +52,34 @@
     "alpha_one_sided": 0.025,
     "interval": "95% two-sided t interval over block-level paired contrasts",
     "outcomes": {
-      "consequential": "lower(G) > 0.010 and lower(S) > 0 and upper(H) < 0.001",
-      "negligible": "-0.002 < lower(G) and upper(G) < 0.002",
-      "prevalence_dependent": "lower(G) > 0.002 and not consequential; report break-even prevalence interval [m/upper(G), m/lower(G)]",
-      "inconclusive": "none of the above; report the failing gate"
+      "gap_magnitude": {
+        "consequential": "lower(G) > 0.010",
+        "prevalence_dependent": "0.002 < lower(G) <= 0.010",
+        "negligible": "-0.002 < lower(G) and upper(G) < 0.002",
+        "reverse": "upper(G) < -0.002",
+        "inconclusive": "otherwise"
+      },
+      "safeguards": {
+        "source_gain_supported": "lower(S) > 0",
+        "harm_bounded": "upper(H) < 0.001",
+        "assay_sensitive": "E exact gain positive in at least 75% of screened blocks"
+      },
+      "primary_claim": {
+        "consequential reuse advantage": "consequential magnitude and both safeguards",
+        "prevalence_dependent reuse advantage": "prevalence-dependent magnitude and both safeguards",
+        "differential gap without safeguards": "consequential or prevalence-dependent magnitude with a failed safeguard",
+        "negligible differential gap": "negligible magnitude and assay sensitive",
+        "assay insensitive": "negligible magnitude but positive control failed",
+        "reverse gap": "reverse magnitude",
+        "inconclusive": "otherwise, or execution failures above 5% of scheduled blocks, or fewer than 240 screened blocks"
+      }
     },
     "secondary": {
-      "identity_specific": "lower(Q) > 0.010, where Q = (L_D,source - L_C,source) - (L_D,indep - L_C,indep) and D is the closer-than-base-training neighbor arm",
-      "detectable": "lower(G) > 0",
-      "harm_flag": "lower(H) > 0.001 reported as consequential independent-event harm",
-      "multiplicity": "Holm across secondary claims; distance bands and detectors exploratory",
-      "banded_neighbor": "Q2 for arm D2 reported descriptively"
+      "identity_specific": "H0: Q <= 0.010 (Q against the closer-than-base-training arm D)",
+      "detectable": "H0: G <= 0",
+      "consequential_harm": "H0: H <= 0.001",
+      "multiplicity": "Holm step-down at one-sided 0.025 across these three; Q2, distance profile, and detectors exploratory",
+      "identity_planning": "With pilot v4 Q upper SD 0.00063 and about 260 screened blocks, P(identity claim) exceeds 0.9 when true Q >= 0.0102."
     },
     "estimands_also_reported": [
       "S",
@@ -74,17 +91,35 @@
       "E_exact_gain",
       "E_transfer_loss",
       "all arm-by-population errors"
-    ]
+    ],
+    "max_failure_fraction": 0.05,
+    "minimum_screened_blocks": 320,
+    "break_even_rules": "pi* = m/G: finite interval [m/upper(G), m/lower(G)] when lower(G) > 0; unbounded above when lower(G) <= 0 < upper(G); no positive crossing when upper(G) <= 0; also reported intersected with [0, 1].",
+    "crossover": "H/G block-bootstrap percentile interval, with the fraction of resamples where it is undefined",
+    "analyzer": "scripts/analyze_confirmation.py (SHA-256 bound in the freeze manifest)"
   },
   "freeze_requirement": "Configuration SHA-256 recorded in a freeze manifest with sign-off from the paper lead and Yining Hua before --unblind is permitted.",
   "claim_boundary": "Effect of replacing 64 independent continuation events with same-trajectory rerenders for this ConvLSTM, dose, and continuation phase.",
-  "sample_size_rationale": "256 blocks. The harm gate is binding: per-block independent-population differences between two random continuations have SD about 0.0015 (pilot v4; S-H correlation -0.96), while the reuse gap cancels this shared shift. Using pilot v4 80% upper SD limits, joint consequential-rule power is 1.00 at H=0 and 0.97 at H=0.0005 (half the margin); 0.73 if SDs are 1.5x larger at H=0.0005. Test size at the threshold is about 0.025. Runtime about 3.5 hours on Apple MPS (50 s per block). See results/confirmation_power.json.",
-  "base_competence_screen": "Pre-treatment screen: a block enters the primary analysis iff its base model's bounded error on the block's independent population is below that population's constant-velocity error. All blocks are reported; an intent-to-treat analysis over every completed block is a sensitivity analysis.",
+  "sample_size_rationale": "352 scheduled blocks, planned as 336 analyzed after about 4% screen attrition (at least 320 screened required). The harm gate is binding: per-block independent-population differences between two random continuations have SD about 0.0017 (pooled pilots v4+v5, 14 df; S-H correlation -0.95), which the reuse gap cancels. Joint consequential-rule power at G = S + H = 0.015 with SDs at the pooled 80% upper limit: 1.00 at H = 0 and 0.99 at H = 0.0005; 0.95 at H = 0.0005 using pilot v5 alone. Test size at the threshold about 0.025. About 4.9 hours on Apple MPS. results/confirmation_power.json.",
+  "base_competence_screen": "Pre-treatment screen on a separate 256-event competence population (never scored in contrasts): a block enters the primary analysis iff its base model's bounded error there is below constant velocity's. All blocks reported; intent-to-treat over all completed blocks is a sensitivity analysis.",
   "closer_nearby": {
-    "construction": "independent events conditioned on RMS state distance between 0.25 and 0.5 of the source's nearest base-training distance; uniform proposals over a sensitivity-scaled box (edge offset alone gives 6x the band maximum, capped at half the range) within the uniform initial-state prior, accepted by distance band",
+    "construction": "box-conditioned band distribution: uniform initial-state prior restricted to a sensitivity-scaled box (edge offset alone gives 6x the band maximum; capped at the full parameter range) and conditioned on RMS state distance in [0.25, 0.5] x the source's nearest base-training distance",
     "low_fraction": 0.25,
     "high_fraction": 0.5,
     "box_multiplier": 6.0,
-    "containment_validation": "Doubling test (multiplier 3 vs 6, 600 neighbors each): per-parameter offset distributions agree; 6 is used."
-  }
+    "containment_validation": "results/closer_sampler_validation.json (box enlargement 6 vs 9, reservoir agreement, capped fractions); empirical, not a proof"
+  },
+  "screen_examples": 256,
+  "failure_policy": "Infrastructure errors (OSError, MemoryError, device/MPS runtime errors) retry once with identical seeds; other exceptions are algorithmic failures. All failures are recorded.",
+  "required_signoff_roles": [
+    "paper_lead",
+    "evaluation_science"
+  ],
+  "excluded_pilot_seeds": [
+    2026101603,
+    2026101604,
+    2026101605,
+    2026101624
+  ],
+  "planning_analyzed_blocks": 336
 }

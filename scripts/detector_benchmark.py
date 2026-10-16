@@ -7,6 +7,7 @@ from their public release locations on first use.
 from __future__ import annotations
 
 import argparse
+import gzip
 import hashlib
 import io
 import json
@@ -651,7 +652,32 @@ def main() -> None:
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
-    print(f"done in {result['seconds']:.0f}s -> {args.out}")
+    scores_path = args.out.with_name(args.out.stem + "_scores.json.gz")
+    export = {
+        "config": config,
+        "splits": {
+            name: {
+                "positive_sources": split["positive_sources"],
+                "scores": {
+                    transform: {
+                        role: {
+                            detector: {
+                                key: np.asarray(value).tolist() for key, value in rec.items()
+                            }
+                            for detector, rec in entry.items()
+                            if not detector.startswith("_")
+                        }
+                        for role, entry in roles.items()
+                    }
+                    for transform, roles in split["scores"].items()
+                },
+            }
+            for name, split in (("calibration", calibration), ("test", test))
+        },
+    }
+    with gzip.open(scores_path, "wt") as handle:
+        json.dump(export, handle)
+    print(f"done in {result['seconds']:.0f}s -> {args.out}, {scores_path}")
 
 
 if __name__ == "__main__":

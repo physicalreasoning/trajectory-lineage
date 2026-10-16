@@ -1,0 +1,107 @@
+{
+  "box_enlargement_6_vs_9": {
+    "radius": {
+      "ks": 0.054166666666666696,
+      "ks_critical_0.05": 0.1239678721820026,
+      "mean_offset_fraction": [
+        0.17799280995867306,
+        0.17461808817362598
+      ],
+      "q95_offset_fraction": [
+        0.40714723943233966,
+        0.392696524834107
+      ]
+    },
+    "vx_left": {
+      "ks": 0.04583333333333334,
+      "ks_critical_0.05": 0.1239678721820026,
+      "mean_offset_fraction": [
+        0.07409701347250999,
+        0.07383486930164632
+      ],
+      "q95_offset_fraction": [
+        0.18397220803256686,
+        0.17998908731141422
+      ]
+    },
+    "vx_right": {
+      "ks": 0.08750000000000002,
+      "ks_critical_0.05": 0.1239678721820026,
+      "mean_offset_fraction": [
+        0.1000352158183448,
+        0.10525897047804499
+      ],
+      "q95_offset_fraction": [
+        0.23408605077130012,
+        0.23854846754231665
+      ]
+    },
+    "x_left": {
+      "ks": 0.07500000000000007,
+      "ks_critical_0.05": 0.1239678721820026,
+      "mean_offset_fraction": [
+        0.06386117220437075,
+        0.060337104331676494
+      ],
+      "q95_offset_fraction": [
+        0.14504067429926196,
+        0.13550542446282038
+      ]
+    },
+    "x_right": {
+      "ks": 0.09166666666666667,
+      "ks_critical_0.05": 0.1239678721820026,
+      "mean_offset_fraction": [
+        0.04694756794506552,
+        0.05124064184977537
+      ],
+      "q95_offset_fraction": [
+        0.11871983938219276,
+        0.11964008188932497
+      ]
+    },
+    "y": {
+      "ks": 0.09166666666666667,
+      "ks_critical_0.05": 0.1239678721820026,
+      "mean_offset_fraction": [
+        0.007849589014224192,
+        0.008576990522674207
+      ],
+      "q95_offset_fraction": [
+        0.018933429687387773,
+        0.020576876546345952
+      ]
+    }
+  },
+  "capped_fraction_by_parameter": {
+    "radius": 1.0,
+    "vx_left": 0.0,
+    "vx_right": 0.3333333333333333,
+    "x_left": 0.0,
+    "x_right": 0.0,
+    "y": 0.0
+  },
+  "distance_over_reference_mean": [
+    0.4263288502806188,
+    0.43380188177033197
+  ],
+  "interpretation": "Containment is supported when no enlargement KS statistic exceeds its critical value and mean offsets agree; it is an empirical check, not a proof.",
+  "reservoir_agreement": {
+    "band": [
+      0.012,
+      0.016
+    ],
+    "box_mean_sd": [
+      0.01430883584353392,
+      0.0010839204337818938
+    ],
+    "ks": 0.08333333333333337,
+    "ks_critical_0.05": 0.17531704613832239,
+    "reservoir_mean_sd": [
+      0.014162673726336238,
+      0.0011484471944460317
+    ]
+  },
+  "samples_per_multiplier": 240,
+  "seconds": 342.4645557090407
+}

@@ -258,6 +258,25 @@ def _parameter_sensitivities(source: Event, spec: EventSpec, step: float = 0.01)
     return sensitivities
 
 
+def closer_neighbor_box(
+    source: Event, spec: EventSpec, *, max_distance: float, box_multiplier: float
+) -> FloatArray:
+    """Proposal half-widths for ``sample_closer_neighbor``, in parameter units.
+
+    Each half-width is ``box_multiplier * max_distance / sensitivity`` times the parameter range,
+    capped at the full range. A capped parameter is therefore proposed over its entire range from
+    any source value, so insensitive parameters (for example the radius) are never truncated.
+    """
+
+    names = list(STATE_RANGES)
+    widths = np.array([STATE_RANGES[name][1] - STATE_RANGES[name][0] for name in names])
+    sensitivities = _parameter_sensitivities(source, spec)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        fractions = box_multiplier * max_distance / sensitivities
+    fractions = np.where(np.isfinite(fractions), np.minimum(fractions, 1.0), 1.0)
+    return fractions * widths
+
+
 def sample_closer_neighbor(
     rng: np.random.Generator,
     source: Event,
@@ -265,34 +284,30 @@ def sample_closer_neighbor(
     *,
     min_distance: float,
     max_distance: float,
-    box_multiplier: float = 3.0,
-    max_proposals: int = 2_000_000,
+    box_multiplier: float = 6.0,
+    max_proposals: int = 5_000_000,
 ) -> tuple[Event, float, float]:
-    """Draw an independent event conditioned on lying in a distance band around ``source``.
+    """Draw an independent event from the box-conditioned band distribution around ``source``.
 
-    Initial states are uniform over ``STATE_RANGES``. Proposals are uniform over a box around the
-    source's initial state intersected with the ranges (out-of-range proposals are rejected, not
-    clipped) and accepted by distance band. Each box half-width is scaled by that parameter's
-    local sensitivity so an offset at the box edge alone produces ``box_multiplier`` times the
-    band maximum (capped at half the range). If the box contains every initial state whose
-    trajectory lies in the band, accepted events follow the independent-sampling distribution
-    conditioned on the band, i.e. the reservoir-selection target. The third return value is the
-    largest normalized box offset of the accepted state; values well below one support
-    containment.
+    Target distribution (declared, not assumed): the uniform initial-state prior restricted to the
+    proposal box from ``closer_neighbor_box`` and conditioned on the RMS state distance lying in
+    ``[min_distance, max_distance]``. Proposals are uniform over the box intersected with the
+    ranges (out-of-range proposals are rejected, not clipped) and accepted by distance band, so
+    accepted events follow exactly that distribution. It equals the unrestricted conditional
+    (reservoir-selection target) only if the box contains every band member; that is checked
+    empirically by ``scripts/validate_closer_sampler.py`` rather than assumed. The third return
+    value is the largest normalized box offset of the accepted state.
     """
 
     if not 0 <= min_distance < max_distance:
         raise ValueError("distance band must satisfy 0 <= min < max")
     names = list(STATE_RANGES)
-    widths = np.array([STATE_RANGES[name][1] - STATE_RANGES[name][0] for name in names])
     lows = np.array([STATE_RANGES[name][0] for name in names])
     highs = np.array([STATE_RANGES[name][1] for name in names])
     center = np.array([getattr(source.state, name) for name in names])
-    sensitivities = _parameter_sensitivities(source, spec)
-    with np.errstate(divide="ignore", invalid="ignore"):
-        fractions = box_multiplier * max_distance / sensitivities
-    fractions = np.where(np.isfinite(fractions), np.minimum(fractions, 0.5), 0.5)
-    half_widths = fractions * widths
+    half_widths = closer_neighbor_box(
+        source, spec, max_distance=max_distance, box_multiplier=box_multiplier
+    )
     for _ in range(max_proposals):
         offset = rng.uniform(-1.0, 1.0, size=len(names))
         proposal = center + offset * half_widths

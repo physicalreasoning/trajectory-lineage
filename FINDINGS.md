@@ -23,7 +23,7 @@ What did not survive:
 - Confirmatory feasibility; and
 - Publication readiness.
 
-No neural model has been trained in this repository. The smoke result checks software contracts only.
+At the time of this smoke test no neural model had been trained in this repository; the smoke result checked software contracts only. (A ConvLSTM was trained later; see finding 3.)
 
 ## 1 · Registered memory positive control passes (2026-10-06)
 
@@ -117,3 +117,28 @@ Source: `results/convlstm_smoke.json`.
 **Scope:** This is a software and protocol check on solid-color synthetic renders with zero-distance thresholds. It does not establish performance under compression, clutter, camera motion, partial visibility, nearby trajectories, or real video. Those conditions require calibrated development/test families and stronger SSCD, DINOv2, temporal-alignment, and optical-flow baselines.
 
 Source: `results/detector_smoke.json`.
+
+## 5 · Matched learned-model exposure protocol is ready for confirmation; effect remains blinded (2026-10-16)
+
+Five discarded, effect-blinded pilots shaped the confirmatory protocol (`experiments/exposure_confirmation.json`, status `draft_pending_signoff`). Each pilot released only contrast dispersion, runtime, pre-treatment balance, design descriptors, and a binary exact-render positive control. **No learned-model reuse effect estimate has been inspected or released.**
+
+| Pilot | Finding that changed the design |
+|---|---|
+| v1 | Nearby events were perturbations of sources (derived, not independent) |
+| v2 | Code audit: overlapping random streams across blocks, uncapped metric, failed blocks excluded |
+| v3 | Band neighbors were farther than each source's nearest base-training event for 86% of sources |
+| v4 | Box half-widths capped at half a parameter's range excluded valid band members; competence screen reused the scored population |
+| v5 | Final protocol: 8/8 blocks completed and competent, positive control passed, 12–13 presentations per source |
+
+The final protocol has five matched continuation arms from shared model and optimizer state—independent replacements (B), appearance-changed rerenders of the evaluation sources (C), independent neighbors closer than anything in base training (D, median distance 0.0061 versus 0.0143 for the nearest base event), banded independent neighbors (D2), and exact renders (E)—evaluated on held-out source renders, exact renders, and 512 independent events with a bounded metric.
+
+Supporting checks:
+
+- **Determinism.** Two MPS runs of pilot v3 reproduced every dispersion exactly.
+- **Balance.** Across 24 base-only blocks, base source − independent error was −0.0006 (95% CI −0.0015 to 0.0003); one base model in 24 failed to beat constant velocity, motivating a pre-treatment competence screen on a separate population.
+- **Neighbor sampler.** `results/closer_sampler_validation.json`: enlarging the proposal box 6× → 9× changed no parameter's offset distribution (all KS statistics below critical values), and box sampling matched reservoir selection on a band both can reach (KS 0.083, critical 0.175).
+- **Power.** Pooled pilots v4+v5 (14 df): the harm gate is binding because continuation shifts the whole model by a block-specific amount (corr(S, H) = −0.95). With 336 analyzed blocks, joint power is 0.99 when true harm is half the margin at the pooled 80% upper SD (0.95 using v5 alone); size at the threshold is about 0.025.
+
+The pre-specified contract (`docs/EFFECT_SIZE.md`) uses a declared ranking margin m = 0.001, a consequential threshold of 0.010 (m at 10% prevalence), a negligible bound of ±0.002 (m at 50% prevalence), and a harm margin of 0.001, with outcomes reported on separate magnitude, safeguard, and identity-specificity axes. Unblinding requires a manifest binding the configuration, a clean code commit, the analyzer `scripts/analyze_confirmation.py`, and named sign-offs from the paper lead and the evaluation-science reviewer.
+
+Source: `results/exposure_pilot_v5_blinded.json`, `results/confirmation_power.json`, `results/exposure_balance_check.json`, `results/closer_sampler_validation.json`.
