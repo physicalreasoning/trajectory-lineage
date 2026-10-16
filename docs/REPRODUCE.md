@@ -108,13 +108,37 @@ Expected mean centre errors:
 
 The command writes `results/convlstm_smoke.json` with the full configuration and per-seed results.
 
-## Effect-Size Planning
+## Matched Exposure Pilots and Confirmation
+
+The runner needs the `models` extra (PyTorch). Every report is effect-blinded by default.
 
 ```bash
-uv run python scripts/plan_exposure_power.py
+# Discarded, effect-blinded variance pilot on the confirmatory protocol (about 7 minutes on Apple MPS)
+uv run --extra models python scripts/exposure_experiment.py \
+  --config experiments/exposure_pilot_v4.json --out results/exposure_pilot_v4_blinded.json --device mps
+
+# Pre-treatment balance check using base checkpoints only
+uv run --extra models python scripts/exposure_balance_check.py --device mps
+
+# Finite-sample joint power for the decision contract from the blinded pilot
+uv run python scripts/plan_confirmation.py
 ```
 
-The command reads the ConvLSTM smoke result and reports the draft minimum reuse gap and block-count sensitivity across candidate pilot standard deviations.
+The confirmation (`experiments/exposure_confirmation.json`, 256 blocks, about 3.5 hours) is run the same way. Raw block records require `--unblind PATH --freeze-manifest MANIFEST`, where the manifest records the configuration SHA-256 and collaborator sign-off; the runner refuses otherwise. Two MPS runs of the same configuration reproduced pilot v3 dispersion exactly.
+
+`scripts/plan_exposure_power.py` and `scripts/exposure_pilot.py` are superseded and kept only to document earlier runs.
+
+## Detector Benchmark
+
+Requires PyTorch, torchvision, and Pillow. Pretrained SSCD, DINOv2, and RAFT-small weights download on first use.
+
+```bash
+uv venv .venv-detectors --python 3.11
+uv pip install --python .venv-detectors/bin/python torch torchvision pillow numpy h5py
+PYTHONPATH=src .venv-detectors/bin/python scripts/detector_benchmark.py
+```
+
+The registered configuration is `experiments/detector_benchmark_v2.json`; output is `results/detector_benchmark_v2.json` (about 55 minutes on Apple MPS). Use `--scale 0.03` for a one-minute smoke run.
 
 ## Detector Smoke
 

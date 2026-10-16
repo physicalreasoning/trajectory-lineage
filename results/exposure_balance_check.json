@@ -1,0 +1,247 @@
+{
+  "blocks": 24,
+  "config": {
+    "arm_examples_per_batch": 8,
+    "arms": {
+      "B": "64 independent replacement trajectories under fresh appearances",
+      "C": "the 64 source trajectories under appearances unique within the block",
+      "D": "one independently simulated reservoir event per source with RMS state distance between the 0.1st and 1st percentiles of independent-pair distances",
+      "E": "the exact renders forming the exact population (diagnostic reference, not a ceiling)"
+    },
+    "base_train_examples": 512,
+    "base_training_steps": 300,
+    "batch_size": 32,
+    "blocks": 8,
+    "claim_boundary": "Discarded. No effect estimate from this run may be inspected or reported.",
+    "continuation_steps": 100,
+    "error_cap": 1.0,
+    "experiment_seed": 2026101603,
+    "exposure_dose": "800 arm-slot presentations over 64 sources: 12 or 13 presentations per source",
+    "frame_dt": 0.04,
+    "future_frames": 16,
+    "heldout_renders_per_source": 4,
+    "hidden_channels": 16,
+    "image_size": 64,
+    "independent_eval_examples": 512,
+    "learning_rate": 0.001,
+    "name": "exposure_pilot_v3",
+    "nearby": {
+      "construction": "independently simulated reservoir events assigned one-to-one by maximum bipartite matching inside a state-distance quantile band",
+      "high_quantile": 0.01,
+      "low_quantile": 0.001,
+      "reservoir_size": 20000
+    },
+    "observed_frames": 8,
+    "populations": {
+      "exact": "the render E trains on; unseen by B, C, and D",
+      "independent": "512 independently sampled trajectories under fresh appearances",
+      "source": "4 held-out renders per source trajectory, unseen by every arm"
+    },
+    "positive_control": "E exact-population gain over B positive in at least 75% of scheduled blocks",
+    "primary_metric": "mean over examples of per-disk-frame Euclidean center error, capped at 1 arena width; nonfinite outputs receive the cap",
+    "purpose": "Estimate contrast dispersion, runtime, and assay sensitivity under the exact confirmatory protocol without releasing effect locations.",
+    "replay_examples_per_batch": 24,
+    "role": "discarded_effect_blinded_variance_pilot",
+    "sd_upper_limit_confidence": 0.8,
+    "seed_derivation": "numpy SeedSequence(entropy=experiment_seed, spawn_key=(block_index,)) spawned into data, schedule, base_batches, torch roles",
+    "source_trajectories": 64,
+    "status": "registered_before_run"
+  },
+  "experiment_seed": 2026101624,
+  "provenance": {
+    "device": "mps",
+    "git_commit": "ec2f31e8e0fa7f72d60fc6ec7a5b622cce85d2f7",
+    "git_dirty": true,
+    "numpy": "2.4.6",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.11.13",
+    "torch": "2.14.1"
+  },
+  "rows": [
+    {
+      "block_index": 0,
+      "exact": 0.024965979158878326,
+      "fresh": 0.026107534766197205,
+      "independent": 0.02696014568209648,
+      "source": 0.024454526603221893
+    },
+    {
+      "block_index": 1,
+      "exact": 0.03138261288404465,
+      "fresh": 0.034076493233442307,
+      "independent": 0.03272441029548645,
+      "source": 0.031661950051784515
+    },
+    {
+      "block_index": 2,
+      "exact": 0.031048420816659927,
+      "fresh": 0.03305887058377266,
+      "independent": 0.029577180743217468,
+      "source": 0.03138957917690277
+    },
+    {
+      "block_index": 3,
+      "exact": 0.032094765454530716,
+      "fresh": 0.03297509253025055,
+      "independent": 0.031597889959812164,
+      "source": 0.03173671290278435
+    },
+    {
+      "block_index": 4,
+      "exact": 0.028140611946582794,
+      "fresh": 0.028368471190333366,
+      "independent": 0.02951992303133011,
+      "source": 0.028790930286049843
+    },
+    {
+      "block_index": 5,
+      "exact": 0.03071330115199089,
+      "fresh": 0.034076642245054245,
+      "independent": 0.03086508996784687,
+      "source": 0.03028261289000511
+    },
+    {
+      "block_index": 6,
+      "exact": 0.030543120577931404,
+      "fresh": 0.030892064794898033,
+      "independent": 0.03089522011578083,
+      "source": 0.029652955010533333
+    },
+    {
+      "block_index": 7,
+      "exact": 0.032585639506578445,
+      "fresh": 0.03163730725646019,
+      "independent": 0.031043505296111107,
+      "source": 0.03219786286354065
+    },
+    {
+      "block_index": 8,
+      "exact": 0.028519615530967712,
+      "fresh": 0.02614077366888523,
+      "independent": 0.027193531394004822,
+      "source": 0.027789436280727386
+    },
+    {
+      "block_index": 9,
+      "exact": 0.035064905881881714,
+      "fresh": 0.036273036152124405,
+      "independent": 0.03229011967778206,
+      "source": 0.03422991558909416
+    },
+    {
+      "block_index": 10,
+      "exact": 0.10882522910833359,
+      "fresh": 0.1165744736790657,
+      "independent": 0.11709074676036835,
+      "source": 0.10882518440485
+    },
+    {
+      "block_index": 11,
+      "exact": 0.029697563499212265,
+      "fresh": 0.02862599492073059,
+      "independent": 0.029749462381005287,
+      "source": 0.02949095331132412
+    },
+    {
+      "block_index": 12,
+      "exact": 0.030095353722572327,
+      "fresh": 0.028522778302431107,
+      "independent": 0.030163785442709923,
+      "source": 0.0307704396545887
+    },
+    {
+      "block_index": 13,
+      "exact": 0.03233014792203903,
+      "fresh": 0.03050067275762558,
+      "independent": 0.030494797974824905,
+      "source": 0.03144824504852295
+    },
+    {
+      "block_index": 14,
+      "exact": 0.0292377807199955,
+      "fresh": 0.02951783500611782,
+      "independent": 0.030062276870012283,
+      "source": 0.030608244240283966
+    },
+    {
+      "block_index": 15,
+      "exact": 0.029900580644607544,
+      "fresh": 0.03170299530029297,
+      "independent": 0.030314600095152855,
+      "source": 0.030640244483947754
+    },
+    {
+      "block_index": 16,
+      "exact": 0.03374238312244415,
+      "fresh": 0.03392887860536575,
+      "independent": 0.0338648296892643,
+      "source": 0.0330313965678215
+    },
+    {
+      "block_index": 17,
+      "exact": 0.026550594717264175,
+      "fresh": 0.022756420075893402,
+      "independent": 0.025615615770220757,
+      "source": 0.02685561589896679
+    },
+    {
+      "block_index": 18,
+      "exact": 0.031162960454821587,
+      "fresh": 0.028711730614304543,
+      "independent": 0.030530039221048355,
+      "source": 0.029850861057639122
+    },
+    {
+      "block_index": 19,
+      "exact": 0.026624232530593872,
+      "fresh": 0.02794867381453514,
+      "independent": 0.026270877569913864,
+      "source": 0.026910405606031418
+    },
+    {
+      "block_index": 20,
+      "exact": 0.02739899978041649,
+      "fresh": 0.029890406876802444,
+      "independent": 0.030431685969233513,
+      "source": 0.027805209159851074
+    },
+    {
+      "block_index": 21,
+      "exact": 0.02590099349617958,
+      "fresh": 0.027569439262151718,
+      "independent": 0.028140805661678314,
+      "source": 0.026043672114610672
+    },
+    {
+      "block_index": 22,
+      "exact": 0.03224868327379227,
+      "fresh": 0.035605013370513916,
+      "independent": 0.03533443808555603,
+      "source": 0.03185756504535675
+    },
+    {
+      "block_index": 23,
+      "exact": 0.03035341575741768,
+      "fresh": 0.03257981687784195,
+      "independent": 0.031059982255101204,
+      "source": 0.030830103904008865
+    }
+  ],
+  "summary": {
+    "exact_minus_independent": {
+      "mean": -0.0005276278437425693,
+      "standard_deviation": 0.0022223015771387932,
+      "t_statistic": -1.163135556892521
+    },
+    "fresh_minus_independent": {
+      "mean": 0.00026043566564718884,
+      "standard_deviation": 0.00171513897740824,
+      "t_statistic": 0.7438866471586881
+    },
+    "source_minus_independent": {
+      "mean": -0.0006098474065462748,
+      "standard_deviation": 0.002149391764012863,
+      "t_statistic": -1.3899885465357007
+    }
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "assumptions": "Block contrasts bivariate normal with pilot-derived covariance inflated to the 80% upper SD limit, then by 1.0, 1.5, and 2.0. Conditional power, not assurance.",
+  "blocks": 256,
+  "derived_sh_correlation": -0.95954669777173,
+  "pilot": "results/exposure_pilot_v4_blinded.json",
+  "pilot_config_sha256": "44308ac9cc900e4c697c7013e89582b294e47cf567781441065d56a77266103b",
+  "rows": [
+    {
+      "alternative": {
+        "G": 0.015,
+        "H": 0.0,
+        "S": 0.015
+      },
+      "false_consequential_rate_at_threshold": 0.02325,
+      "negligible_power_at_zero": 1.0,
+      "power_at_alternative": {
+        "consequential": 1.0,
+        "gap_gate": 1.0,
+        "harm_gate": 1.0,
+        "negligible": 0.0,
+        "source_gate": 1.0
+      },
+      "sd_multiplier_over_upper_limit": 1.0
+    },
+    {
+      "alternative": {
+        "G": 0.015,
+        "H": 0.0005,
+        "S": 0.014499999999999999
+      },
+      "false_consequential_rate_at_threshold": 0.02585,
+      "negligible_power_at_zero": 1.0,
+      "power_at_alternative": {
+        "consequential": 0.96625,
+        "gap_gate": 1.0,
+        "harm_gate": 0.96625,
+        "negligible": 0.0,
+        "source_gate": 1.0
+      },
+      "sd_multiplier_over_upper_limit": 1.0
+    },
+    {
+      "alternative": {
+        "G": 0.015,
+        "H": 0.0,
+        "S": 0.015
+      },
+      "false_consequential_rate_at_threshold": 0.02515,
+      "negligible_power_at_zero": 1.0,
+      "power_at_alternative": {
+        "consequential": 0.9991,
+        "gap_gate": 1.0,
+        "harm_gate": 0.9991,
+        "negligible": 0.0,
+        "source_gate": 1.0
+      },
+      "sd_multiplier_over_upper_limit": 1.5
+    },
+    {
+      "alternative": {
+        "G": 0.015,
+        "H": 0.0005,
+        "S": 0.014499999999999999
+      },
+      "false_consequential_rate_at_threshold": 0.02555,
+      "negligible_power_at_zero": 1.0,
+      "power_at_alternative": {
+        "consequential": 0.7258,
+        "gap_gate": 1.0,
+        "harm_gate": 0.7258,
+        "negligible": 0.0,
+        "source_gate": 1.0
+      },
+      "sd_multiplier_over_upper_limit": 1.5
+    },
+    {
+      "alternative": {
+        "G": 0.015,
+        "H": 0.0,
+        "S": 0.015
+      },
+      "false_consequential_rate_at_threshold": 0.02375,
+      "negligible_power_at_zero": 1.0,
+      "power_at_alternative": {
+        "consequential": 0.9687,
+        "gap_gate": 1.0,
+        "harm_gate": 0.9687,
+        "negligible": 0.0,
+        "source_gate": 1.0
+      },
+      "sd_multiplier_over_upper_limit": 2.0
+    },
+    {
+      "alternative": {
+        "G": 0.015,
+        "H": 0.0005,
+        "S": 0.014499999999999999
+      },
+      "false_consequential_rate_at_threshold": 0.02305,
+      "negligible_power_at_zero": 1.0,
+      "power_at_alternative": {
+        "consequential": 0.47875,
+        "gap_gate": 1.0,
+        "harm_gate": 0.47875,
+        "negligible": 0.0,
+        "source_gate": 1.0
+      },
+      "sd_multiplier_over_upper_limit": 2.0
+    }
+  ],
+  "simulations": 20000,
+  "t_critical": 1.9693105698498736,
+  "upper_limit_inflation": 1.3509277415540362
+}

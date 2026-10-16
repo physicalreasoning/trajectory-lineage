@@ -1,0 +1,90 @@
+{
+  "name": "exposure_confirmation",
+  "status": "draft_pending_signoff",
+  "role": "confirmatory",
+  "blocks": 256,
+  "experiment_seed": 2026101664,
+  "observed_frames": 8,
+  "future_frames": 16,
+  "image_size": 64,
+  "frame_dt": 0.04,
+  "base_train_examples": 512,
+  "source_trajectories": 64,
+  "heldout_renders_per_source": 4,
+  "independent_eval_examples": 512,
+  "batch_size": 32,
+  "base_training_steps": 300,
+  "continuation_steps": 100,
+  "arm_examples_per_batch": 8,
+  "replay_examples_per_batch": 24,
+  "learning_rate": 0.001,
+  "hidden_channels": 16,
+  "error_cap": 1.0,
+  "nearby": {
+    "construction": "independently simulated reservoir events assigned one-to-one by maximum bipartite matching inside a state-distance quantile band",
+    "reservoir_size": 20000,
+    "low_quantile": 0.001,
+    "high_quantile": 0.01
+  },
+  "arms": {
+    "B": "64 independent replacement trajectories under fresh appearances",
+    "C": "the 64 source trajectories under appearances unique within the block",
+    "D": "one independent neighbor per source, closer than anything in base training: RMS state distance in [0.25, 0.5] x the source's nearest base-training distance",
+    "D2": "one reservoir-selected independent neighbor per source in the 0.1st-1st percentile band of pairwise independent distances (comparable to base-training nearest neighbors)",
+    "E": "the exact renders forming the exact population (diagnostic reference, not a ceiling)"
+  },
+  "populations": {
+    "source": "4 held-out renders per source trajectory, unseen by every arm",
+    "exact": "the render E trains on; unseen by B, C, and D",
+    "independent": "512 independently sampled trajectories under fresh appearances"
+  },
+  "exposure_dose": "800 arm-slot presentations over 64 sources: 12 or 13 presentations per source",
+  "primary_metric": "mean over examples of per-disk-frame Euclidean center error, capped at 1 arena width; nonfinite outputs receive the cap",
+  "sd_upper_limit_confidence": 0.8,
+  "seed_derivation": "numpy SeedSequence(entropy=experiment_seed, spawn_key=(block_index,)) spawned into data, schedule, base_batches, torch roles",
+  "decision_contract": {
+    "ranking_margin_m": 0.001,
+    "consequential_reference_prevalence": 0.1,
+    "negligible_reference_prevalence": 0.5,
+    "consequential_threshold": 0.01,
+    "negligible_bound": 0.002,
+    "harm_margin_h": 0.001,
+    "alpha_one_sided": 0.025,
+    "interval": "95% two-sided t interval over block-level paired contrasts",
+    "outcomes": {
+      "consequential": "lower(G) > 0.010 and lower(S) > 0 and upper(H) < 0.001",
+      "negligible": "-0.002 < lower(G) and upper(G) < 0.002",
+      "prevalence_dependent": "lower(G) > 0.002 and not consequential; report break-even prevalence interval [m/upper(G), m/lower(G)]",
+      "inconclusive": "none of the above; report the failing gate"
+    },
+    "secondary": {
+      "identity_specific": "lower(Q) > 0.010, where Q = (L_D,source - L_C,source) - (L_D,indep - L_C,indep) and D is the closer-than-base-training neighbor arm",
+      "detectable": "lower(G) > 0",
+      "harm_flag": "lower(H) > 0.001 reported as consequential independent-event harm",
+      "multiplicity": "Holm across secondary claims; distance bands and detectors exploratory",
+      "banded_neighbor": "Q2 for arm D2 reported descriptively"
+    },
+    "estimands_also_reported": [
+      "S",
+      "I",
+      "H",
+      "Q",
+      "C_apparent_improvement",
+      "B_apparent_improvement",
+      "E_exact_gain",
+      "E_transfer_loss",
+      "all arm-by-population errors"
+    ]
+  },
+  "freeze_requirement": "Configuration SHA-256 recorded in a freeze manifest with sign-off from the paper lead and Yining Hua before --unblind is permitted.",
+  "claim_boundary": "Effect of replacing 64 independent continuation events with same-trajectory rerenders for this ConvLSTM, dose, and continuation phase.",
+  "sample_size_rationale": "256 blocks. The harm gate is binding: per-block independent-population differences between two random continuations have SD about 0.0015 (pilot v4; S-H correlation -0.96), while the reuse gap cancels this shared shift. Using pilot v4 80% upper SD limits, joint consequential-rule power is 1.00 at H=0 and 0.97 at H=0.0005 (half the margin); 0.73 if SDs are 1.5x larger at H=0.0005. Test size at the threshold is about 0.025. Runtime about 3.5 hours on Apple MPS (50 s per block). See results/confirmation_power.json.",
+  "base_competence_screen": "Pre-treatment screen: a block enters the primary analysis iff its base model's bounded error on the block's independent population is below that population's constant-velocity error. All blocks are reported; an intent-to-treat analysis over every completed block is a sensitivity analysis.",
+  "closer_nearby": {
+    "construction": "independent events conditioned on RMS state distance between 0.25 and 0.5 of the source's nearest base-training distance; uniform proposals over a sensitivity-scaled box (edge offset alone gives 6x the band maximum, capped at half the range) within the uniform initial-state prior, accepted by distance band",
+    "low_fraction": 0.25,
+    "high_fraction": 0.5,
+    "box_multiplier": 6.0,
+    "containment_validation": "Doubling test (multiplier 3 vs 6, 600 neighbors each): per-parameter offset distributions agree; 6 is used."
+  }
+}

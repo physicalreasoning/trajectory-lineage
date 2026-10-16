@@ -1,0 +1,187 @@
+{
+  "base_competence_failures": [],
+  "blinded": true,
+  "blocks_base_competent": 8,
+  "blocks_completed": 8,
+  "blocks_scheduled": 8,
+  "config": {
+    "arm_examples_per_batch": 8,
+    "arms": {
+      "B": "64 independent replacement trajectories under fresh appearances",
+      "C": "the 64 source trajectories under appearances unique within the block",
+      "D": "one independently simulated reservoir event per source with RMS state distance between the 0.1st and 1st percentiles of independent-pair distances",
+      "E": "the exact renders forming the exact population (diagnostic reference, not a ceiling)"
+    },
+    "base_competence_screen": "Pre-treatment screen: a block enters the primary analysis iff its base model's bounded error on the block's independent population is below that population's constant-velocity error. All blocks are reported; an intent-to-treat analysis over every completed block is a sensitivity analysis.",
+    "base_train_examples": 512,
+    "base_training_steps": 300,
+    "batch_size": 32,
+    "blocks": 8,
+    "claim_boundary": "Discarded. No effect estimate from this run may be inspected or reported.",
+    "continuation_steps": 100,
+    "error_cap": 1.0,
+    "experiment_seed": 2026101603,
+    "exposure_dose": "800 arm-slot presentations over 64 sources: 12 or 13 presentations per source",
+    "frame_dt": 0.04,
+    "future_frames": 16,
+    "heldout_renders_per_source": 4,
+    "hidden_channels": 16,
+    "image_size": 64,
+    "independent_eval_examples": 512,
+    "learning_rate": 0.001,
+    "name": "exposure_pilot_v3",
+    "nearby": {
+      "construction": "independently simulated reservoir events assigned one-to-one by maximum bipartite matching inside a state-distance quantile band",
+      "high_quantile": 0.01,
+      "low_quantile": 0.001,
+      "reservoir_size": 20000
+    },
+    "observed_frames": 8,
+    "populations": {
+      "exact": "the render E trains on; unseen by B, C, and D",
+      "independent": "512 independently sampled trajectories under fresh appearances",
+      "source": "4 held-out renders per source trajectory, unseen by every arm"
+    },
+    "positive_control": "E exact-population gain over B positive in at least 75% of scheduled blocks",
+    "primary_metric": "mean over examples of per-disk-frame Euclidean center error, capped at 1 arena width; nonfinite outputs receive the cap",
+    "purpose": "Estimate contrast dispersion, runtime, and assay sensitivity under the exact confirmatory protocol without releasing effect locations.",
+    "replay_examples_per_batch": 24,
+    "role": "discarded_effect_blinded_variance_pilot",
+    "sd_upper_limit_confidence": 0.8,
+    "seed_derivation": "numpy SeedSequence(entropy=experiment_seed, spawn_key=(block_index,)) spawned into data, schedule, base_batches, torch roles",
+    "source_trajectories": 64,
+    "status": "registered_before_run"
+  },
+  "config_sha256": "d13aa0f1f1c383cf4e5353b659100ef7d9db16c44ff8f6db931522f64861acdb",
+  "design_descriptors": {
+    "nearby_band_mean": [
+      0.013569006602114232,
+      0.022621391547591227
+    ],
+    "nearby_state_distance_median": 0.019359370980274484,
+    "presentations_per_source": [
+      [
+        12,
+        13
+      ]
+    ],
+    "replacement_state_distance_median": 0.10514992982966548
+  },
+  "dispersion": {
+    "B_apparent_improvement": {
+      "blocks": 8,
+      "standard_deviation": 0.000845622952,
+      "standard_deviation_upper_limit": 0.0011423755,
+      "upper_limit_confidence": 0.8
+    },
+    "C_apparent_improvement": {
+      "blocks": 8,
+      "standard_deviation": 0.000608544799,
+      "standard_deviation_upper_limit": 0.00082210005,
+      "upper_limit_confidence": 0.8
+    },
+    "C_independent_gain": {
+      "blocks": 8,
+      "standard_deviation": 0.000579872755,
+      "standard_deviation_upper_limit": 0.000783366191,
+      "upper_limit_confidence": 0.8
+    },
+    "C_independent_harm": {
+      "blocks": 8,
+      "standard_deviation": 0.000579872755,
+      "standard_deviation_upper_limit": 0.000783366191,
+      "upper_limit_confidence": 0.8
+    },
+    "C_minus_D_gap": {
+      "blocks": 8,
+      "standard_deviation": 0.000753083376,
+      "standard_deviation_upper_limit": 0.00101736122,
+      "upper_limit_confidence": 0.8
+    },
+    "C_minus_D_source": {
+      "blocks": 8,
+      "standard_deviation": 0.000716657257,
+      "standard_deviation_upper_limit": 0.00096815217,
+      "upper_limit_confidence": 0.8
+    },
+    "C_reuse_gap": {
+      "blocks": 8,
+      "standard_deviation": 0.00099002013,
+      "standard_deviation_upper_limit": 0.00133744566,
+      "upper_limit_confidence": 0.8
+    },
+    "C_source_gain": {
+      "blocks": 8,
+      "standard_deviation": 0.00129875829,
+      "standard_deviation_upper_limit": 0.0017545286,
+      "upper_limit_confidence": 0.8
+    },
+    "D_independent_gain": {
+      "blocks": 8,
+      "standard_deviation": 0.00069711973,
+      "standard_deviation_upper_limit": 0.000941758382,
+      "upper_limit_confidence": 0.8
+    },
+    "D_reuse_gap": {
+      "blocks": 8,
+      "standard_deviation": 0.000601659857,
+      "standard_deviation_upper_limit": 0.000812798991,
+      "upper_limit_confidence": 0.8
+    },
+    "D_source_gain": {
+      "blocks": 8,
+      "standard_deviation": 0.000865591739,
+      "standard_deviation_upper_limit": 0.00116935189,
+      "upper_limit_confidence": 0.8
+    },
+    "E_exact_gain": {
+      "blocks": 8,
+      "standard_deviation": 0.001596445,
+      "standard_deviation_upper_limit": 0.00215668183,
+      "upper_limit_confidence": 0.8
+    },
+    "E_independent_gain": {
+      "blocks": 8,
+      "standard_deviation": 0.000588227087,
+      "standard_deviation_upper_limit": 0.000794652289,
+      "upper_limit_confidence": 0.8
+    },
+    "E_reuse_gap": {
+      "blocks": 8,
+      "standard_deviation": 0.000857178241,
+      "standard_deviation_upper_limit": 0.00115798587,
+      "upper_limit_confidence": 0.8
+    },
+    "E_source_gain": {
+      "blocks": 8,
+      "standard_deviation": 0.00138088129,
+      "standard_deviation_upper_limit": 0.00186547084,
+      "upper_limit_confidence": 0.8
+    },
+    "E_transfer_loss": {
+      "blocks": 8,
+      "standard_deviation": 0.000779999526,
+      "standard_deviation_upper_limit": 0.001053723,
+      "upper_limit_confidence": 0.8
+    }
+  },
+  "infrastructure_failures": [],
+  "positive_control_passed": true,
+  "pretreatment_balance": {
+    "base_source_minus_independent_mean": -2.0475825294852257e-05,
+    "base_source_minus_independent_sd": 0.0015248226105788463
+  },
+  "provenance": {
+    "device": "mps",
+    "git_commit": "ec2f31e8e0fa7f72d60fc6ec7a5b622cce85d2f7",
+    "git_dirty": true,
+    "numpy": "2.4.6",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.11.13",
+    "torch": "2.14.1"
+  },
+  "runtime": {
+    "seconds_per_block_mean": 26.848171411358635,
+    "total_seconds": 214.78537129086908
+  }
+}

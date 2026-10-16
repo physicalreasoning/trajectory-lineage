@@ -1,0 +1,52 @@
+{
+  "name": "exposure_pilot",
+  "status": "registered_before_run",
+  "role": "discarded_blinded_internal_pilot",
+  "purpose": "Estimate block-level variance, runtime, failure rate, and assay sensitivity for the matched ConvLSTM trajectory-reuse experiment without revealing effect locations.",
+  "blocks": 8,
+  "block_seed_start": 20261100,
+  "base_train_examples": 512,
+  "source_trajectories": 64,
+  "independent_eval_examples": 128,
+  "observed_frames": 8,
+  "future_frames": 16,
+  "image_size": 64,
+  "frame_dt": 0.04,
+  "batch_size": 32,
+  "base_training_steps": 300,
+  "continuation_steps": 100,
+  "arm_examples_per_batch": 8,
+  "replay_examples_per_batch": 24,
+  "learning_rate": 0.001,
+  "hidden_channels": 16,
+  "nearby": {
+    "construction": "independently simulated reservoir events selected by state-distance quantile band; each reservoir event used once",
+    "reservoir_size": 20000,
+    "low_quantile": 0.001,
+    "high_quantile": 0.01
+  },
+  "arms": {
+    "B": "64 independent replacement trajectories under fresh appearances",
+    "C": "64 evaluation-source trajectories under appearances distinct from the evaluation render",
+    "D": "64 independently simulated reservoir events, one per source, whose RMS state distance to that source lies between the 0.1st and 1st percentiles of independent-pair distances",
+    "E": "the exact 64 renders in the exact population (diagnostic reference, not a ceiling)"
+  },
+  "populations": {
+    "source": "one held-out render per source trajectory, unseen by every arm",
+    "exact": "the render E trains on; unseen by B, C, and D",
+    "independent": "128 independently sampled trajectories under fresh appearances"
+  },
+  "primary_metric": "mean Euclidean center error over the 16 future frames",
+  "blinding": "Only dispersion, runtime, balance checks, and a binary exact-render positive-control check are reported. Contrast means remain unreported until the effect threshold is frozen.",
+  "positive_control": "E exact-population gain over B is positive in at least 75% of blocks",
+  "planning": {
+    "provisional_minimum_gap": 0.004792375490069389,
+    "detectable_excess": 0.0023961877450346947,
+    "alpha": 0.05,
+    "power": 0.9,
+    "sd_upper_limit_confidence": 0.8
+  },
+  "claim_boundary": "Discarded feasibility blocks. No effect estimate from this run may be reported as evidence of trajectory reuse.",
+  "version": 2,
+  "supersedes": "Version 1 engineering run used source-perturbed nearby events and evaluated E only on its trained renders; preserved as results/exposure_pilot_v1_engineering_blinded.json"
+}

@@ -1,0 +1,63 @@
+{
+  "name": "detector_benchmark_v1",
+  "status": "registered_before_run",
+  "purpose": "Measure whether exact, perceptual, and motion-based duplicate detectors recognize same-trajectory rerenders under stress transformations while sparing independent and similarity-selected nearby events, at query-level false-removal rates calibrated on separate families.",
+  "splits": {
+    "calibration": 2026101701,
+    "test": 2026101702
+  },
+  "gallery_trajectories": 500,
+  "positive_queries": 200,
+  "hard_negative_queries": 200,
+  "easy_negative_queries": 1000,
+  "clip_frames": 24,
+  "simulated_frames": 27,
+  "time_shift_frames": 3,
+  "frame_dt": 0.04,
+  "image_size": 64,
+  "learned_frame_indices": [0, 3, 6, 9, 12, 15, 18, 21],
+  "hard_negative_band": {
+    "reservoir_size": 20000,
+    "low_quantile": 0.001,
+    "high_quantile": 0.01
+  },
+  "transforms": {
+    "appearance": "new palette and background color",
+    "texture": "appearance plus a static random background texture",
+    "compression": "appearance plus per-frame JPEG at quality 25",
+    "crop": "appearance plus central 80% crop resized to 64x64",
+    "mirror": "appearance plus horizontal mirroring",
+    "time_shift": "appearance plus a 3-frame (0.12 s) temporal offset",
+    "distractor": "appearance plus a third moving disk"
+  },
+  "detectors": {
+    "exact_hash": "SHA-256 of clip bytes",
+    "silhouette": "color-invariant 8x8 foreground occupancy per frame, negative RMS distance",
+    "centroid_motion": "two-color foreground centroid tracks, negative RMS distance; extraction failure never matches",
+    "sscd_pooled": "SSCD sscd_disc_mixup frame embeddings at 224 px, mean-pooled, cosine",
+    "sscd_aligned": "SSCD frame embeddings, mean of time-aligned per-frame cosines",
+    "dinov2_pooled": "DINOv2 ViT-S/14 CLS embeddings at 224 px, mean-pooled, cosine",
+    "dinov2_aligned": "DINOv2 frame embeddings, mean of time-aligned per-frame cosines",
+    "raft_flow": "torchvision RAFT-small flow between sampled frames at 128 px, 8x8 average-pooled field, cosine",
+    "oracle_state": "negative RMS state distance using simulator provenance (reference only)"
+  },
+  "query_score": "maximum similarity over the full training gallery",
+  "operating_points": [0.01, 0.05],
+  "calibration_rule": "one threshold per detector and operating point: the higher-method (1 - alpha) quantile of pooled calibration easy-negative query scores across all transforms; a query is removed when its score strictly exceeds the threshold",
+  "metrics": [
+    "same-trajectory recall per transform",
+    "easy-negative false removal per transform",
+    "hard-negative (similarity-selected nearby) false removal per transform",
+    "AUROC positives vs easy negatives and vs hard negatives",
+    "top-1 source retrieval accuracy for removed positives",
+    "extraction failures",
+    "Wilson 95% intervals"
+  ],
+  "registered_expectations": [
+    "Exact hashing has near-zero recall under every transform.",
+    "Learned perceptual descriptors degrade under texture and crop and treat similar-looking independent collisions as near matches.",
+    "Motion descriptors are robust to color changes but fail under mirroring, and the two-color centroid extractor fails under texture and distractors.",
+    "Similarity-selected nearby negatives produce higher false removal than unrestricted negatives for motion and state-based detectors."
+  ],
+  "claim_boundary": "Synthetic 64x64 collisions. Pretrained perceptual models receive upsampled frames outside their training distribution. Results characterize detector behavior on lineage ground truth; they do not measure exposure effects."
+}
