@@ -8,6 +8,8 @@
 
 [[Workstream proposal]](docs/WORKSTREAM_PROPOSAL.md)
 [[Data sources]](docs/DATA.md)
+[[Effect-size contract]](docs/EFFECT_SIZE.md)
+[[Detector plan]](docs/DETECTORS.md)
 [[Research plan]](docs/RESEARCH_PLAN.md)
 [[Evaluation protocol]](docs/EVALS.md)
 [[Reproduction]](docs/REPRODUCE.md)
@@ -133,6 +135,19 @@ A compact pixel-conditioned ConvLSTM was trained for 300 updates on 512 generate
 | ConvLSTM | 0.02965 |
 
 The ConvLSTM reduces error by 39.3% relative to constant velocity and lands within 2.1% of nearest-trajectory retrieval. The next experiment applies matched source-family, nearby-trajectory, and background continuation policies to this learned predictor.
+
+## Detector smoke
+
+A 64-family synthetic smoke test now covers the first overlap-detector ladder:
+
+| Detector | Same-trajectory recall | Independent false positives |
+|---|---:|---:|
+| Exact video hash | 0% | 0% |
+| Color-invariant silhouette | 100% | 0% |
+| Foreground-centroid motion | 100% | 0% |
+| Oracle state trajectory | 100% | 0% |
+
+This clean test establishes the detector interfaces and ground-truth accounting. The full audit adds compression, clutter, camera changes, nearby trajectories, and learned perceptual and optical-flow baselines.
 
 ## Setup
 

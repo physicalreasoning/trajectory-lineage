@@ -100,3 +100,20 @@ Source: `results/phyworld_state_baselines.json`.
 **Research consequence:** The model is usable for the discarded exposure pilot, but retrieval remains the stronger baseline. The next experiment should compare matched continuation branches and preserve the per-seed model-versus-retrieval result rather than using only the easier persistence and constant-velocity gates.
 
 Source: `results/convlstm_smoke.json`.
+
+## 4 · Classical detector smoke distinguishes clean rerenders (2026-10-15)
+
+`scripts/detector_smoke.py` ran the configuration frozen in `experiments/detector_smoke.json` over 64 independently generated source families. Each family contains a source rendering, an appearance-only rerender of the same stored trajectory, and an independently sampled collision.
+
+| Detector | Same-trajectory recall | Independent false-positive rate |
+|---|---:|---:|
+| Exact video hash | 0.0 | 0.0 |
+| Color-invariant silhouette | 1.0 | 0.0 |
+| Foreground-centroid motion | 1.0 | 0.0 |
+| Oracle state trajectory | 1.0 | 0.0 |
+
+**The registered smoke gate passes.** Exact hashing misses every appearance-only rerender, while the clean synthetic silhouette, motion, and oracle descriptors recover every same-trajectory pair without matching the independently sampled controls.
+
+**Scope:** This is a software and protocol check on solid-color synthetic renders with zero-distance thresholds. It does not establish performance under compression, clutter, camera motion, partial visibility, nearby trajectories, or real video. Those conditions require calibrated development/test families and stronger SSCD, DINOv2, temporal-alignment, and optical-flow baselines.
+
+Source: `results/detector_smoke.json`.
