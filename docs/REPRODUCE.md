@@ -108,6 +108,22 @@ Expected mean centre errors:
 
 The command writes `results/convlstm_smoke.json` with the full configuration and per-seed results.
 
+## Effect-Size Planning
+
+```bash
+uv run python scripts/plan_exposure_power.py
+```
+
+The command reads the ConvLSTM smoke result and reports the draft minimum reuse gap and block-count sensitivity across candidate pilot standard deviations.
+
+## Detector Smoke
+
+```bash
+uv run python scripts/detector_smoke.py
+```
+
+The command runs the frozen 64-family classical-detector check and writes `results/detector_smoke.json`.
+
 ## Scope
 
 The software checks, memory positive control, PhyWorld state baselines, and ConvLSTM smoke establish the measurement and feasibility path for the later matched-exposure experiment.

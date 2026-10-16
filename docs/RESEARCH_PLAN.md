@@ -2,6 +2,12 @@
 
 All gates are written before their experiment runs. A failed gate stops or narrows the programme; it does not trigger an automatic scope expansion.
 
+## Collaboration Direction
+
+Jiankai’s October 2026 feedback prioritizes closed-loop policy evaluation and transition-matched Kuka controls for the paper’s main narrative. For this trajectory-reuse contribution, he requested two concrete additions: a pre-specified practically meaningful effect size and perceptual and motion-based duplicate-detector baselines.
+
+This repository owns that reuse-specific workstream while remaining separate from the coverage audit and failure-share intervention.
+
 ## Question
 
 Can controlled reuse of a physical trajectory under new pixels change the measured advantage of a training policy relative to evaluation on independently sampled events?
