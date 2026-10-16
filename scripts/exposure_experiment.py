@@ -14,12 +14,18 @@ import hashlib
 import json
 import platform
 import subprocess
+import sys
 import time
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import torch
+
+sys.path.insert(0, str(Path(__file__).parent))
+
+from freeze import FreezeError, git_state  # noqa: E402
+from freeze import validate as validate_freeze  # noqa: E402
 
 from trajectory_lineage.convlstm import ConvLSTMStatePredictor
 from trajectory_lineage.detectors import state_trajectory_distance
@@ -433,41 +439,15 @@ def config_hash(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def git_state() -> tuple[str, bool]:
-    """Return the HEAD commit and whether tracked files are unmodified."""
+def check_freeze(manifest_path: Path, config_path: Path) -> None:
+    """Refuse unblinding unless the manifest passes the shared freeze validation."""
 
     try:
-        commit = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
-        status = subprocess.check_output(
-            ["git", "status", "--porcelain", "--untracked-files=no"], text=True
-        ).strip()
-    except (OSError, subprocess.CalledProcessError):
-        return "unavailable", False
-    return commit, status == ""
-
-
-def check_freeze(manifest_path: Path, config_path: Path) -> None:
-    """Refuse unblinding unless the manifest binds configuration, code, analyzer, and sign-off."""
-
-    manifest = json.loads(manifest_path.read_text())
-    config = json.loads(config_path.read_text())
-    if manifest.get("config_sha256") != config_hash(config_path):
-        raise SystemExit("freeze manifest does not match the configuration; refusing to unblind")
-    commit, clean = git_state()
-    if manifest.get("code_commit") != commit or not clean:
-        raise SystemExit("code differs from the frozen commit or the tree is modified")
-    if manifest.get("analyzer_sha256") != config_hash(ANALYZER):
-        raise SystemExit("analysis code differs from the frozen analyzer")
-    signoffs = manifest.get("signoffs", {})
-    for role in config.get("required_signoff_roles", []):
-        name = signoffs.get(role)
-        if not isinstance(name, str) or len(name.strip()) < 3:
-            raise SystemExit(f"missing sign-off for role {role!r}; refusing to unblind")
-    excluded = set(manifest.get("excluded_pilot_seeds", []))
-    if not set(config.get("excluded_pilot_seeds", [])) <= excluded:
-        raise SystemExit("manifest does not exclude every declared pilot seed")
-    if int(config["experiment_seed"]) in excluded:
-        raise SystemExit("confirmation seed is listed as a pilot seed")
+        validate_freeze(
+            json.loads(manifest_path.read_text()), config_path, ANALYZER, state=git_state
+        )
+    except FreezeError as error:
+        raise SystemExit(f"refusing to unblind: {error}") from error
 
 
 INFRASTRUCTURE_MARKERS = ("mps", "out of memory", "cuda", "device")

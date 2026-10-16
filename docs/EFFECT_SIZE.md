@@ -2,7 +2,7 @@
 
 ## Status
 
-Draft for sign-off by the paper lead and Yining Hua. The executable form is `experiments/exposure_confirmation.json` (`status: draft_pending_signoff`) and the frozen analysis is `scripts/analyze_confirmation.py`. No learned-model reuse effect estimate has been inspected or released. Raw block records (including per-render losses for later detector filtering) are written only when a freeze manifest binds the configuration SHA-256, a clean code commit, the analyzer SHA-256, named sign-offs for the `paper_lead` and `evaluation_science` roles, and the excluded pilot seeds; `scripts/exposure_experiment.py` refuses otherwise.
+Draft for sign-off by the paper lead and Yining Hua. The executable form is `experiments/exposure_confirmation.json` (`status: draft_pending_signoff`) and the frozen analysis is `scripts/analyze_confirmation.py`. No learned-model reuse effect estimate has been inspected or released. Raw block records (including per-render losses for later detector filtering) are written only when a freeze manifest binds a confirmatory configuration's SHA-256, a clean code commit, the analyzer SHA-256, dated named sign-offs for the `paper_lead` and `evaluation_science` roles (placeholders rejected), the agreed decision statement behind the thresholds, and every registered pilot seed (`scripts/freeze.py`); the runner and the analyzer both refuse otherwise. String checks reject placeholders but cannot prove approval, so the manifest should be committed with the approval record.
 
 This responds to Jiankai Sun’s request to “pre-specify a practically meaningful effect size” for the reuse pilot.
 
@@ -43,7 +43,7 @@ Prevalence values are scenarios, not estimates of physical-trajectory reuse in a
 
 ## Decision Rule
 
-Block-level paired contrasts, two-sided 95% t intervals (one-sided α = 0.025 per bound). Primary analysis uses blocks passing a pre-treatment base-competence screen on a separate 256-event population that is never scored (the base model must beat constant velocity there); the intent-to-treat analysis over all completed blocks is a sensitivity analysis. Infrastructure errors retry once with identical seeds; other exceptions are algorithmic failures; if failures exceed 5% of scheduled blocks, or fewer than 240 blocks pass the screen, the result is inconclusive.
+Block-level paired contrasts, two-sided 95% t intervals (one-sided α = 0.025 per bound). Primary analysis uses blocks passing a pre-treatment base-competence screen on a separate 256-event population that is never scored (the base model must beat constant velocity there); an analysis over all completed blocks is a sensitivity analysis. Infrastructure errors retry once with identical seeds; other exceptions are algorithmic failures. The result is inconclusive if failures exceed 5% of scheduled blocks, if fewer than 320 blocks pass the screen, or if a decisive claim changes when failed blocks are imputed with least-favorable observed contrasts. The analyzer accepts only exactly one record per registered block, with finite bounded errors and contrasts consistent with them, and validates the freeze manifest before analysis.
 
 Outcomes are reported on separate axes, so a failed safeguard is never relabeled as a prevalence effect.
 
@@ -63,7 +63,7 @@ Outcomes are reported on separate axes, so a failed safeguard is never relabeled
 
 Secondary hypotheses, Holm step-down at one-sided 0.025: identity-specific reuse (H0: Q ≤ 0.010, against the closer-than-base-training arm), detectable reuse (H0: G ≤ 0), consequential harm (H0: H ≤ 0.001). A claim that same-trajectory exposure helps *beyond closer independent neighbors* requires the identity-specific rejection. Q2, the distance profile, and detectors are exploratory.
 
-Break-even prevalence `π* = m/G`: finite interval `[m/upper(G), m/lower(G)]` when `lower(G) > 0`; unbounded above when `lower(G) ≤ 0 < upper(G)`; no positive crossing when `upper(G) ≤ 0`; also reported intersected with `[0, 1]`. The harm-to-gap crossover `H/G` gets a block-bootstrap interval with the fraction of resamples where it is undefined.
+Break-even prevalence `π* = m/G`: finite interval `[m/upper(G), m/lower(G)]` when `lower(G) > 0`; unbounded above when `lower(G) ≤ 0 < upper(G)`; no positive crossing when `upper(G) ≤ 0`; also reported intersected with `[0, 1]`. The harm-to-gap crossover `H/G` gets a Fieller confidence set (bounded interval, two rays, or the entire line).
 
 What each outcome licenses is narrow: it concerns this model, exposure dose (12–13 presentations per source), continuation phase, population, and metric. A negligible gap does not establish that training is harmless, that both arms are equivalent on every population, or that appearance-level curation is adequate elsewhere.
 
@@ -77,9 +77,9 @@ What each outcome licenses is narrow: it concerns this model, exposure dose (12�
 | 1.5 | 1.00 | 0.83 |
 | 2.0 | 0.99 | 0.59 |
 
-Using pilot v5 alone (7 df), the H = 0.0005 column is 0.95, 0.67, 0.44. The harm gate is binding: continuation on any 64 examples shifts the whole model by a block-specific amount (per-block SD about 0.0017 on independent events), which the reuse gap cancels but the harm contrast does not. Rejection rate exactly at the consequential threshold is 0.024–0.026 (nominal 0.025); negligible-outcome power at `G = 0` is 1.00; identity-specific power exceeds 0.9 when true Q ≥ 0.0102. These are conditional on normal block contrasts and the stated SDs; they are not assurance.
+Using pilot v5 alone (7 df), the H = 0.0005 column is 0.95, 0.67, 0.44; because v4 and v5 used different screening rules, v5 alone is the primary planning sensitivity and the sample size is chosen so that it still gives 0.95. The harm gate is binding: continuation on any 64 examples shifts the whole model by a block-specific amount (per-block SD about 0.0017 on independent events), which the reuse gap cancels but the harm contrast does not. Rejection rate exactly at the consequential threshold is 0.024–0.026 (nominal 0.025); negligible-outcome power at `G = 0` is 1.00 before the assay-sensitivity requirement; identity-specific power exceeds 0.9 when true Q ≥ 0.0102. These are conditional on normal block contrasts and the stated SDs; they are not assurance.
 
-352 blocks are scheduled and planned as 336 analyzed (about 4% screen attrition; at least 320 must pass), about 4.9 hours on Apple MPS.
+352 blocks are scheduled and planned as 336 analyzed (about 4% screen attrition; at least 320 must pass): 4.9 to 6.5 hours on Apple MPS depending on load.
 
 ## Pilot History
 

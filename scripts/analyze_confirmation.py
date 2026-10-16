@@ -9,6 +9,7 @@ prevalence effect:
 
 * gap magnitude (consequential, prevalence-dependent, negligible, reverse, inconclusive);
 * safeguards (source gain supported, independent harm bounded, consequential harm);
+* robustness: decisive claims must survive least-favorable imputation of failed blocks.
 * identity specificity (same trajectory versus closer independent neighbor), Holm-adjusted.
 """
 
@@ -25,9 +26,14 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+from freeze import FreezeError  # noqa: E402
+from freeze import validate as validate_freeze  # noqa: E402
 from plan_confirmation import t_cdf, t_quantile  # noqa: E402
 
-CONTRASTS = ("S", "I", "H", "G", "Q", "Q2", "A_C", "E_exact_gain")
+ARMS = ("B", "C", "D", "D2", "E")
+POPULATIONS = ("source", "exact", "independent")
+STATUSES = ("completed", "algorithmic_failure", "infrastructure_failure")
+
 FIELDS = {
     "S": "C_source_gain",
     "I": "C_independent_gain",
@@ -36,8 +42,62 @@ FIELDS = {
     "Q": "C_minus_D_gap",
     "Q2": "C_minus_D2_gap",
     "A_C": "C_apparent_improvement",
+    "A_B": "B_apparent_improvement",
     "E_exact_gain": "E_exact_gain",
+    "E_transfer_loss": "E_transfer_loss",
 }
+
+
+class RecordError(Exception):
+    """Raised when block records do not form exactly the registered experiment."""
+
+
+def validate_records(runs: list[dict[str, Any]], scheduled: int) -> None:
+    """Require exactly one terminal, internally consistent record per registered block."""
+
+    indices = [run.get("block_index") for run in runs]
+    if sorted(indices) != list(range(scheduled)):
+        raise RecordError(
+            f"expected block indices 0..{scheduled - 1} exactly once; got {len(runs)} records"
+        )
+    for run in runs:
+        if run.get("status") not in STATUSES:
+            raise RecordError(f"block {run.get('block_index')} has unknown status")
+        if run["status"] != "completed":
+            continue
+        errors = run["errors"]
+        values = [errors[arm][population] for arm in ARMS for population in POPULATIONS]
+        values += list(run["contrasts"].values())
+        if not all(math.isfinite(float(value)) for value in values):
+            raise RecordError(f"block {run['block_index']} has nonfinite values")
+        if any(not 0 <= errors[arm][population] <= 1 for arm in ARMS for population in POPULATIONS):
+            raise RecordError(f"block {run['block_index']} has errors outside the bounded metric")
+        gap = (errors["B"]["source"] - errors["C"]["source"]) - (
+            errors["B"]["independent"] - errors["C"]["independent"]
+        )
+        if abs(gap - run["contrasts"]["C_reuse_gap"]) > 1e-9:
+            raise RecordError(f"block {run['block_index']} contrasts disagree with its errors")
+
+
+def fieller(numerator: np.ndarray, denominator: np.ndarray, alpha: float) -> dict[str, Any]:
+    """Fieller confidence set for mean(numerator) / mean(denominator) over blocks."""
+
+    n = len(numerator)
+    covariance = np.cov(numerator, denominator, ddof=1) / n
+    h, g = float(numerator.mean()), float(denominator.mean())
+    t2 = t_quantile(1 - alpha, n - 1) ** 2
+    a = g * g - t2 * covariance[1, 1]
+    b = -2 * (h * g - t2 * covariance[0, 1])
+    c = h * h - t2 * covariance[0, 0]
+    discriminant = b * b - 4 * a * c
+    if a > 0:
+        root = math.sqrt(max(discriminant, 0.0))
+        return {"type": "bounded", "interval": [(-b - root) / (2 * a), (-b + root) / (2 * a)]}
+    if discriminant > 0:
+        root = math.sqrt(discriminant)
+        low, high = sorted([(-b - root) / (2 * a), (-b + root) / (2 * a)])
+        return {"type": "two rays", "excluded_interval": [low, high]}
+    return {"type": "entire real line"}
 
 
 def interval(values: np.ndarray, alpha_one_sided: float) -> dict[str, float]:
@@ -85,30 +145,6 @@ def break_even(gap: dict[str, float], margin: float) -> dict[str, Any]:
     }
 
 
-def ratio_interval(
-    numerator: np.ndarray, denominator: np.ndarray, rng: np.random.Generator, draws: int = 2000
-) -> dict[str, Any]:
-    """Block-bootstrap percentile interval for mean(H)/mean(G) where defined."""
-
-    n = len(numerator)
-    ratios, undefined = [], 0
-    for _ in range(draws):
-        index = rng.integers(0, n, size=n)
-        g_mean = denominator[index].mean()
-        h_mean = numerator[index].mean()
-        if g_mean <= 0 or h_mean <= 0:
-            undefined += 1
-            continue
-        ratios.append(h_mean / g_mean)
-    if not ratios:
-        return {"status": "undefined in every resample", "undefined_fraction": 1.0}
-    return {
-        "status": "estimated",
-        "percentile_95": [float(np.quantile(ratios, 0.025)), float(np.quantile(ratios, 0.975))],
-        "undefined_fraction": undefined / draws,
-    }
-
-
 def classify_gap(gap: dict[str, float], contract: dict[str, Any]) -> str:
     consequential = float(contract["consequential_threshold"])
     negligible = float(contract["negligible_bound"])
@@ -123,8 +159,21 @@ def classify_gap(gap: dict[str, float], contract: dict[str, Any]) -> str:
     return "inconclusive"
 
 
+def arm_summaries(runs: list[dict[str, Any]], alpha: float) -> dict[str, Any]:
+    return {
+        arm: {
+            population: interval(np.array([run["errors"][arm][population] for run in runs]), alpha)
+            for population in POPULATIONS
+        }
+        for arm in ARMS
+    }
+
+
 def analyze_blocks(
-    runs: list[dict[str, Any]], contract: dict[str, Any], rng: np.random.Generator
+    runs: list[dict[str, Any]],
+    contract: dict[str, Any],
+    rng: np.random.Generator,
+    failed: int = 0,
 ) -> dict[str, Any]:
     alpha = float(contract["alpha_one_sided"])
     values = {
@@ -138,7 +187,7 @@ def analyze_blocks(
     harm_margin = float(contract["harm_margin_h"])
     source_supported = summaries["S"]["lower"] > 0
     harm_bounded = summaries["H"]["upper"] < harm_margin
-    assay_sensitive = float(np.mean(values["E_exact_gain"] > 0)) >= 0.75
+    assay_sensitive = float(np.sum(values["E_exact_gain"] > 0)) / (len(runs) + failed) >= 0.75
 
     if magnitude in ("consequential", "prevalence_dependent"):
         if source_supported and harm_bounded:
@@ -166,6 +215,7 @@ def analyze_blocks(
     ]
     return {
         "blocks": len(runs),
+        "arm_population_errors": arm_summaries(runs, alpha),
         "contrasts": summaries,
         "gap_magnitude": magnitude,
         "source_gain_supported": bool(source_supported),
@@ -175,7 +225,7 @@ def analyze_blocks(
         "secondary_p_values": p_values,
         "secondary_holm_rejections": holm(p_values, alpha),
         "break_even_prevalence": break_even(gap, margin),
-        "harm_to_gap_crossover": ratio_interval(values["H"], values["G"], rng),
+        "harm_to_gap_crossover_fieller": fieller(values["H"], values["G"], alpha),
         "sensitivity": {
             "trimmed_mean_G_10pct": float(trimmed.mean()),
             "leave_one_block_out_G_range": [min(leave_one_out), max(leave_one_out)],
@@ -183,9 +233,36 @@ def analyze_blocks(
     }
 
 
-def analyze(runs: list[dict[str, Any]], config: dict[str, Any]) -> dict[str, Any]:
+def worst_case_records(
+    runs: list[dict[str, Any]], failed: int, direction: str
+) -> list[dict[str, Any]]:
+    """Append imputed records for failed blocks using least favorable observed contrasts."""
+
+    if failed == 0:
+        return runs
+    contrasts = {field: [run["contrasts"][field] for run in runs] for field in FIELDS.values()}
+    worst = {
+        field: (min(values) if direction == "low" else max(values))
+        for field, values in contrasts.items()
+    }
+    worst["C_independent_harm"] = max(contrasts["C_independent_harm"])
+    worst["C_independent_gain"] = -worst["C_independent_harm"]
+    worst["E_exact_gain"] = min(contrasts["E_exact_gain"])
+    imputed = [
+        {"block_index": -1, "status": "imputed", "contrasts": dict(worst)} for _ in range(failed)
+    ]
+    for record in imputed:
+        record["errors"] = runs[0]["errors"]
+    return runs + imputed
+
+
+def analyze(
+    runs: list[dict[str, Any]], config: dict[str, Any], *, check_records: bool = True
+) -> dict[str, Any]:
     contract = config["decision_contract"]
-    scheduled = len(runs)
+    scheduled = int(config["blocks"])
+    if check_records:
+        validate_records(runs, scheduled)
     completed = [run for run in runs if run["status"] == "completed"]
     failures = [run for run in runs if run["status"] != "completed"]
     screened = [run for run in completed if run.get("base_competent", False)]
@@ -206,16 +283,32 @@ def analyze(runs: list[dict[str, Any]], config: dict[str, Any]) -> dict[str, Any
         "screened": len(screened),
         "screen_failures": [run["block_index"] for run in completed if run not in screened],
     }
+    if len(screened) >= 2:
+        result["primary"] = analyze_blocks(screened, contract, rng, failed=len(failures))
+    if len(completed) >= 2:
+        result["all_completed_blocks"] = analyze_blocks(
+            completed, contract, rng, failed=len(failures)
+        )
     if len(failures) > max_failure * scheduled:
         result["primary_claim"] = "inconclusive (execution failures exceed the declared limit)"
         return result
     if len(screened) < minimum:
         result["primary_claim"] = "inconclusive (too few screened blocks)"
         return result
-    result["primary"] = analyze_blocks(screened, contract, rng)
-    result["primary_claim"] = result["primary"]["primary_claim"]
-    if len(completed) >= 2:
-        result["intent_to_treat"] = analyze_blocks(completed, contract, rng)
+    claim = result["primary"]["primary_claim"]
+    if failures:
+        robust = {
+            analyze_blocks(
+                worst_case_records(screened, len(failures), direction),
+                contract,
+                rng,
+            )["primary_claim"]
+            for direction in ("low", "high")
+        }
+        result["failure_robustness"] = sorted(robust)
+        if robust != {claim}:
+            claim = "inconclusive (failure-sensitive)"
+    result["primary_claim"] = claim
     return result
 
 
@@ -228,7 +321,12 @@ def main() -> None:
         "--config", type=Path, default=Path("experiments/exposure_confirmation.json")
     )
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--freeze-manifest", type=Path, required=True)
     args = parser.parse_args()
+    try:
+        validate_freeze(json.loads(args.freeze_manifest.read_text()), args.config, Path(__file__))
+    except FreezeError as error:
+        raise SystemExit(f"refusing to analyze: {error}") from error
     result = analyze(json.loads(args.records.read_text()), json.loads(args.config.read_text()))
     args.out.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
     print(json.dumps({key: result[key] for key in ("primary_claim", "scheduled", "screened")}))

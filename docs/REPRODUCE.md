@@ -115,16 +115,19 @@ The runner needs the `models` extra (PyTorch). Every report is effect-blinded by
 ```bash
 # Discarded, effect-blinded variance pilot on the confirmatory protocol (about 7 minutes on Apple MPS)
 uv run --extra models python scripts/exposure_experiment.py \
-  --config experiments/exposure_pilot_v4.json --out results/exposure_pilot_v4_blinded.json --device mps
+  --config experiments/exposure_pilot_v5.json --out results/exposure_pilot_v5_blinded.json --device mps
 
 # Pre-treatment balance check using base checkpoints only
 uv run --extra models python scripts/exposure_balance_check.py --device mps
 
-# Finite-sample joint power for the decision contract from the blinded pilot
+# Finite-sample joint power for the decision contract from the blinded pilots (v4 and v5 pooled)
 uv run python scripts/plan_confirmation.py
+
+# Empirical checks of the closer-neighbor sampler
+uv run python scripts/validate_closer_sampler.py
 ```
 
-The confirmation (`experiments/exposure_confirmation.json`, 256 blocks, about 3.5 hours) is run the same way. Raw block records require `--unblind PATH --freeze-manifest MANIFEST`, where the manifest records the configuration SHA-256 and collaborator sign-off; the runner refuses otherwise. Two MPS runs of the same configuration reproduced pilot v3 dispersion exactly.
+The confirmation (`experiments/exposure_confirmation.json`, 352 blocks, 4.9 to 6.5 hours) is run the same way. Raw block records require `--unblind PATH --freeze-manifest MANIFEST`; the manifest (template: `experiments/freeze_manifest.template.json`) must pass `scripts/freeze.py`. The frozen analysis is `uv run python scripts/analyze_confirmation.py --records PATH --freeze-manifest MANIFEST --out PATH`. Two MPS runs of the same configuration reproduced pilot v3 dispersion exactly.
 
 `scripts/plan_exposure_power.py` and `scripts/exposure_pilot.py` are superseded and kept only to document earlier runs.
 
@@ -138,7 +141,7 @@ uv pip install --python .venv-detectors/bin/python torch torchvision pillow nump
 PYTHONPATH=src .venv-detectors/bin/python scripts/detector_benchmark.py
 ```
 
-The registered configuration is `experiments/detector_benchmark_v2.json`; output is `results/detector_benchmark_v2.json` (about 55 minutes on Apple MPS). Use `--scale 0.03` for a one-minute smoke run.
+The registered configuration is `experiments/detector_benchmark_v4.json`; outputs are `results/detector_benchmark_v4.json` and per-query scores `results/detector_benchmark_v4_scores.json.gz` (about 75 minutes on Apple MPS). Then run `uv run python scripts/analyze_detectors.py` for per-transformation rates, family-bootstrap intervals, the copy-control gate, and hard-constrained recall. Use `--scale 0.03` for a two-minute smoke run.
 
 ## Detector Smoke
 

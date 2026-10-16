@@ -102,17 +102,22 @@ def test_failed_blocks_count_against_positive_control() -> None:
 
 
 def test_unblinding_requires_complete_manifest(tmp_path: Path, monkeypatch) -> None:
-    config = dict(TINY, required_signoff_roles=["paper_lead", "evaluation_science"])
+    config = dict(
+        TINY, role="confirmatory", required_signoff_roles=["paper_lead", "evaluation_science"]
+    )
     config["excluded_pilot_seeds"] = [5]
-    config_path = tmp_path / "config.json"
+    config_path = tmp_path / "exposure_confirmation.json"
     config_path.write_text(json.dumps(config))
+    (tmp_path / "exposure_pilot_v9.json").write_text(json.dumps({"experiment_seed": 7}))
     monkeypatch.setattr(experiment, "git_state", lambda: ("abc123", True))
     valid = {
         "config_sha256": experiment.config_hash(config_path),
         "code_commit": "abc123",
         "analyzer_sha256": experiment.config_hash(experiment.ANALYZER),
         "signoffs": {"paper_lead": "Jiankai Sun", "evaluation_science": "Yining Hua"},
-        "excluded_pilot_seeds": [5],
+        "signoff_date": "2026-10-20",
+        "decision_statement": "A 0.001 shift changes whether we report one model as better.",
+        "excluded_pilot_seeds": [5, 7],
     }
     manifest = tmp_path / "freeze.json"
     manifest.write_text(json.dumps(valid))
@@ -121,14 +126,21 @@ def test_unblinding_requires_complete_manifest(tmp_path: Path, monkeypatch) -> N
         ("config_sha256", "wrong"),
         ("code_commit", "other"),
         ("analyzer_sha256", "wrong"),
-        ("signoffs", {"paper_lead": "a"}),
-        ("excluded_pilot_seeds", []),
+        ("signoffs", {"paper_lead": "full name", "evaluation_science": "Yining Hua"}),
+        ("signoff_date", "soon"),
+        ("decision_statement", "ok"),
+        ("excluded_pilot_seeds", [5]),
     ):
         manifest.write_text(json.dumps(dict(valid, **{key: bad})))
         with pytest.raises(SystemExit):
             experiment.check_freeze(manifest, config_path)
     monkeypatch.setattr(experiment, "git_state", lambda: ("abc123", False))
     manifest.write_text(json.dumps(valid))
+    with pytest.raises(SystemExit):
+        experiment.check_freeze(manifest, config_path)
+    monkeypatch.setattr(experiment, "git_state", lambda: ("abc123", True))
+    config_path.write_text(json.dumps(dict(config, role="discarded_effect_blinded_variance_pilot")))
+    manifest.write_text(json.dumps(dict(valid, config_sha256=experiment.config_hash(config_path))))
     with pytest.raises(SystemExit):
         experiment.check_freeze(manifest, config_path)
 

@@ -71,7 +71,7 @@
         "negligible differential gap": "negligible magnitude and assay sensitive",
         "assay insensitive": "negligible magnitude but positive control failed",
         "reverse gap": "reverse magnitude",
-        "inconclusive": "otherwise, or execution failures above 5% of scheduled blocks, or fewer than 240 screened blocks"
+        "inconclusive": "otherwise, or execution failures above 5% of scheduled blocks, or fewer than 320 screened blocks, or a decisive claim that changes under least-favorable imputation of failed blocks"
       }
     },
     "secondary": {
@@ -95,13 +95,15 @@
     "max_failure_fraction": 0.05,
     "minimum_screened_blocks": 320,
     "break_even_rules": "pi* = m/G: finite interval [m/upper(G), m/lower(G)] when lower(G) > 0; unbounded above when lower(G) <= 0 < upper(G); no positive crossing when upper(G) <= 0; also reported intersected with [0, 1].",
-    "crossover": "H/G block-bootstrap percentile interval, with the fraction of resamples where it is undefined",
-    "analyzer": "scripts/analyze_confirmation.py (SHA-256 bound in the freeze manifest)"
+    "crossover": "Fieller confidence set for mean(H)/mean(G): bounded interval, two rays, or the entire line",
+    "analyzer": "scripts/analyze_confirmation.py (SHA-256 bound in the freeze manifest)",
+    "failure_robustness": "Any failed block is imputed with least-favorable observed contrasts (minimum S and G and maximum H, and separately maximum G); a decisive claim stands only if unchanged.",
+    "record_integrity": "The analyzer requires exactly one record per registered block index, finite bounded errors, and contrasts consistent with errors, and validates the freeze manifest before analysis."
   },
   "freeze_requirement": "Configuration SHA-256 recorded in a freeze manifest with sign-off from the paper lead and Yining Hua before --unblind is permitted.",
   "claim_boundary": "Effect of replacing 64 independent continuation events with same-trajectory rerenders for this ConvLSTM, dose, and continuation phase.",
-  "sample_size_rationale": "352 scheduled blocks, planned as 336 analyzed after about 4% screen attrition (at least 320 screened required). The harm gate is binding: per-block independent-population differences between two random continuations have SD about 0.0017 (pooled pilots v4+v5, 14 df; S-H correlation -0.95), which the reuse gap cancels. Joint consequential-rule power at G = S + H = 0.015 with SDs at the pooled 80% upper limit: 1.00 at H = 0 and 0.99 at H = 0.0005; 0.95 at H = 0.0005 using pilot v5 alone. Test size at the threshold about 0.025. About 4.9 hours on Apple MPS. results/confirmation_power.json.",
-  "base_competence_screen": "Pre-treatment screen on a separate 256-event competence population (never scored in contrasts): a block enters the primary analysis iff its base model's bounded error there is below constant velocity's. All blocks reported; intent-to-treat over all completed blocks is a sensitivity analysis.",
+  "sample_size_rationale": "352 scheduled blocks, planned as 336 analyzed after about 4% screen attrition (at least 320 screened required). The harm gate is binding: per-block independent-population differences between two random continuations have SD about 0.0017 (pooled pilots v4+v5, 14 df; S-H correlation -0.95), which the reuse gap cancels. Joint consequential-rule power at G = S + H = 0.015 with SDs at the pooled 80% upper limit: 1.00 at H = 0 and 0.99 at H = 0.0005; 0.95 at H = 0.0005 using pilot v5 alone. Test size at the threshold about 0.025. Runtime 4.9 to 6.5 hours on Apple MPS depending on load. results/confirmation_power.json.",
+  "base_competence_screen": "Pre-treatment screen on a separate 256-event competence population (never scored in contrasts): a block enters the primary analysis iff its base model's bounded error there is below constant velocity's. All blocks reported; an analysis over all completed blocks is a sensitivity analysis.",
   "closer_nearby": {
     "construction": "box-conditioned band distribution: uniform initial-state prior restricted to a sensitivity-scaled box (edge offset alone gives 6x the band maximum; capped at the full parameter range) and conditioned on RMS state distance in [0.25, 0.5] x the source's nearest base-training distance",
     "low_fraction": 0.25,
@@ -121,5 +123,6 @@
     2026101605,
     2026101624
   ],
-  "planning_analyzed_blocks": 336
+  "planning_analyzed_blocks": 336,
+  "runtime_estimate": "About 50 s per block on an unloaded Apple MPS laptop (pilot v4) and 66 s under concurrent load (pilot v5): 4.9 to 6.5 hours for 352 blocks."
 }
