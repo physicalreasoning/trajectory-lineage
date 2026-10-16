@@ -138,12 +138,12 @@ The ConvLSTM reduces error by 39.3% relative to constant velocity and lands with
 
 ## Duplicate-detector audit
 
-A registered benchmark (native 224 px, 8 transformations, 14 detector variants, calibrated query-level false removal, a conventional-copy positive control, and an independent-seed replication) found that perceptual similarity tracks appearance, not trajectory:
+A registered benchmark (native 224 px, 8 transformations, 14 detector variants, calibrated query-level false removal, a conventional-copy positive control, and an independent-seed robustness check) found that perceptual similarity is dominated by appearance rather than trajectory:
 
-| Detector | Re-encoded copy (5%) | Same trajectory, new appearance (1%) | Different nearby trajectory, same appearance, removed (1%) |
+| Detector (nominal 1% false removal) | Re-encoded copy | Same trajectory, new appearance | Different nearby trajectory, same appearance, removed |
 |---|---:|---:|---:|
 | Exact hash | 0% | 0% | 0% |
-| SSCD, aligned + normalized (passes copy gate) | 85% | 12% | 31% |
+| SSCD, aligned + normalized (passes copy gate) | 58.5% | 11.5% | 31% |
 | Centroid tracks + mirror/time search (fails gate: JPEG corrupts extraction) | 0% | 100% | 0% |
 
 Trajectory-aware matching recovers rerenders under appearance, texture, mirror, and time-shift changes when extraction is reliable, and calibrating only on unrestricted negatives removes most independent events that lie closer to a training trajectory than any other training clip. See `FINDINGS.md` §6 and `docs/DETECTORS.md`.

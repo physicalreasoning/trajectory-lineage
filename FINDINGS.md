@@ -143,7 +143,7 @@ The pre-specified contract (`docs/EFFECT_SIZE.md`) uses a declared ranking margi
 
 Source: `results/exposure_pilot_v5_blinded.json`, `results/confirmation_power.json`, `results/exposure_balance_check.json`, `results/closer_sampler_validation.json`.
 
-## 6 · Perceptual similarity tracks appearance, not trajectory (2026-10-16)
+## 6 · Perceptual similarity is dominated by appearance, not trajectory (2026-10-16)
 
 `scripts/detector_benchmark.py` ran the registered `experiments/detector_benchmark_v4.json` from clean commit `fd14187` (native 224 px; 500-trajectory gallery; per split 200 positives, 200 independent hard negatives closer to a target than its nearest other gallery trajectory, and 600 independent easy-negative families; 8 transformations; 14 detector variants). `scripts/analyze_detectors.py` computed per-transformation rates with family-bootstrap intervals that propagate calibration uncertainty, a copy-control gate, hard-constrained recall, and track validation against simulator positions.
 
@@ -153,11 +153,11 @@ Pre-registered gate (necessary, not sufficient): copy-control AUROC ≥ 0.95 and
 |---|---|
 | Only SSCD with alignment and background normalization passes the gate among practical detectors | Copy AUROC 0.96, recall 0.85 at 5%; DINOv2, RAFT, silhouettes, and centroid tracks fail |
 | It misses most same-trajectory rerenders | Recall 0.12 (bootstrap 0.07–0.16) at 1% and 0.22 at 5% under appearance change; 0.01–0.06 at 1% with texture, compression, crop, mirror, time shift, or distractors |
-| It flags different trajectories that share appearance | In the copy control it removes 31% of same-appearance closer independent trajectories at 1% (56% at 5%); copy-versus-hard AUROC 0.70 |
+| It flags different trajectories that share appearance | In the copy control it removes 31% of same-appearance closer independent trajectories at 1% (56% at 5%); copy-versus-hard AUROC 0.70 shows some, but limited, trajectory information |
 | Trajectory-aware matching recovers rerenders when extraction works | Centroid tracks with mirror and time-offset search: 100% recall under appearance, texture, mirror, and time shift at 1.7–2.5% false removal; tracks are within 0.3–0.4 px of truth there, but JPEG corrupts extraction (24–27 px), and crop breaks the matcher's coordinates although extraction stays accurate |
-| Easy-negative calibration over-removes close independent events | 69% (centroid, appearance) and 53% (state reference) at the pooled 1% point despite perfect separation; a hard-negative constraint keeps recall at 1.00 with 1.0–2.5% hard removal |
+| Easy-negative calibration over-removes close independent events | 69% (centroid, appearance) and 53% (state reference) at the pooled 1% point despite perfect separation (a state-distance removal rule of score > −10⁻⁶ keeps 100% recall with no negative removals); a hard-negative constraint keeps recall at 1.00 with 1.0–2.5% hard removal |
 | Pooled calibration does not control per-transformation false removal | Up to 5.8% (silhouette, appearance) and 7.8% (normalized SSCD, compression) at the pooled 1% point |
 
-**Replication:** v3 (independent seeds; superseded hard-negative sampler; fresh-palette copy negatives) gave the same headline values (copy recall 0.84 at 5%; rerender recall 0.12 at 1%; invariant centroid recall 1.00). **Scope:** synthetic collisions; full clips at 224 px (curation setting), not the ConvLSTM's 64 px prefixes; one gallery per split; 600 independent negative families limit precision at 1%. The 64 px v2 run failed its copy control and supports no perceptual conclusion.
+**Robustness check:** v3 (a changed protocol with independent seeds; superseded hard-negative sampler; fresh-palette copy negatives) gave the same headline values (copy recall 0.84 at 5%; rerender recall 0.12 at 1%; invariant centroid recall 1.00). **Scope:** synthetic collisions; full clips at 224 px (curation setting), not the ConvLSTM's 64 px prefixes; one gallery per split; 600 independent negative families limit precision at 1%. The 64 px v2 run failed its copy control and supports no perceptual conclusion.
 
-Source: `results/detector_benchmark_v4.json`, `results/detector_benchmark_v4_scores.json.gz`, `results/detector_benchmark_v4_analysis.json` (v3: `results/detector_benchmark_v3*`).
+Source: `results/detector_benchmark_v4.json`, `results/detector_benchmark_v4_scores.json.gz`, `results/detector_benchmark_v4_analysis.json` (v3: `results/detector_benchmark_v3*`); weights and environment: `results/detector_weights_manifest.json`, `results/detector_environment.txt`.

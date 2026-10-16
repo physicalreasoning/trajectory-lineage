@@ -75,7 +75,22 @@ def recompute_contrasts(errors: dict[str, dict[str, float]]) -> dict[str, float]
     }
 
 
-def validate_records(runs: list[dict[str, Any]], scheduled: int) -> list[dict[str, Any]]:
+def expected_lengths(config: dict[str, Any]) -> dict[str, int]:
+    sources = int(config["source_trajectories"])
+    return {
+        "source": sources * int(config["heldout_renders_per_source"]),
+        "exact": sources,
+        "independent": int(config["independent_eval_examples"]),
+    }
+
+
+def bounded(value: object) -> bool:
+    return isinstance(value, (int, float)) and math.isfinite(float(value)) and 0 <= value <= 1
+
+
+def validate_records(
+    runs: list[dict[str, Any]], scheduled: int, config: dict[str, Any] | None = None
+) -> list[dict[str, Any]]:
     """Require one terminal record per registered block; rebuild contrasts and the screen.
 
     Stored contrasts and screen flags are never trusted: contrasts are recomputed from component
@@ -98,14 +113,37 @@ def validate_records(runs: list[dict[str, Any]], scheduled: int) -> list[dict[st
         values = [errors[arm][population] for arm in ARMS for population in POPULATIONS]
         if not all(math.isfinite(float(value)) and 0 <= value <= 1 for value in values):
             raise RecordError(f"block {run['block_index']} has errors outside the bounded metric")
-        for arm, populations in run.get("item_losses", {}).items():
-            for population, items in populations.items():
-                if abs(float(np.mean(items)) - errors[arm][population]) > 1e-5:
-                    raise RecordError(f"block {run['block_index']} item losses disagree")
+        if config is not None:
+            lengths = expected_lengths(config)
+            items = run.get("item_losses")
+            if not isinstance(items, dict):
+                raise RecordError(f"block {run['block_index']} lacks per-item losses")
+            for arm in ARMS:
+                for population in POPULATIONS:
+                    values_list = items.get(arm, {}).get(population)
+                    if not isinstance(values_list, list) or len(values_list) != lengths[population]:
+                        raise RecordError(
+                            f"block {run['block_index']} item losses have wrong shape"
+                        )
+                    if not all(bounded(value) for value in values_list):
+                        raise RecordError(f"block {run['block_index']} item losses out of range")
+                    if abs(float(np.mean(values_list)) - errors[arm][population]) > 1e-5:
+                        raise RecordError(f"block {run['block_index']} item losses disagree")
+            renders = int(config["heldout_renders_per_source"])
+            expected_families = [index // renders for index in range(lengths["source"])]
+            if run.get("source_family_of_render") != expected_families:
+                raise RecordError(f"block {run['block_index']} has an invalid family mapping")
+        else:
+            for arm, populations in run.get("item_losses", {}).items():
+                for population, values_list in populations.items():
+                    if not all(bounded(value) for value in values_list) or (
+                        abs(float(np.mean(values_list)) - errors[arm][population]) > 1e-5
+                    ):
+                        raise RecordError(f"block {run['block_index']} item losses disagree")
         screen_error = run.get("screen_base_error")
         screen_cv = run.get("screen_constant_velocity_error")
-        if not all(isinstance(value, (int, float)) for value in (screen_error, screen_cv)):
-            raise RecordError(f"block {run['block_index']} lacks competence-screen errors")
+        if not (bounded(screen_error) and bounded(screen_cv)):
+            raise RecordError(f"block {run['block_index']} lacks valid competence-screen errors")
         record = dict(run)
         record["contrasts"] = recompute_contrasts(errors)
         record["base_competent"] = bool(screen_error < screen_cv)
@@ -124,6 +162,14 @@ def fieller(numerator: np.ndarray, denominator: np.ndarray, alpha: float) -> dic
     b = -2 * (h * g - t2 * covariance[0, 1])
     c = h * h - t2 * covariance[0, 0]
     discriminant = b * b - 4 * a * c
+    tiny = 1e-15 * max(1.0, abs(b), abs(c))
+    if covariance[1, 1] == 0 and g == 0:
+        return {"type": "undefined (denominator identically zero)"}
+    if abs(a) <= tiny:
+        if abs(b) <= tiny:
+            return {"type": "entire real line"} if c <= 0 else {"type": "empty"}
+        root = -c / b
+        return {"type": "ray", "bound": root, "direction": "below" if b > 0 else "above"}
     if a > 0:
         root = math.sqrt(max(discriminant, 0.0))
         return {"type": "bounded", "interval": [(-b - root) / (2 * a), (-b + root) / (2 * a)]}
@@ -276,12 +322,16 @@ DECISIVE = {
 
 
 def analyze(
-    runs: list[dict[str, Any]], config: dict[str, Any], *, check_records: bool = True
+    runs: list[dict[str, Any]],
+    config: dict[str, Any],
+    *,
+    check_records: bool = True,
+    strict_items: bool = True,
 ) -> dict[str, Any]:
     contract = config["decision_contract"]
     scheduled = int(config["blocks"])
     if check_records:
-        runs = validate_records(runs, scheduled)
+        runs = validate_records(runs, scheduled, config if strict_items else None)
     completed = [run for run in runs if run["status"] == "completed"]
     failures = [run for run in runs if run["status"] != "completed"]
     screened = [run for run in completed if run.get("base_competent", False)]
@@ -307,6 +357,11 @@ def analyze(
         result["all_completed_blocks"] = analyze_blocks(
             completed, contract, rng, failed=len(failures)
         )
+    if failures or len(screened) < minimum:
+        result["secondary_qualified"] = (
+            "completeness or eligibility requirement failed: secondary decisions are reported "
+            "but not claimed"
+        )
     if len(screened) < minimum:
         result["primary_claim"] = "inconclusive (too few screened blocks)"
         return result
@@ -317,7 +372,6 @@ def analyze(
         # conservative. Decisive claims therefore require every block to complete; deterministic
         # infrastructure failures can be rerun with identical seeds before analysis.
         claim = "inconclusive (unresolved block failures)"
-        result["secondary_qualified"] = "secondary decisions are reported but not claimed"
     result["primary_claim"] = claim
     return result
 

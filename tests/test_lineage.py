@@ -55,3 +55,9 @@ def test_missing_independence_assertion_is_unresolved() -> None:
     plain = LineageRecord("t1", "state-a", "t1-r1", "pixels-a", 1)
     other = LineageRecord("t2", "state-b", "t2-r1", "pixels-b", 2)
     assert plain.relationship_to(other) == Relationship.UNRESOLVED
+
+
+def test_siblings_with_a_shared_parent_are_not_independent() -> None:
+    left = record("t2", "t2-r1", parent="t1")
+    right = record("t3", "t3-r1", parent="t1")
+    assert left.relationship_to(right) == Relationship.DERIVED_TRAJECTORY

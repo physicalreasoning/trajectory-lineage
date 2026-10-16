@@ -67,6 +67,10 @@ class LineageRecord:
             self.trajectory_id == other.parent_trajectory_id
         ):
             return Relationship.DERIVED_TRAJECTORY
+        if self.parent_trajectory_id is not None and (
+            self.parent_trajectory_id == other.parent_trajectory_id
+        ):
+            return Relationship.DERIVED_TRAJECTORY
         if self.related_pair_id is not None and self.related_pair_id == other.related_pair_id:
             return Relationship.NEARBY_TRAJECTORY
         if self.independently_generated and other.independently_generated:
