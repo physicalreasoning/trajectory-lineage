@@ -142,3 +142,21 @@ Supporting checks:
 The pre-specified contract (`docs/EFFECT_SIZE.md`) uses a declared ranking margin m = 0.001, a consequential threshold of 0.010 (m at 10% prevalence), a negligible bound of ±0.002 (m at 50% prevalence), and a harm margin of 0.001, with outcomes reported on separate magnitude, safeguard, and identity-specificity axes. Unblinding requires a manifest binding the configuration, a clean code commit, the analyzer `scripts/analyze_confirmation.py`, and named sign-offs from the paper lead and the evaluation-science reviewer.
 
 Source: `results/exposure_pilot_v5_blinded.json`, `results/confirmation_power.json`, `results/exposure_balance_check.json`, `results/closer_sampler_validation.json`.
+
+## 6 · A working copy detector largely misses same-trajectory rerenders (2026-10-16)
+
+`scripts/detector_benchmark.py` ran the registered `experiments/detector_benchmark_v3.json` (native 224 px; 500-trajectory gallery; 200 positives, 200 closer-than-gallery independent hard negatives, and 600 independent easy-negative families per split; 8 transformations; 14 detector variants). `scripts/analyze_detectors.py` computed per-transformation rates with family-bootstrap intervals that propagate calibration uncertainty.
+
+Pre-registered gate: a detector bears on trajectory reuse only if it passes the conventional-copy control (JPEG-re-encoded identical render; AUROC ≥ 0.95, recall ≥ 0.80 at 5%).
+
+| Finding | Evidence (test split, pooled calibrated operating points) |
+|---|---|
+| Only SSCD with alignment and background normalization passes the copy gate among practical detectors | Copy AUROC 0.97; recall 0.84 at 5%. DINOv2, RAFT, silhouettes, and centroid tracks fail |
+| It catches about one in eight appearance-changed same-trajectory rerenders | Recall 0.12 (bootstrap 0.07–0.17) at 1%, 0.23 at 5%; 0.00–0.04 at 1% under texture, compression, crop, mirror, time shift, or distractors |
+| Trajectory-aware matching recovers rerenders when extraction works | Centroid tracks with mirror and time-offset search: 100% recall under appearance, texture, mirror, and time shift at about 2% false removal; 0% under JPEG or crop because the exact-color extractor breaks (fails the gate) |
+| Easy-negative calibration over-removes close independent events | Appearance-only centroid tracks remove 81% of hard negatives and the state-distance reference 77%, despite perfect separation (AUROC 1.00); adding a hard-negative constraint keeps recall at 1.00 with ≤1% hard removal |
+| Pooled calibration does not control per-transformation false removal | Up to 4.3% (silhouette, appearance) and 11.3% (normalized DINOv2, texture) at the pooled 1% point |
+
+**Scope:** synthetic collisions; full 24-frame clips at 224 px (curation setting), not the 64 px prefixes the ConvLSTM consumes; 600 independent negative families limit precision at 1%. The earlier 64 px run failed its copy control (upsampled JPEG blocks dominated SSCD) and is preserved as `results/detector_benchmark_v2_failed_control.json`; it supports no perceptual conclusion.
+
+Source: `results/detector_benchmark_v3.json`, `results/detector_benchmark_v3_scores.json.gz`, `results/detector_benchmark_v3_analysis.json`.
