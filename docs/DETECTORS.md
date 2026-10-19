@@ -49,9 +49,13 @@ A detector’s results support conclusions about trajectory reuse only if it pas
 | v3 (224 px) | Hard negatives came from the superseded half-range sampler (the fix landed after the process loaded); copy negatives had fresh palettes. Same headline values as v4; preserved as a replication |
 | v4 (224 px) | Registered protocol above, from clean commit `fd14187` with provenance in the result |
 
+## OFS-k (published motion-copy detector)
+
+`experiments/detector_benchmark_v4_ofs.json` scores OFS-k (Chen et al., 2024) on the identical v4 clips: RAFT flow for every consecutive frame pair, per-cell cosine between time-aligned flows, maximum over k-frame windows (k = 3 primary; 5 and 10 reported). Adaptations: flow at 128 px pooled to a 16 × 16 grid; natural-motion filtering omitted because the scenes contain no panning or static frames. It fails the copy gate (AUROC 0.57) despite ranking the true source first for 51–67% of copies, and recalls 3.5% of same-trajectory rerenders at 1%.
+
 ## Planned Next
 
-- Faithful reimplementations of published GSSCD/VSSCD and OFS-k pipelines and the VSC 2022 temporal matcher.
+- Faithful reimplementations of published GSSCD/VSSCD and the VSC 2022 temporal matcher; full-resolution OFS-k.
 - A deployed curation embedding (InternVideo2 or Cosmos-Embed1).
 - Larger independent negative pools for precise 1% claims.
 - Filtering analysis on the confirmation populations after unblinding: common masks across arms, retained prevalence `π_τ = π r_S / (π r_S + (1 − π) r_I)`, residual distortion `π_τ G_τ`, component errors, retained event and difficulty coverage, compared with equally sized random removal and provenance-family exclusion.
