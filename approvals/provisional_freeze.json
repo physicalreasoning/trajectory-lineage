@@ -1,0 +1,17 @@
+{
+  "mode": "provisional",
+  "config_sha256": "687f58417f83b4627ec899ee907909145783bc4bc1c3d3965336e2f8493e6089",
+  "code_commit": "a25d881621cfc422cea1553515f58a1baa914888",
+  "analyzer_sha256": "b817c5b72ea1d966794bfe8480ac2789c88e9072a19dba469c5a3109ef704163",
+  "signoffs": {
+    "workstream_owner": "Lovejesh (workstream owner)"
+  },
+  "signoff_date": "2026-10-16",
+  "decision_statement": "Provisional freeze by the workstream owner before unblinding, on the user's instruction to proceed under conservative assumptions: thresholds exactly as proposed in docs/EFFECT_SIZE.md (m = 0.001; consequential lower bound > 0.010; negligible within +/-0.002; harm margin 0.001). Collaborator approval (paper lead, evaluation science) is pending; results are labeled provisional until then.",
+  "excluded_pilot_seeds": [
+    2026101603,
+    2026101604,
+    2026101605,
+    2026101624
+  ]
+}
