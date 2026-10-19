@@ -402,6 +402,14 @@ def main() -> None:
         raise SystemExit(f"refusing to analyze: {error}") from error
     runs = check_identity(json.loads(args.records.read_text()), args.freeze_manifest, args.config)
     result = analyze(runs, json.loads(args.config.read_text()))
+    manifest = json.loads(args.freeze_manifest.read_text())
+    result["freeze_mode"] = manifest.get("mode", "confirmatory")
+    if result["freeze_mode"] == "provisional":
+        result["status"] = (
+            "PROVISIONAL: thresholds were frozen by the workstream owner before unblinding; "
+            "collaborator approval is pending. If approved unchanged, the result stands as "
+            "specified; if thresholds change, it becomes exploratory."
+        )
     args.out.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
     print(json.dumps({key: result[key] for key in ("primary_claim", "scheduled", "screened")}))
 

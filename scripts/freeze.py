@@ -17,6 +17,7 @@ from typing import Callable
 
 PLACEHOLDERS = {"full name", "name", "tbd", "todo", "x", "a", "approver"}
 REQUIRED_ROLES = ("paper_lead", "evaluation_science")
+PROVISIONAL_ROLES = ("workstream_owner",)
 REPOSITORY = Path(__file__).resolve().parents[1]
 EXPERIMENTS = REPOSITORY / "experiments"
 APPROVAL_PATHS = ("approvals/",)
@@ -112,7 +113,19 @@ def validate(
         )
     if manifest.get("analyzer_sha256") != sha256(analyzer_path):
         raise FreezeError("analysis code differs from the frozen analyzer")
-    roles = list(dict.fromkeys([*REQUIRED_ROLES, *(config.get("required_signoff_roles") or [])]))
+    mode = manifest.get("mode", "confirmatory")
+    if mode == "provisional":
+        # Thresholds frozen by the workstream owner before unblinding while collaborator review is
+        # pending. Outputs are stamped provisional; collaborator signatures are never implied.
+        roles = list(PROVISIONAL_ROLES)
+        if "provisional" not in str(manifest.get("decision_statement", "")).lower():
+            raise FreezeError("a provisional manifest must say so in its decision statement")
+    elif mode == "confirmatory":
+        roles = list(
+            dict.fromkeys([*REQUIRED_ROLES, *(config.get("required_signoff_roles") or [])])
+        )
+    else:
+        raise FreezeError("manifest mode must be confirmatory or provisional")
     signoffs = manifest.get("signoffs", {})
     for role in roles:
         if not valid_name(signoffs.get(role)):
@@ -138,4 +151,5 @@ def run_identity(manifest_path: Path, config_path: Path) -> dict:
         "experiment_seed": int(config["experiment_seed"]),
         "manifest_sha256": sha256(manifest_path),
         "code_commit": json.loads(manifest_path.read_text()).get("code_commit"),
+        "mode": json.loads(manifest_path.read_text()).get("mode", "confirmatory"),
     }

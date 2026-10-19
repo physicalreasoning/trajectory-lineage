@@ -72,24 +72,53 @@ def build_block(config: dict[str, Any], rng: np.random.Generator, spec: EventSpe
     """Construct every training and evaluation population for one independent block."""
 
     seeds = AppearanceRegistry(rng)
+    render_seeds: dict[str, list[int]] = {}
     base_events = [sample_event(rng, spec) for _ in range(int(config["base_train_examples"]))]
-    base_videos = [render_event(event, spec, seeds.draw()) for event in base_events]
+    render_seeds["base"] = [seeds.draw() for _ in base_events]
+    base_videos = [
+        render_event(event, spec, seed_value)
+        for event, seed_value in zip(base_events, render_seeds["base"], strict=True)
+    ]
 
     sources = [sample_event(rng, spec) for _ in range(int(config["source_trajectories"]))]
-    exact_videos = [render_event(event, spec, seeds.draw()) for event in sources]
+    render_seeds["exact"] = [seeds.draw() for _ in sources]
+    exact_videos = [
+        render_event(event, spec, seed_value)
+        for event, seed_value in zip(sources, render_seeds["exact"], strict=True)
+    ]
     renders_per_source = int(config["heldout_renders_per_source"])
     heldout_events = [event for event in sources for _ in range(renders_per_source)]
-    heldout_videos = [render_event(event, spec, seeds.draw()) for event in heldout_events]
-    rerender_videos = [render_event(event, spec, seeds.draw()) for event in sources]
+    render_seeds["heldout"] = [seeds.draw() for _ in heldout_events]
+    heldout_videos = [
+        render_event(event, spec, seed_value)
+        for event, seed_value in zip(heldout_events, render_seeds["heldout"], strict=True)
+    ]
+    render_seeds["rerender"] = [seeds.draw() for _ in sources]
+    rerender_videos = [
+        render_event(event, spec, seed_value)
+        for event, seed_value in zip(sources, render_seeds["rerender"], strict=True)
+    ]
 
     independent = [sample_event(rng, spec) for _ in range(int(config["independent_eval_examples"]))]
-    independent_videos = [render_event(event, spec, seeds.draw()) for event in independent]
+    render_seeds["independent"] = [seeds.draw() for _ in independent]
+    independent_videos = [
+        render_event(event, spec, seed_value)
+        for event, seed_value in zip(independent, render_seeds["independent"], strict=True)
+    ]
 
     replacement = [sample_event(rng, spec) for _ in sources]
-    replacement_videos = [render_event(event, spec, seeds.draw()) for event in replacement]
+    render_seeds["replacement"] = [seeds.draw() for _ in replacement]
+    replacement_videos = [
+        render_event(event, spec, seed_value)
+        for event, seed_value in zip(replacement, render_seeds["replacement"], strict=True)
+    ]
 
     screen = [sample_event(rng, spec) for _ in range(int(config["screen_examples"]))]
-    screen_videos = [render_event(event, spec, seeds.draw()) for event in screen]
+    render_seeds["screen"] = [seeds.draw() for _ in screen]
+    screen_videos = [
+        render_event(event, spec, seed_value)
+        for event, seed_value in zip(screen, render_seeds["screen"], strict=True)
+    ]
 
     # D: independent neighbors closer than anything in base training, relative to each source's
     # nearest base-training distance r_i.
@@ -108,7 +137,11 @@ def build_block(config: dict[str, Any], rng: np.random.Generator, spec: EventSpe
         nearby.append(neighbor)
         nearby_distances.append(distance)
         box_offsets.append(offset)
-    nearby_videos = [render_event(event, spec, seeds.draw()) for event in nearby]
+    render_seeds["nearby"] = [seeds.draw() for _ in nearby]
+    nearby_videos = [
+        render_event(event, spec, seed_value)
+        for event, seed_value in zip(nearby, render_seeds["nearby"], strict=True)
+    ]
 
     # D2: reservoir-selected independent neighbors in a pairwise quantile band.
     nearby_config = config["nearby"]
@@ -122,7 +155,11 @@ def build_block(config: dict[str, Any], rng: np.random.Generator, spec: EventSpe
     banded, banded_distances = select_reservoir_neighbors(
         rng, sources, reservoir, min_distance=low, max_distance=high
     )
-    banded_videos = [render_event(event, spec, seeds.draw()) for event in banded]
+    render_seeds["banded"] = [seeds.draw() for _ in banded]
+    banded_videos = [
+        render_event(event, spec, seed_value)
+        for event, seed_value in zip(banded, render_seeds["banded"], strict=True)
+    ]
 
     replacement_distances = [
         state_trajectory_distance(source.trajectory.positions, other.trajectory.positions)
@@ -158,6 +195,15 @@ def build_block(config: dict[str, Any], rng: np.random.Generator, spec: EventSpe
         "base_nearest_distances": base_nearest.tolist(),
         "box_offsets": box_offsets,
         "replacement_distances": replacement_distances,
+        "render_seeds": render_seeds,
+        "events": {
+            "base": base_events,
+            "sources": sources,
+            "independent": independent,
+            "replacement": replacement,
+            "nearby": nearby,
+            "banded": banded,
+        },
         "screen": to_tensors(screen_videos, screen, spec),
         "screen_events": screen,
         "source_family_of_render": [

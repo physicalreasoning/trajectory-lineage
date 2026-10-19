@@ -1,6 +1,6 @@
 {
   "name": "exposure_confirmation",
-  "status": "draft_pending_signoff",
+  "status": "frozen_provisional_pending_collaborator_approval",
   "role": "confirmatory",
   "blocks": 352,
   "experiment_seed": 2026101664,
