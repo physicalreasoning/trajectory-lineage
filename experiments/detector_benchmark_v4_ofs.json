@@ -1,0 +1,13 @@
+{
+  "name": "detector_benchmark_v4_ofs",
+  "status": "registered_before_run",
+  "purpose": "Add the published OFS-k motion-copy detector (Chen et al., 2024, arXiv 2410.21669) to the v4 detector benchmark, scored on the identical clips.",
+  "base_configuration": "experiments/detector_benchmark_v4.json (same splits, seeds, gallery, queries, transformations, calibration rule, and copy gate)",
+  "detector": "RAFT-small optical flow for every consecutive frame pair; per-cell cosine similarity between time-aligned flows; OFS-k is the maximum over k-frame windows of the mean similarity; k in {3, 5, 10}, k = 3 primary as in the paper",
+  "adaptations": [
+    "Flow computed at 128 px from the 224 px clips and average-pooled to a 16 x 16 grid before per-cell cosine (compute adaptation; the paper uses full-resolution pixels).",
+    "Natural-motion filtering omitted: the synthetic scenes contain no camera panning or static frames."
+  ],
+  "command": "PYTHONPATH=src .venv-detectors/bin/python scripts/detector_benchmark.py --config experiments/detector_benchmark_v4.json --detectors ofs --out results/detector_benchmark_v4_ofs.json",
+  "registered_expectation": "OFS-k is appearance-invariant in principle, so it should recover more same-trajectory rerenders than SSCD under appearance change, but sparse disk motion on a static background may limit separation and mirroring and time shifts break time-aligned flow matching."
+}

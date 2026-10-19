@@ -239,6 +239,50 @@ def flow_descriptors(
     return pooled.reshape(len(clips), len(indices) - 1, 2, 8, 8)
 
 
+def ofs_flows(raft, clips: np.ndarray, device: torch.device, batch: int = 64) -> np.ndarray:
+    """Unit flow vectors between all consecutive frames on a pooled grid, for OFS-k.
+
+    Follows Chen et al. (2024): RAFT flow for every consecutive frame pair and per-pixel cosine
+    similarity between time-aligned flows. Flow is computed at 128 px and average-pooled to a
+    16 x 16 grid before normalization (a compute adaptation); zero-flow cells contribute zero.
+    """
+
+    frames = clips.shape[1]
+    first = clips[:, :-1].reshape(-1, *clips.shape[2:])
+    second = clips[:, 1:].reshape(-1, *clips.shape[2:])
+    outputs = []
+    with torch.no_grad():
+        for start in range(0, len(first), batch):
+            left = torch.from_numpy(first[start : start + batch]).permute(0, 3, 1, 2).float()
+            right = torch.from_numpy(second[start : start + batch]).permute(0, 3, 1, 2).float()
+            left = functional.interpolate(left / 127.5 - 1.0, size=128, mode="bilinear")
+            right = functional.interpolate(right / 127.5 - 1.0, size=128, mode="bilinear")
+            flow = raft(left.to(device), right.to(device))[-1]
+            pooled = functional.adaptive_avg_pool2d(flow, 16)
+            norm = pooled.norm(dim=1, keepdim=True)
+            unit = torch.where(norm > 1e-3, pooled / norm.clamp(min=1e-6), torch.zeros_like(pooled))
+            outputs.append(unit.cpu().numpy())
+    flows = np.concatenate(outputs).astype(np.float32)
+    return flows.reshape(len(clips), frames - 1, 2, 16, 16)
+
+
+def ofs_matrix(query: np.ndarray, gallery: np.ndarray, k: int) -> torch.Tensor:
+    """OFS-k: max over k-frame windows of mean time-aligned per-cell flow cosine."""
+
+    steps = query.shape[1]
+    cells = query.shape[3] * query.shape[4]
+    q = torch.from_numpy(query).flatten(2)
+    g = torch.from_numpy(gallery).flatten(2)
+    per_step = torch.einsum("qtd,gtd->tqg", q, g) / cells
+    windows = per_step.unfold(0, k, 1).mean(dim=-1) if steps >= k else per_step.mean(0, True)
+    return windows.max(dim=0).values
+
+
+def describe_ofs(clips: np.ndarray, config, encoders: LearnedEncoders) -> dict[str, Any]:
+    hashes = [hashlib.sha256(np.ascontiguousarray(clip).tobytes()).hexdigest() for clip in clips]
+    return {"hash": hashes, "ofs": ofs_flows(encoders.raft(), clips, encoders.device)}
+
+
 def describe(clips: np.ndarray, config, encoders: LearnedEncoders) -> dict[str, Any]:
     """Compute every detector descriptor for a batch of clips."""
 
@@ -279,6 +323,9 @@ def concat(parts: list[dict[str, Any]]) -> dict[str, Any]:
     return out
 
 
+DESCRIBE = {"all": None, "ofs": None}
+
+
 def describe_in_chunks(clip_iter, config, encoders, chunk: int | None = None) -> dict[str, Any]:
     if chunk is None:
         chunk = max(25, int(200 * (64 / int(config["image_size"])) ** 2))
@@ -286,11 +333,15 @@ def describe_in_chunks(clip_iter, config, encoders, chunk: int | None = None) ->
     for clip in clip_iter:
         buffer.append(clip)
         if len(buffer) == chunk:
-            parts.append(describe(np.stack(buffer), config, encoders))
+            parts.append(_describer(config)(np.stack(buffer), config, encoders))
             buffer = []
     if buffer:
-        parts.append(describe(np.stack(buffer), config, encoders))
+        parts.append(_describer(config)(np.stack(buffer), config, encoders))
     return concat(parts)
+
+
+def _describer(config):
+    return describe_ofs if config.get("_detector_mode") == "ofs" else describe
 
 
 def negative_rms_matrix(query: np.ndarray, gallery: np.ndarray) -> torch.Tensor:
@@ -503,7 +554,12 @@ def run_split(config: dict[str, Any], seed: int, encoders: LearnedEncoders) -> d
         render_clip(event, int(rng.integers(0, 2**31 - 1)), None, rng, config)
         for event in split["background"]
     )
-    background = describe_in_chunks(background_clips, config, encoders)
+    if config.get("_detector_mode") == "ofs":
+        for _ in background_clips:  # render to keep the random stream identical to full mode
+            pass
+        background = None
+    else:
+        background = describe_in_chunks(background_clips, config, encoders)
     frames = int(config["clip_frames"])
     max_shift = int(config["invariant_max_shift_frames"])
     flow_shift = int(config["invariant_max_shift_flow_steps"])
@@ -532,15 +588,20 @@ def run_split(config: dict[str, Any], seed: int, encoders: LearnedEncoders) -> d
                 for event, seed_value in zip(events, seeds, strict=True)
             )
             query = describe_in_chunks(clips, config, encoders)
-            matrices = score_all(
-                query,
-                gallery,
-                max_shift,
-                flow_shift,
-                background,
-                int(config["background_top_k"]),
-                int(config["image_size"]),
-            )
+            if config.get("_detector_mode") == "ofs":
+                matrices = {
+                    f"ofs_{k}": ofs_matrix(query["ofs"], gallery["ofs"], k) for k in (3, 5, 10)
+                }
+            else:
+                matrices = score_all(
+                    query,
+                    gallery,
+                    max_shift,
+                    flow_shift,
+                    background,
+                    int(config["background_top_k"]),
+                    int(config["image_size"]),
+                )
             matrices["oracle_state"] = oracle_matrix(events, gallery_events, frames)
             entry: dict[str, Any] = {}
             for name, matrix in matrices.items():
@@ -552,10 +613,11 @@ def run_split(config: dict[str, Any], seed: int, encoders: LearnedEncoders) -> d
                     ties = (matrix == target_scores[:, None]).sum(dim=1).double() - 1
                     record["rank"] = (1 + greater + 0.5 * ties).numpy()
                 entry[name] = record
-            entry["_centroid_failures"] = int(np.isnan(query["centroid"]).any(axis=1).sum())
-            entry["_centroid_track_validation"] = track_rmse_pixels(
-                query["centroid"], events, transform, config
-            )
+            if "centroid" in query:
+                entry["_centroid_failures"] = int(np.isnan(query["centroid"]).any(axis=1).sum())
+                entry["_centroid_track_validation"] = track_rmse_pixels(
+                    query["centroid"], events, transform, config
+                )
             scores[transform][role] = entry
             print(f"  {transform:13s} {role:9s} n={len(events)}", flush=True)
     return {
@@ -647,6 +709,8 @@ def summarize(config, calibration, test) -> dict[str, Any]:
                 }
             detector["transforms"][transform] = row
         summary[name] = detector
+    if "_centroid_failures" not in test["scores"][TRANSFORMS[0]]["positive"]:
+        return {"detectors": summary}
     failures = {
         transform: {
             role: test["scores"][transform][role]["_centroid_failures"]
@@ -677,8 +741,15 @@ def main() -> None:
     parser.add_argument(
         "--scale", type=float, default=1.0, help="Shrink query counts for smoke runs."
     )
+    parser.add_argument(
+        "--detectors",
+        choices=("all", "ofs"),
+        default="all",
+        help="'ofs' scores only OFS-k on the identical clips (same seeds and rendering).",
+    )
     args = parser.parse_args()
     config = json.loads(args.config.read_text())
+    config["_detector_mode"] = args.detectors
     if args.scale != 1.0:
         for key in (
             "gallery_trajectories",
