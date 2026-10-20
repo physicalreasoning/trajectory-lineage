@@ -9,7 +9,7 @@
 [[Workstream proposal]](docs/WORKSTREAM_PROPOSAL.md)
 [[Data sources]](docs/DATA.md)
 [[Effect-size contract]](docs/EFFECT_SIZE.md)
-[[Detector plan]](docs/DETECTORS.md)
+[[Detector audit]](docs/DETECTORS.md)
 [[Research plan]](docs/RESEARCH_PLAN.md)
 [[Evaluation protocol]](docs/EVALS.md)
 [[Reproduction]](docs/REPRODUCE.md)
@@ -17,7 +17,7 @@
 
 ## Status
 
-**Research in progress. The memory positive control passes and a 1.09M-parameter ConvLSTM predictor has been trained; the matched learned-model exposure confirmation is specified and awaiting collaborator sign-off, and no learned-model reuse effect has been estimated or released.**
+**Interim result available; confirmation running.** In an independent 16-run interim sample, reusing a physical trajectory under new colors gave a detectable but negligible evaluation advantage (reuse gap +0.0015, 95% CI 0.0011–0.0018; about 6% lower error on reused trajectories), no larger than training on very close independent trajectories. Standard duplicate checks miss this reuse; trajectory matching catches it. The pre-registered 352-run confirmation runs under a provisional freeze (`approvals/provisional_freeze.json`) and will replace the interim numbers.
 
 The broad claim that trajectory overlap causes benchmark contamination did not survive adversarial review. This repository begins with the narrower question that remained:
 
@@ -39,12 +39,14 @@ This repository makes those relationships explicit:
 
 | relationship | meaning |
 |---|---|
-| `exact_render` | identical rendered tensor |
-| `same_trajectory` | different render, identical stored physical states |
+| `exact_render` | the stored render was reused |
+| `same_trajectory` | the stored physical state sequence was reused under a different render |
+| `derived_trajectory` | a recorded derivation edge (including siblings of one parent) |
 | `nearby_trajectory` | independently generated states linked by a declared similarity rule |
-| `independent` | no derivation edge or declared neighbor relation |
+| `independent` | documented independent generation |
+| `unresolved` | no documented provenance |
 
-Known lineage lets us run a controlled experiment. It does not tell us what an undocumented model saw during pretraining.
+Relationships come from provenance, not similarity: equal pixels or equal states are reported separately and never imply lineage. Known lineage lets us run a controlled experiment. It does not tell us what an undocumented model saw during pretraining.
 
 ## What we will build
 
@@ -71,17 +73,15 @@ If these fail after two documented pilot revisions, the experiment stops rather 
 
 ## Current code
 
-This initial scaffold implements only the contracts needed before model training:
+- Exact continuous-time equal-mass collisions with independent appearance rerendering;
+- Provenance-based lineage records and deterministic manifests;
+- A 1.09M-parameter ConvLSTM visual-state predictor;
+- A matched exposure runner (`scripts/exposure_experiment.py`) with cloned model and optimizer state, bounded metric, role-separated random streams, a separate competence screen, and per-item losses;
+- A frozen confirmatory analyzer (`scripts/analyze_confirmation.py`) and freeze gate (`scripts/freeze.py`);
+- A duplicate-detector benchmark (`scripts/detector_benchmark.py`, `scripts/analyze_detectors.py`) and an exploratory filtering analysis (`scripts/exposure_filtering.py`); and
+- A validated loader for the PhyWorld collision evaluation set.
 
-- Exact continuous-time equal-mass collisions;
-- Deterministic state trajectories;
-- Independent appearance rerendering;
-- Lineage relationships and deterministic manifest writing;
-- Bounded center-error measurement;
-- The evaluation-reuse effect calculation; and
-- A validated loader and manifest generator for the PhyWorld collision evaluation set.
-
-It intentionally does **not** include a trained neural predictor or claim a world-model result.
+Claims are limited to this synthetic assay and a small predictor; no claim is made about policy success or released world models.
 
 ## First local pilot
 
@@ -134,7 +134,20 @@ A compact pixel-conditioned ConvLSTM was trained for 300 updates on 512 generate
 | Nearest trajectory | **0.02903** |
 | ConvLSTM | 0.02965 |
 
-The ConvLSTM reduces error by 39.3% relative to constant velocity and lands within 2.1% of nearest-trajectory retrieval. The next experiment applies matched source-family, nearby-trajectory, and background continuation policies to this learned predictor.
+The ConvLSTM reduces error by 39.3% relative to constant velocity and lands within 2.1% of nearest-trajectory retrieval.
+
+## Matched exposure experiment
+
+Each independent training run trains a base ConvLSTM on 512 events, then continues matched copies (identical updates, batch positions, and 12–13 presentations per example) on independent trajectories (B), the evaluation-source trajectories under new appearances (C), independent trajectories closer than anything in base training (D), banded neighbors (D2), or the exact evaluation renders (E). Thresholds were fixed before any result was observed (`docs/EFFECT_SIZE.md`): consequential if the reuse gap's lower bound exceeds 0.010, negligible if its interval lies within ±0.002, harm margin 0.001.
+
+| Interim (independent 16-run sample; 15 screened) | Estimate | 95% CI |
+|---|---:|---:|
+| Reuse gap G | +0.00146 | [+0.00113, +0.00179] |
+| Source gain | +0.00172 | [+0.00071, +0.00273] |
+| Harm on independent events | −0.00026 | [−0.00108, +0.00057] |
+| Same trajectory vs closer independent neighbor | +0.00008 | [−0.00017, +0.00032] |
+
+Outcome under the contract: **negligible differential gap**, while still detectable. Reuse would need to make up 56–89% of an evaluation set to move a model comparison by the 0.001 margin, and the advantage matches that from very close independent trajectories, consistent with local generalization. See `FINDINGS.md` §5 and §7.
 
 ## Duplicate-detector audit
 
@@ -144,11 +157,12 @@ A registered benchmark (native 224 px, 8 transformations, 14 detector variants, 
 |---|---:|---:|---:|
 | Exact hash | 0% | 0% | 0% |
 | SSCD, aligned + normalized (passes copy gate) | 58.5% | 11.5% | 31% |
+| OFS-k motion-copy score (published; fails copy gate) | 2% | 3.5% | — |
 | Centroid tracks + mirror/time search (fails gate: JPEG corrupts extraction) | 0% | 100% | 0% |
 
 Trajectory-aware matching recovers rerenders under appearance, texture, mirror, and time-shift changes when extraction is reliable, and calibrating only on unrestricted negatives removes most independent events that lie closer to a training trajectory than any other training clip. See `FINDINGS.md` §6 and `docs/DETECTORS.md`.
 
-The matched learned-model exposure confirmation is specified and pending collaborator sign-off (`FINDINGS.md` §5, `docs/EFFECT_SIZE.md`).
+Applied to the exposure experiment (8 interim runs, exploratory), SSCD filtering removes 12% of reused clips and leaves the distortion unchanged, like random removal of equal size, while trajectory matching removes all reused clips and keeps 99.2% of independent clips (`FINDINGS.md` §7).
 
 ## Setup
 
@@ -174,14 +188,17 @@ relationship = same_trajectory
 ```text
 src/trajectory_lineage/  simulator, lineage contracts, bounded metrics
 scripts/                 one executable experiment per file
-results/                 committed machine-readable pilot results
-experiments/             future frozen experiment configurations
+results/                 committed machine-readable results
+experiments/             frozen experiment configurations
+approvals/               freeze manifests binding configuration, code, and analyzer
 tests/                   physics, lineage, and measurement invariants
 docs/
   RESEARCH_PLAN.md        gates and kill criteria
   SPEC.md                 lineage and simulator contracts
   EVALS.md                metrics and claim boundaries
   REPRODUCE.md            exact commands and expected outputs
+  EFFECT_SIZE.md          pre-specified thresholds and decision rule
+  DETECTORS.md            duplicate-detector audit protocol and results
 FINDINGS.md               append-only findings and corrections
 ```
 
