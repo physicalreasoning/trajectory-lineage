@@ -162,3 +162,25 @@ Pre-registered gate (necessary, not sufficient): copy-control AUROC ≥ 0.95 and
 **Robustness check:** v3 (a changed protocol with independent seeds; superseded hard-negative sampler; fresh-palette copy negatives) gave the same headline values (copy recall 0.84 at 5%; rerender recall 0.12 at 1%; invariant centroid recall 1.00). **Scope:** synthetic collisions; full clips at 224 px (curation setting), not the ConvLSTM's 64 px prefixes; one gallery per split; 600 independent negative families limit precision at 1%. The 64 px v2 run failed its copy control and supports no perceptual conclusion.
 
 Source: `results/detector_benchmark_v4.json`, `results/detector_benchmark_v4_scores.json.gz`, `results/detector_benchmark_v4_analysis.json`; OFS-k on the identical clips: `results/detector_benchmark_v4_ofs_analysis.json` (v3: `results/detector_benchmark_v3*`); weights and environment: `results/detector_weights_manifest.json`, `results/detector_environment.txt`.
+
+## 7 · Interim: trajectory reuse gives a detectable but negligible advantage (2026-10-19)
+
+An independent 16-block sample (`experiments/exposure_interim.json`, seed distinct from the confirmation) ran the identical protocol and locked analyzer while the 352-block confirmation runs blind. **Interim and exploratory; the confirmation will replace these numbers.**
+
+| Quantity (15 screened blocks) | Estimate | 95% CI |
+|---|---:|---:|
+| Reuse gap G | +0.00146 | [+0.00113, +0.00179] |
+| Source gain S | +0.00172 | [+0.00071, +0.00273] |
+| Independent harm H | −0.00026 | [−0.00108, +0.00057] |
+| Same trajectory vs closer independent neighbor Q | +0.00008 | [−0.00017, +0.00032] |
+| Same trajectory vs banded neighbor Q2 | +0.00060 | [+0.00023, +0.00097] |
+| Exact-render gain (positive control) | +0.00240 | [+0.00150, +0.00329] |
+
+- Under the pre-specified contract the outcome is **negligible differential gap** (interval within ±0.002; assay sensitive), while also **detectable** (Holm-adjusted G > 0).
+- Reuse would need to make up 56–89% of an evaluation set to move a comparison by the 0.001 margin.
+- **Not identity-specific:** independent neighbors closer than any base-training event give the same benefit as the identical trajectories (Q ≈ 0); farther neighbors give less (Q2 > 0). The advantage behaves like local generalization.
+- Projected 95% half-width at 336 blocks: ±0.00006 for G.
+
+**Detector filtering on 8 interim blocks (exploratory, `scripts/exposure_filtering.py`, committed before results).** At 1% calibrated false removal, SSCD removes 12% of reused renders and leaves distortion at 0.00014 versus 0.00015 unfiltered—the same as random removal of equal size—while trajectory matching removes 100% of reused renders, keeps 99.2% of independent events, and reduces distortion to zero, matching provenance exclusion.
+
+Source: `results/exposure_interim_analysis.json`, `results/exposure_interim_filtering.json`.
