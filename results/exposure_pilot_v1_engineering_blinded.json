@@ -1,0 +1,148 @@
+{
+  "blinded": true,
+  "blocks_scheduled": 8,
+  "blocks_valid": 8,
+  "config": {
+    "arm_examples_per_batch": 8,
+    "arms": {
+      "B": "64 independent replacement trajectories under fresh appearances",
+      "C": "64 evaluation-source trajectories under appearances distinct from the evaluation render",
+      "D": "64 nearby independently simulated trajectories, one per source, inside the declared state-distance band",
+      "E": "the exact 64 evaluation-source renders (diagnostic ceiling)"
+    },
+    "base_train_examples": 512,
+    "base_training_steps": 300,
+    "batch_size": 32,
+    "blinding": "Only dispersion, runtime, balance checks, and a binary exact-render positive-control check are reported. Contrast means remain unreported until the effect threshold is frozen.",
+    "block_seed_start": 20261100,
+    "blocks": 8,
+    "claim_boundary": "Discarded feasibility blocks. No effect estimate from this run may be reported as evidence of trajectory reuse.",
+    "continuation_steps": 100,
+    "frame_dt": 0.04,
+    "future_frames": 16,
+    "hidden_channels": 16,
+    "image_size": 64,
+    "independent_eval_examples": 128,
+    "learning_rate": 0.001,
+    "name": "exposure_pilot",
+    "nearby": {
+      "max_state_distance": 0.03,
+      "min_state_distance": 0.01,
+      "perturbation_fraction_of_range": 0.08
+    },
+    "observed_frames": 8,
+    "planning": {
+      "alpha": 0.05,
+      "detectable_excess": 0.0023961877450346947,
+      "power": 0.9,
+      "provisional_minimum_gap": 0.004792375490069389,
+      "sd_upper_limit_confidence": 0.8
+    },
+    "populations": {
+      "independent": "128 independently sampled trajectories under fresh appearances",
+      "source": "one held-out evaluation render per source trajectory"
+    },
+    "positive_control": "E source gain is positive in at least 75% of blocks",
+    "primary_metric": "mean Euclidean center error over the 16 future frames",
+    "purpose": "Estimate block-level variance, runtime, failure rate, and assay sensitivity for the matched ConvLSTM trajectory-reuse experiment without revealing effect locations.",
+    "replay_examples_per_batch": 24,
+    "role": "discarded_blinded_internal_pilot",
+    "source_trajectories": 64,
+    "status": "registered_before_run"
+  },
+  "design_descriptors": {
+    "nearby_state_distance_median": 0.016304101318518647,
+    "replacement_state_distance_median": 0.10516651164149438
+  },
+  "device": "mps",
+  "dispersion": {
+    "C_independent_gain": {
+      "blocks": 8,
+      "required_blocks_at_upper_limit": 3,
+      "standard_deviation": 0.0009289242465595792,
+      "standard_deviation_upper_limit": 0.0012549095339462262,
+      "upper_limit_confidence": 0.8
+    },
+    "C_minus_D_gap": {
+      "blocks": 8,
+      "required_blocks_at_upper_limit": 1,
+      "standard_deviation": 0.0004954718813373307,
+      "standard_deviation_upper_limit": 0.0006693467093741216,
+      "upper_limit_confidence": 0.8
+    },
+    "C_minus_D_source": {
+      "blocks": 8,
+      "required_blocks_at_upper_limit": 4,
+      "standard_deviation": 0.000967156820232832,
+      "standard_deviation_upper_limit": 0.0013065589783304828,
+      "upper_limit_confidence": 0.8
+    },
+    "C_reuse_gap": {
+      "blocks": 8,
+      "required_blocks_at_upper_limit": 2,
+      "standard_deviation": 0.0006207106181293717,
+      "standard_deviation_upper_limit": 0.000838535193151775,
+      "upper_limit_confidence": 0.8
+    },
+    "C_source_gain": {
+      "blocks": 8,
+      "required_blocks_at_upper_limit": 3,
+      "standard_deviation": 0.0008931759366219674,
+      "standard_deviation_upper_limit": 0.0012066161503583577,
+      "upper_limit_confidence": 0.8
+    },
+    "D_independent_gain": {
+      "blocks": 8,
+      "required_blocks_at_upper_limit": 1,
+      "standard_deviation": 0.0004708404968750883,
+      "standard_deviation_upper_limit": 0.0006360714888053361,
+      "upper_limit_confidence": 0.8
+    },
+    "D_reuse_gap": {
+      "blocks": 8,
+      "required_blocks_at_upper_limit": 2,
+      "standard_deviation": 0.0006529500736296569,
+      "standard_deviation_upper_limit": 0.0008820883679411986,
+      "upper_limit_confidence": 0.8
+    },
+    "D_source_gain": {
+      "blocks": 8,
+      "required_blocks_at_upper_limit": 2,
+      "standard_deviation": 0.0006391257789768988,
+      "standard_deviation_upper_limit": 0.0008634127447953071,
+      "upper_limit_confidence": 0.8
+    },
+    "E_independent_gain": {
+      "blocks": 8,
+      "required_blocks_at_upper_limit": 4,
+      "standard_deviation": 0.0010430716154807716,
+      "standard_deviation_upper_limit": 0.0014091143811817367,
+      "upper_limit_confidence": 0.8
+    },
+    "E_reuse_gap": {
+      "blocks": 8,
+      "required_blocks_at_upper_limit": 2,
+      "standard_deviation": 0.0006185463089275037,
+      "standard_deviation_upper_limit": 0.0008356113678109133,
+      "upper_limit_confidence": 0.8
+    },
+    "E_source_gain": {
+      "blocks": 8,
+      "required_blocks_at_upper_limit": 4,
+      "standard_deviation": 0.0009886385007359367,
+      "standard_deviation_upper_limit": 0.0013355791764449948,
+      "upper_limit_confidence": 0.8
+    }
+  },
+  "positive_control_passed": true,
+  "pretreatment_balance": {
+    "base_independent_error_mean": 0.027895523235201836,
+    "base_source_minus_independent_mean": 0.0011554176453500986,
+    "base_source_minus_independent_sd": 0.0017049616983879088
+  },
+  "runtime": {
+    "seconds_per_block_max": 26.486909374943934,
+    "seconds_per_block_mean": 24.86627008310461,
+    "total_seconds": 198.93016066483688
+  }
+}

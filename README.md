@@ -8,6 +8,8 @@
 
 [[Workstream proposal]](docs/WORKSTREAM_PROPOSAL.md)
 [[Data sources]](docs/DATA.md)
+[[Effect-size contract]](docs/EFFECT_SIZE.md)
+[[Detector plan]](docs/DETECTORS.md)
 [[Research plan]](docs/RESEARCH_PLAN.md)
 [[Evaluation protocol]](docs/EVALS.md)
 [[Reproduction]](docs/REPRODUCE.md)
@@ -15,7 +17,7 @@
 
 ## Status
 
-**Conceptual pilot. The registered memory positive control passes; no neural world model has been trained.**
+**Research in progress. The memory positive control passes and a 1.09M-parameter ConvLSTM predictor has been trained; the matched learned-model exposure confirmation is specified and awaiting collaborator sign-off, and no learned-model reuse effect has been estimated or released.**
 
 The broad claim that trajectory overlap causes benchmark contamination did not survive adversarial review. This repository begins with the narrower question that remained:
 
@@ -133,6 +135,20 @@ A compact pixel-conditioned ConvLSTM was trained for 300 updates on 512 generate
 | ConvLSTM | 0.02965 |
 
 The ConvLSTM reduces error by 39.3% relative to constant velocity and lands within 2.1% of nearest-trajectory retrieval. The next experiment applies matched source-family, nearby-trajectory, and background continuation policies to this learned predictor.
+
+## Duplicate-detector audit
+
+A registered benchmark (native 224 px, 8 transformations, 14 detector variants, calibrated query-level false removal, a conventional-copy positive control, and an independent-seed robustness check) found that perceptual similarity is dominated by appearance rather than trajectory:
+
+| Detector (nominal 1% false removal) | Re-encoded copy | Same trajectory, new appearance | Different nearby trajectory, same appearance, removed |
+|---|---:|---:|---:|
+| Exact hash | 0% | 0% | 0% |
+| SSCD, aligned + normalized (passes copy gate) | 58.5% | 11.5% | 31% |
+| Centroid tracks + mirror/time search (fails gate: JPEG corrupts extraction) | 0% | 100% | 0% |
+
+Trajectory-aware matching recovers rerenders under appearance, texture, mirror, and time-shift changes when extraction is reliable, and calibrating only on unrestricted negatives removes most independent events that lie closer to a training trajectory than any other training clip. See `FINDINGS.md` §6 and `docs/DETECTORS.md`.
+
+The matched learned-model exposure confirmation is specified and pending collaborator sign-off (`FINDINGS.md` §5, `docs/EFFECT_SIZE.md`).
 
 ## Setup
 

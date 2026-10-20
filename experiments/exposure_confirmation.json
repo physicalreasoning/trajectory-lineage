@@ -1,0 +1,129 @@
+{
+  "name": "exposure_confirmation",
+  "status": "frozen_provisional_pending_collaborator_approval",
+  "role": "confirmatory",
+  "blocks": 352,
+  "experiment_seed": 2026101664,
+  "observed_frames": 8,
+  "future_frames": 16,
+  "image_size": 64,
+  "frame_dt": 0.04,
+  "base_train_examples": 512,
+  "source_trajectories": 64,
+  "heldout_renders_per_source": 4,
+  "independent_eval_examples": 512,
+  "batch_size": 32,
+  "base_training_steps": 300,
+  "continuation_steps": 100,
+  "arm_examples_per_batch": 8,
+  "replay_examples_per_batch": 24,
+  "learning_rate": 0.001,
+  "hidden_channels": 16,
+  "error_cap": 1.0,
+  "nearby": {
+    "construction": "independently simulated reservoir events assigned one-to-one by maximum bipartite matching inside a state-distance quantile band",
+    "reservoir_size": 20000,
+    "low_quantile": 0.001,
+    "high_quantile": 0.01
+  },
+  "arms": {
+    "B": "64 independent replacement trajectories under fresh appearances",
+    "C": "the 64 source trajectories under appearances unique within the block",
+    "D": "one independent neighbor per source, closer than anything in base training: RMS state distance in [0.25, 0.5] x the source's nearest base-training distance",
+    "D2": "one reservoir-selected independent neighbor per source in the 0.1st-1st percentile band of pairwise independent distances (comparable to base-training nearest neighbors)",
+    "E": "the exact renders forming the exact population (diagnostic reference, not a ceiling)"
+  },
+  "populations": {
+    "source": "4 held-out renders per source trajectory, unseen by every arm",
+    "exact": "the render E trains on; unseen by B, C, and D",
+    "independent": "512 independently sampled trajectories under fresh appearances"
+  },
+  "exposure_dose": "800 arm-slot presentations over 64 sources: 12 or 13 presentations per source",
+  "primary_metric": "mean over examples of per-disk-frame Euclidean center error, capped at 1 arena width; nonfinite outputs receive the cap",
+  "sd_upper_limit_confidence": 0.8,
+  "seed_derivation": "numpy SeedSequence(entropy=experiment_seed, spawn_key=(block_index,)) spawned into data, schedule, base_batches, torch roles",
+  "decision_contract": {
+    "ranking_margin_m": 0.001,
+    "consequential_reference_prevalence": 0.1,
+    "negligible_reference_prevalence": 0.5,
+    "consequential_threshold": 0.01,
+    "negligible_bound": 0.002,
+    "harm_margin_h": 0.001,
+    "alpha_one_sided": 0.025,
+    "interval": "95% two-sided t interval over block-level paired contrasts",
+    "outcomes": {
+      "gap_magnitude": {
+        "consequential": "lower(G) > 0.010",
+        "prevalence_dependent": "0.002 < lower(G) <= 0.010",
+        "negligible": "-0.002 < lower(G) and upper(G) < 0.002",
+        "reverse": "upper(G) < -0.002",
+        "inconclusive": "otherwise"
+      },
+      "safeguards": {
+        "source_gain_supported": "lower(S) > 0",
+        "harm_bounded": "upper(H) < 0.001",
+        "assay_sensitive": "E exact gain positive in at least 75% of screened blocks"
+      },
+      "primary_claim": {
+        "consequential reuse advantage": "consequential magnitude and both safeguards",
+        "prevalence_dependent reuse advantage": "prevalence-dependent magnitude and both safeguards",
+        "differential gap without safeguards": "consequential or prevalence-dependent magnitude with a failed safeguard",
+        "negligible differential gap": "negligible magnitude and assay sensitive",
+        "assay insensitive": "negligible magnitude but positive control failed",
+        "reverse gap": "reverse magnitude",
+        "inconclusive": "otherwise, or any unresolved block failure for a decisive claim, or fewer than 320 screened blocks"
+      }
+    },
+    "secondary": {
+      "identity_specific": "H0: Q <= 0.010 (Q against the closer-than-base-training arm D)",
+      "detectable": "H0: G <= 0",
+      "consequential_harm": "H0: H <= 0.001",
+      "multiplicity": "Holm step-down at one-sided 0.025 across these three; Q2, distance profile, and detectors exploratory",
+      "identity_planning": "With pilot v4 Q upper SD 0.00063 and about 260 screened blocks, P(identity claim) exceeds 0.9 when true Q >= 0.0102."
+    },
+    "estimands_also_reported": [
+      "S",
+      "I",
+      "H",
+      "Q",
+      "C_apparent_improvement",
+      "B_apparent_improvement",
+      "E_exact_gain",
+      "E_transfer_loss",
+      "all arm-by-population errors"
+    ],
+    "minimum_screened_blocks": 320,
+    "break_even_rules": "pi* = m/G: finite interval [m/upper(G), m/lower(G)] when lower(G) > 0; unbounded above when lower(G) <= 0 < upper(G); no positive crossing when upper(G) <= 0; also reported intersected with [0, 1].",
+    "crossover": "Fieller confidence set for mean(H)/mean(G): bounded interval, two rays, or the entire line",
+    "analyzer": "scripts/analyze_confirmation.py (SHA-256 bound in the freeze manifest)",
+    "record_integrity": "The analyzer requires exactly one record per registered block index; recomputes every contrast from component errors and the competence screen from its recorded errors (stored contrasts and flags are ignored); requires finite errors in [0, 1] and per-item losses that average to the errors (tolerance 1e-5); and checks that the export's identity (configuration hash, experiment seed, manifest hash, frozen code commit) matches the approved run.",
+    "completeness_rule": "Decisive claims require every registered block to complete. The metric is bounded in [0, 1], so one missing block could move mean harm by up to 1/352, more than the harm margin; no observed-data imputation is conservative. Infrastructure failures are deterministic to rerun with identical seeds and must be resolved before analysis; any remaining failure makes decisive claims inconclusive (estimates still reported).",
+    "scope_of_confirmatory_claims": "The confirmatory decision covers the matched exposure assay only. Detector-filtering consequences are exploratory unless a filtering analysis (gallery, calibration seeds, masks, weighting, standardization, uncertainty, random and provenance baselines) is implemented, tested, and frozen before unblinding."
+  },
+  "freeze_requirement": "A manifest (template experiments/freeze_manifest.template.json) validated by scripts/freeze.py: confirmatory role; configuration and analyzer SHA-256; frozen code commit, with HEAD allowed to differ only by files under approvals/; dated, named sign-offs for paper_lead and evaluation_science (roles fixed in code, placeholders rejected); a decision statement; and every pilot seed in the repository registry.",
+  "claim_boundary": "Effect of replacing 64 independent continuation events with same-trajectory rerenders for this ConvLSTM, dose, and continuation phase.",
+  "sample_size_rationale": "352 scheduled blocks, planned as 336 analyzed after about 4% screen attrition (at least 320 screened required). The harm gate is binding: per-block independent-population differences between two random continuations have SD about 0.0017 (pooled pilots v4+v5, 14 df; S-H correlation -0.95), which the reuse gap cancels. Joint consequential-rule power at G = S + H = 0.015 with SDs at the pooled 80% upper limit: 1.00 at H = 0 and 0.99 at H = 0.0005; 0.95 at H = 0.0005 using pilot v5 alone. Test size at the threshold about 0.025. Runtime 4.9 to 6.5 hours on Apple MPS depending on load. results/confirmation_power.json.",
+  "base_competence_screen": "Pre-treatment screen on a separate 256-event competence population (never scored in contrasts): a block enters the primary analysis iff its base model's bounded error there is below constant velocity's. All blocks reported; an analysis over all completed blocks is a sensitivity analysis.",
+  "closer_nearby": {
+    "construction": "box-conditioned band distribution: uniform initial-state prior restricted to a sensitivity-scaled box (edge offset alone gives 6x the band maximum; capped at the full parameter range) and conditioned on RMS state distance in [0.25, 0.5] x the source's nearest base-training distance",
+    "low_fraction": 0.25,
+    "high_fraction": 0.5,
+    "box_multiplier": 6.0,
+    "containment_validation": "results/closer_sampler_validation.json (box enlargement 6 vs 9, reservoir agreement, capped fractions); empirical, not a proof"
+  },
+  "screen_examples": 256,
+  "failure_policy": "Infrastructure errors (OSError, MemoryError, device/MPS runtime errors) retry once with identical seeds; other exceptions are algorithmic failures. All failures are recorded.",
+  "required_signoff_roles": [
+    "paper_lead",
+    "evaluation_science"
+  ],
+  "excluded_pilot_seeds": [
+    2026101603,
+    2026101604,
+    2026101605,
+    2026101624
+  ],
+  "planning_analyzed_blocks": 336,
+  "runtime_estimate": "About 50 s per block on an unloaded Apple MPS laptop (pilot v4) and 66 s under concurrent load (pilot v5): 4.9 to 6.5 hours for 352 blocks.",
+  "secondary_endpoints_note": "Raw records retain per-render bounded center-error losses only; contact-timing and post-contact-velocity endpoints are not part of this confirmation."
+}

@@ -1,0 +1,11 @@
+{
+  "torch": "2.14.1",
+  "torchvision": "0.29.1",
+  "weights_sha256": {
+    "sscd_disc_mixup.torchscript.pt": "9f26bd4c848cc19b73d2ae92eea6e04886f61a7b764ceb7a13aeee62e6a6db56",
+    "dinov2_vits14_pretrain.pth": "b938bf1bc15cd2ec0feacfe3a1bb553fe8ea9ca46a7e1d8d00217f29aef60cd9",
+    "raft_small_C_T_V2-01064c6d.pth": "01064c6dba73b0fc9fc8edf772248560a00a3acfd62ac6677e9eeebad9680e27"
+  },
+  "dinov2_hub_revision": "hub snapshot without git metadata",
+  "note": "Checksums of the cached weights used by detector benchmarks v3 and v4."
+}

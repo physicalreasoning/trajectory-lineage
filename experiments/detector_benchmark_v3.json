@@ -1,0 +1,94 @@
+{
+  "name": "detector_benchmark_v3",
+  "status": "registered_before_run",
+  "purpose": "Measure whether exact, perceptual, and motion-based duplicate detectors recognize same-trajectory rerenders under stress transformations while sparing independent and similarity-selected nearby events, at query-level false-removal rates calibrated on separate families.",
+  "splits": {
+    "calibration": 2026101721,
+    "test": 2026101722
+  },
+  "gallery_trajectories": 500,
+  "positive_queries": 200,
+  "hard_negative_queries": 200,
+  "easy_negative_queries": 600,
+  "clip_frames": 24,
+  "simulated_frames": 27,
+  "time_shift_frames": 3,
+  "frame_dt": 0.04,
+  "image_size": 224,
+  "learned_frame_indices": [
+    0,
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21
+  ],
+  "hard_negative_band": {
+    "construction": "independent event conditioned on RMS state distance in [0.25, 0.5] x the target's nearest other-gallery distance (sensitivity-scaled box proposals, multiplier 6)",
+    "low_fraction": 0.25,
+    "high_fraction": 0.5,
+    "box_multiplier": 6.0
+  },
+  "transforms": {
+    "copy_reencode": "positive control: the identical gallery render re-encoded as JPEG quality 75 (negatives: independent events, fresh appearance, same re-encoding)",
+    "appearance": "new palette and background color",
+    "texture": "appearance plus a static random background texture",
+    "compression": "appearance plus per-frame JPEG at quality 25",
+    "crop": "appearance plus central 80% crop resized to full resolution",
+    "mirror": "appearance plus horizontal mirroring",
+    "time_shift": "appearance plus a 3-frame (0.12 s) temporal offset",
+    "distractor": "appearance plus a third moving disk (radius and speed scaled with resolution)"
+  },
+  "detectors": {
+    "exact_hash": "SHA-256 of clip bytes",
+    "silhouette": "color-invariant 8x8 foreground occupancy per frame, negative RMS distance",
+    "centroid_motion": "two-color foreground centroid tracks, negative RMS distance; extraction failure never matches",
+    "sscd_pooled": "SSCD sscd_disc_mixup frame embeddings on native 224 px frames, mean-pooled, cosine",
+    "sscd_aligned": "SSCD frame embeddings, mean of time-aligned per-frame cosines",
+    "dinov2_pooled": "DINOv2 ViT-S/14 CLS embeddings on native 224 px frames, mean-pooled, cosine",
+    "dinov2_aligned": "DINOv2 frame embeddings, mean of time-aligned per-frame cosines",
+    "raft_flow": "torchvision RAFT-small flow between sampled frames at native 224 px, 8x8 average-pooled field, cosine",
+    "oracle_state": "privileged state-distance reference: negative RMS state distance from simulator records (not a provenance oracle)",
+    "centroid_invariant": "centroid tracks searched over mirroring and integer time offsets up to 3 frames (overlapping frames only)",
+    "raft_flow_invariant": "RAFT flow descriptor searched over mirroring (grid flip, negated x-flow) and offsets up to 1 sampled step",
+    "sscd_aligned_norm": "sscd_aligned minus the query's mean top-10 similarity to 500 unrelated background clips (VSC-style score normalization)",
+    "dinov2_aligned_norm": "dinov2_aligned with the same background normalization",
+    "raft_flow_norm": "raft_flow with the same background normalization"
+  },
+  "query_score": "maximum similarity over the full training gallery",
+  "operating_points": [
+    0.01,
+    0.05
+  ],
+  "calibration_rule": "one threshold per detector and operating point: the higher-method (1 - alpha) quantile of pooled calibration easy-negative query scores across all transforms; a query is removed when its score strictly exceeds the threshold",
+  "metrics": [
+    "same-trajectory recall per transform",
+    "easy-negative false removal per transform",
+    "hard-negative (similarity-selected nearby) false removal per transform",
+    "AUROC positives vs easy negatives and vs hard negatives",
+    "top-1 source retrieval accuracy for removed positives",
+    "extraction failures",
+    "Wilson 95% intervals",
+    "tie-aware (mid-rank) median rank and top-1 rate of the true source among gallery items",
+    "per-transform easy-negative false removal (calibration transfer)"
+  ],
+  "registered_expectations": [
+    "All perceptual detectors achieve high recall on the copy_reencode positive control.",
+    "Exact hashing has near-zero recall under every transform except none.",
+    "On appearance-changed rerenders, generic perceptual descriptors (SSCD, DINOv2) are far weaker than on copies, because trajectory identity is carried by small positional differences in visually homogeneous scenes.",
+    "Motion descriptors recover appearance-only rerenders; invariance search recovers mirror and time-shift recall at some cost in false removal.",
+    "Closer-than-gallery hard negatives produce higher false removal than easy negatives for motion and state-based detectors."
+  ],
+  "claim_boundary": "Synthetic collisions rendered natively at 224 px; full 24-frame clips compared with full training clips (curation setting). Results characterize detector behavior on provenance ground truth; they do not measure exposure effects and do not transfer automatically to the 64 px, 8-frame model inputs.",
+  "supersedes": "v2 rendered at 64 px. Upsampling to 224 px magnified JPEG blocks so that a re-encoded exact copy had median SSCD cosine 0.64 to its source, below a recolored rerender (0.94); the copy positive control failed, so v2 perceptual results are uninterpretable for trajectory claims. v2 also had a 1/64 mirror-mapping offset in centroid_invariant and an untied rank statistic. v3 renders natively at 224 px (no resampling for SSCD/DINOv2; RAFT at native resolution).",
+  "invariant_max_shift_frames": 3,
+  "invariant_max_shift_flow_steps": 1,
+  "background_clips": 500,
+  "background_top_k": 10,
+  "interpretive_gate": "Conclusions about a perceptual detector on trajectory reuse require it to pass the copy_reencode positive control: AUROC versus easy negatives >= 0.95 and recall >= 0.80 at the 5% operating point. Detectors failing the gate are reported as not functional in this domain.",
+  "size_note": "Easy negatives reduced from 1000 to 600 per transform before running (native 224 px is ~3.8x slower); pooled calibration still uses 4,800 negatives.",
+  "outputs": "results/detector_benchmark_v3.json (summary) and results/detector_benchmark_v3_scores.json.gz (per-query scores for frontier, bootstrap, and gate analyses by scripts/analyze_detectors.py)",
+  "restart_note": "First v3 launch was stopped at about 40% because it saved only summaries; restarted with identical configuration and seeds plus per-query score export."
+}

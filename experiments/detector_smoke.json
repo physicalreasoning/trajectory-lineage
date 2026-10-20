@@ -1,0 +1,22 @@
+{
+  "name": "detector_smoke",
+  "status": "registered_before_run",
+  "families": 64,
+  "frames": 24,
+  "frame_dt": 0.04,
+  "image_size": 64,
+  "seed": 20261015,
+  "thresholds": {
+    "silhouette_distance": 1e-12,
+    "centroid_motion_distance": 1e-12,
+    "oracle_state_distance": 1e-12
+  },
+  "gates": {
+    "exact_hash_same_trajectory_recall_at_most": 0.05,
+    "silhouette_same_trajectory_recall_at_least": 0.95,
+    "motion_same_trajectory_recall_at_least": 0.95,
+    "oracle_same_trajectory_recall": 1.0,
+    "independent_false_positive_at_most": 0.05
+  },
+  "claim_boundary": "This smoke test validates classical detectors on clean synthetic renders; learned perceptual and optical-flow baselines remain future work."
+}
