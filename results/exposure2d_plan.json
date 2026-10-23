@@ -1,0 +1,1099 @@
+{
+  "planning_sds_80pct_upper": {
+    "S": 0.00518559521,
+    "H": 0.00110181673,
+    "G": 0.00547364146,
+    "Q": 0.00411067004,
+    "E": 0.00748320836
+  },
+  "attrition": 0.04,
+  "assay_effect": 0.002,
+  "by_sd_scale": {
+    "1": {
+      "100": {
+        "analyzed_blocks": 96,
+        "E_gain_detectable_at_90pct_power": 0.0024757131903624633,
+        "consequential_G0.015_H0": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.7415
+        },
+        "consequential_G0.015_H0.0005": {
+          "consequential_claim": 0.9935,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.9935,
+          "assay_sensitive": 0.7305
+        },
+        "at_threshold_G0.010": {
+          "consequential_claim": 0.02725,
+          "prevalence_dependent_claim": 0.0215,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.7495
+        },
+        "prevalence_G0.006": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 1.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.74325
+        },
+        "null_G0": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 0.0,
+          "negligible_claim": 0.69475,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.734
+        },
+        "negligible_boundary_G0.002": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.0255,
+          "any_positive_magnitude": 0.0255,
+          "negligible_claim": 0.03925,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.73275
+        },
+        "harm_at_margin_H0.001": {
+          "consequential_claim": 0.0225,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.0225,
+          "assay_sensitive": 0.749
+        }
+      },
+      "200": {
+        "analyzed_blocks": 192,
+        "E_gain_detectable_at_90pct_power": 0.0017505935851782797,
+        "consequential_G0.015_H0": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.95925
+        },
+        "consequential_G0.015_H0.0005": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.952
+        },
+        "at_threshold_G0.010": {
+          "consequential_claim": 0.0265,
+          "prevalence_dependent_claim": 0.023,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.95675
+        },
+        "prevalence_G0.006": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 1.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.9565
+        },
+        "null_G0": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 0.0,
+          "negligible_claim": 0.95875,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.95975
+        },
+        "negligible_boundary_G0.002": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.025,
+          "any_positive_magnitude": 0.025,
+          "negligible_claim": 0.0485,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.9565
+        },
+        "harm_at_margin_H0.001": {
+          "consequential_claim": 0.02675,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.02675,
+          "assay_sensitive": 0.95425
+        }
+      },
+      "400": {
+        "analyzed_blocks": 384,
+        "E_gain_detectable_at_90pct_power": 0.0012378565951812316,
+        "consequential_G0.015_H0": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 1.0
+        },
+        "consequential_G0.015_H0.0005": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.9995
+        },
+        "at_threshold_G0.010": {
+          "consequential_claim": 0.0265,
+          "prevalence_dependent_claim": 0.02875,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.9995
+        },
+        "prevalence_G0.006": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 1.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.9995
+        },
+        "null_G0": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 0.0,
+          "negligible_claim": 0.9995,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.9995
+        },
+        "negligible_boundary_G0.002": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.02625,
+          "any_positive_magnitude": 0.02625,
+          "negligible_claim": 0.04675,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.99875
+        },
+        "harm_at_margin_H0.001": {
+          "consequential_claim": 0.026,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.026,
+          "assay_sensitive": 0.9995
+        }
+      },
+      "600": {
+        "analyzed_blocks": 576,
+        "E_gain_detectable_at_90pct_power": 0.0010107056776443117,
+        "consequential_G0.015_H0": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 1.0
+        },
+        "consequential_G0.015_H0.0005": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 1.0
+        },
+        "at_threshold_G0.010": {
+          "consequential_claim": 0.02425,
+          "prevalence_dependent_claim": 0.02125,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 1.0
+        },
+        "prevalence_G0.006": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 1.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 1.0
+        },
+        "null_G0": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 0.0,
+          "negligible_claim": 1.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 1.0
+        },
+        "negligible_boundary_G0.002": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.02275,
+          "any_positive_magnitude": 0.02275,
+          "negligible_claim": 0.04975,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 1.0
+        },
+        "harm_at_margin_H0.001": {
+          "consequential_claim": 0.02025,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.02025,
+          "assay_sensitive": 1.0
+        }
+      },
+      "800": {
+        "analyzed_blocks": 768,
+        "E_gain_detectable_at_90pct_power": 0.0008752967925891398,
+        "consequential_G0.015_H0": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 1.0
+        },
+        "consequential_G0.015_H0.0005": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 1.0
+        },
+        "at_threshold_G0.010": {
+          "consequential_claim": 0.0255,
+          "prevalence_dependent_claim": 0.0255,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 1.0
+        },
+        "prevalence_G0.006": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 1.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 1.0
+        },
+        "null_G0": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 0.0,
+          "negligible_claim": 1.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 1.0
+        },
+        "negligible_boundary_G0.002": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.0255,
+          "any_positive_magnitude": 0.0255,
+          "negligible_claim": 0.051,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 1.0
+        },
+        "harm_at_margin_H0.001": {
+          "consequential_claim": 0.02225,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.02225,
+          "assay_sensitive": 1.0
+        }
+      },
+      "1000": {
+        "analyzed_blocks": 960,
+        "E_gain_detectable_at_90pct_power": 0.0007828892514867403,
+        "consequential_G0.015_H0": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 1.0
+        },
+        "consequential_G0.015_H0.0005": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 1.0
+        },
+        "at_threshold_G0.010": {
+          "consequential_claim": 0.02925,
+          "prevalence_dependent_claim": 0.0225,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 1.0
+        },
+        "prevalence_G0.006": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 1.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 1.0
+        },
+        "null_G0": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 0.0,
+          "negligible_claim": 1.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 1.0
+        },
+        "negligible_boundary_G0.002": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.02175,
+          "any_positive_magnitude": 0.02175,
+          "negligible_claim": 0.0525,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 1.0
+        },
+        "harm_at_margin_H0.001": {
+          "consequential_claim": 0.02725,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.02725,
+          "assay_sensitive": 1.0
+        }
+      }
+    },
+    "1.5": {
+      "100": {
+        "analyzed_blocks": 96,
+        "E_gain_detectable_at_90pct_power": 0.0037135697855436942,
+        "consequential_G0.015_H0": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.38775
+        },
+        "consequential_G0.015_H0.0005": {
+          "consequential_claim": 0.83875,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.83875,
+          "assay_sensitive": 0.41125
+        },
+        "at_threshold_G0.010": {
+          "consequential_claim": 0.028,
+          "prevalence_dependent_claim": 0.0215,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.41075
+        },
+        "prevalence_G0.006": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.99475,
+          "any_positive_magnitude": 0.99725,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.4155
+        },
+        "null_G0": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 0.0,
+          "negligible_claim": 0.2305,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.41775
+        },
+        "negligible_boundary_G0.002": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.02275,
+          "any_positive_magnitude": 0.02275,
+          "negligible_claim": 0.02375,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.40725
+        },
+        "harm_at_margin_H0.001": {
+          "consequential_claim": 0.02125,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.02125,
+          "assay_sensitive": 0.419
+        }
+      },
+      "200": {
+        "analyzed_blocks": 192,
+        "E_gain_detectable_at_90pct_power": 0.0026258903777674194,
+        "consequential_G0.015_H0": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.69775
+        },
+        "consequential_G0.015_H0.0005": {
+          "consequential_claim": 0.988,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.988,
+          "assay_sensitive": 0.69925
+        },
+        "at_threshold_G0.010": {
+          "consequential_claim": 0.02475,
+          "prevalence_dependent_claim": 0.02425,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.68475
+        },
+        "prevalence_G0.006": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 1.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.68275
+        },
+        "null_G0": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 0.0,
+          "negligible_claim": 0.62975,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.6875
+        },
+        "negligible_boundary_G0.002": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.02525,
+          "any_positive_magnitude": 0.02525,
+          "negligible_claim": 0.03275,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.6985
+        },
+        "harm_at_margin_H0.001": {
+          "consequential_claim": 0.0265,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.0265,
+          "assay_sensitive": 0.69525
+        }
+      },
+      "400": {
+        "analyzed_blocks": 384,
+        "E_gain_detectable_at_90pct_power": 0.0018567848927718471,
+        "consequential_G0.015_H0": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.938
+        },
+        "consequential_G0.015_H0.0005": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.93625
+        },
+        "at_threshold_G0.010": {
+          "consequential_claim": 0.03,
+          "prevalence_dependent_claim": 0.027,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.94375
+        },
+        "prevalence_G0.006": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 1.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.936
+        },
+        "null_G0": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 0.0,
+          "negligible_claim": 0.92975,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.9325
+        },
+        "negligible_boundary_G0.002": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.023,
+          "any_positive_magnitude": 0.023,
+          "negligible_claim": 0.04675,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.934
+        },
+        "harm_at_margin_H0.001": {
+          "consequential_claim": 0.02575,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.02575,
+          "assay_sensitive": 0.93925
+        }
+      },
+      "600": {
+        "analyzed_blocks": 576,
+        "E_gain_detectable_at_90pct_power": 0.0015160585164664675,
+        "consequential_G0.015_H0": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.99075
+        },
+        "consequential_G0.015_H0.0005": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.99025
+        },
+        "at_threshold_G0.010": {
+          "consequential_claim": 0.02325,
+          "prevalence_dependent_claim": 0.026,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.98875
+        },
+        "prevalence_G0.006": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 1.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.9925
+        },
+        "null_G0": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 0.0,
+          "negligible_claim": 0.99175,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.99175
+        },
+        "negligible_boundary_G0.002": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.02825,
+          "any_positive_magnitude": 0.02825,
+          "negligible_claim": 0.0465,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.989
+        },
+        "harm_at_margin_H0.001": {
+          "consequential_claim": 0.0265,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.0265,
+          "assay_sensitive": 0.98725
+        }
+      },
+      "800": {
+        "analyzed_blocks": 768,
+        "E_gain_detectable_at_90pct_power": 0.0013129451888837097,
+        "consequential_G0.015_H0": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.9985
+        },
+        "consequential_G0.015_H0.0005": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.99725
+        },
+        "at_threshold_G0.010": {
+          "consequential_claim": 0.0255,
+          "prevalence_dependent_claim": 0.02375,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.9985
+        },
+        "prevalence_G0.006": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 1.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.99925
+        },
+        "null_G0": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 0.0,
+          "negligible_claim": 0.99975,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.99975
+        },
+        "negligible_boundary_G0.002": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.023,
+          "any_positive_magnitude": 0.023,
+          "negligible_claim": 0.051,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.99925
+        },
+        "harm_at_margin_H0.001": {
+          "consequential_claim": 0.0255,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.0255,
+          "assay_sensitive": 0.99875
+        }
+      },
+      "1000": {
+        "analyzed_blocks": 960,
+        "E_gain_detectable_at_90pct_power": 0.0011743338772301102,
+        "consequential_G0.015_H0": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.99975
+        },
+        "consequential_G0.015_H0.0005": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.99975
+        },
+        "at_threshold_G0.010": {
+          "consequential_claim": 0.02675,
+          "prevalence_dependent_claim": 0.0225,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.9995
+        },
+        "prevalence_G0.006": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 1.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.99975
+        },
+        "null_G0": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 0.0,
+          "negligible_claim": 0.9995,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.9995
+        },
+        "negligible_boundary_G0.002": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.019,
+          "any_positive_magnitude": 0.019,
+          "negligible_claim": 0.0515,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.99975
+        },
+        "harm_at_margin_H0.001": {
+          "consequential_claim": 0.0275,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.0275,
+          "assay_sensitive": 1.0
+        }
+      }
+    },
+    "2": {
+      "100": {
+        "analyzed_blocks": 96,
+        "E_gain_detectable_at_90pct_power": 0.0049514263807249265,
+        "consequential_G0.015_H0": {
+          "consequential_claim": 0.9875,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.99475,
+          "assay_sensitive": 0.2655
+        },
+        "consequential_G0.015_H0.0005": {
+          "consequential_claim": 0.59525,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.60175,
+          "assay_sensitive": 0.2505
+        },
+        "at_threshold_G0.010": {
+          "consequential_claim": 0.0235,
+          "prevalence_dependent_claim": 0.02975,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.99325,
+          "assay_sensitive": 0.25475
+        },
+        "prevalence_G0.006": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.8845,
+          "any_positive_magnitude": 0.9465,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.99175,
+          "assay_sensitive": 0.255
+        },
+        "null_G0": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 0.0,
+          "negligible_claim": 0.02975,
+          "harm_bounded": 0.99175,
+          "assay_sensitive": 0.25975
+        },
+        "negligible_boundary_G0.002": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.024,
+          "any_positive_magnitude": 0.025,
+          "negligible_claim": 0.00525,
+          "harm_bounded": 0.99325,
+          "assay_sensitive": 0.25225
+        },
+        "harm_at_margin_H0.001": {
+          "consequential_claim": 0.025,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.02575,
+          "assay_sensitive": 0.25625
+        }
+      },
+      "200": {
+        "analyzed_blocks": 192,
+        "E_gain_detectable_at_90pct_power": 0.0035011871703565594,
+        "consequential_G0.015_H0": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.456
+        },
+        "consequential_G0.015_H0.0005": {
+          "consequential_claim": 0.87575,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.87575,
+          "assay_sensitive": 0.454
+        },
+        "at_threshold_G0.010": {
+          "consequential_claim": 0.02875,
+          "prevalence_dependent_claim": 0.03025,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.4485
+        },
+        "prevalence_G0.006": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.99825,
+          "any_positive_magnitude": 0.99975,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.44725
+        },
+        "null_G0": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 0.0,
+          "negligible_claim": 0.27375,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.454
+        },
+        "negligible_boundary_G0.002": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.02425,
+          "any_positive_magnitude": 0.02425,
+          "negligible_claim": 0.02275,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.44425
+        },
+        "harm_at_margin_H0.001": {
+          "consequential_claim": 0.0265,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.0265,
+          "assay_sensitive": 0.444
+        }
+      },
+      "400": {
+        "analyzed_blocks": 384,
+        "E_gain_detectable_at_90pct_power": 0.0024757131903624633,
+        "consequential_G0.015_H0": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.7415
+        },
+        "consequential_G0.015_H0.0005": {
+          "consequential_claim": 0.99375,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.99375,
+          "assay_sensitive": 0.745
+        },
+        "at_threshold_G0.010": {
+          "consequential_claim": 0.02775,
+          "prevalence_dependent_claim": 0.0285,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.74225
+        },
+        "prevalence_G0.006": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 1.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.74375
+        },
+        "null_G0": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 0.0,
+          "negligible_claim": 0.71425,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.7495
+        },
+        "negligible_boundary_G0.002": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.02675,
+          "any_positive_magnitude": 0.02675,
+          "negligible_claim": 0.03125,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.7445
+        },
+        "harm_at_margin_H0.001": {
+          "consequential_claim": 0.026,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.026,
+          "assay_sensitive": 0.742
+        }
+      },
+      "600": {
+        "analyzed_blocks": 576,
+        "E_gain_detectable_at_90pct_power": 0.0020214113552886235,
+        "consequential_G0.015_H0": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.8775
+        },
+        "consequential_G0.015_H0.0005": {
+          "consequential_claim": 0.99925,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.99925,
+          "assay_sensitive": 0.89725
+        },
+        "at_threshold_G0.010": {
+          "consequential_claim": 0.0255,
+          "prevalence_dependent_claim": 0.027,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.88675
+        },
+        "prevalence_G0.006": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 1.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.891
+        },
+        "null_G0": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 0.0,
+          "negligible_claim": 0.88575,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.88825
+        },
+        "negligible_boundary_G0.002": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.02225,
+          "any_positive_magnitude": 0.02225,
+          "negligible_claim": 0.046,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.88575
+        },
+        "harm_at_margin_H0.001": {
+          "consequential_claim": 0.02625,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.02625,
+          "assay_sensitive": 0.8925
+        }
+      },
+      "800": {
+        "analyzed_blocks": 768,
+        "E_gain_detectable_at_90pct_power": 0.0017505935851782797,
+        "consequential_G0.015_H0": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.96025
+        },
+        "consequential_G0.015_H0.0005": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.95975
+        },
+        "at_threshold_G0.010": {
+          "consequential_claim": 0.0285,
+          "prevalence_dependent_claim": 0.0295,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.96075
+        },
+        "prevalence_G0.006": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 1.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.957
+        },
+        "null_G0": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 0.0,
+          "negligible_claim": 0.96075,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.96075
+        },
+        "negligible_boundary_G0.002": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.02375,
+          "any_positive_magnitude": 0.02375,
+          "negligible_claim": 0.0465,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.9555
+        },
+        "harm_at_margin_H0.001": {
+          "consequential_claim": 0.0295,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.0295,
+          "assay_sensitive": 0.96
+        }
+      },
+      "1000": {
+        "analyzed_blocks": 960,
+        "E_gain_detectable_at_90pct_power": 0.0015657785029734807,
+        "consequential_G0.015_H0": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.984
+        },
+        "consequential_G0.015_H0.0005": {
+          "consequential_claim": 1.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.98425
+        },
+        "at_threshold_G0.010": {
+          "consequential_claim": 0.02775,
+          "prevalence_dependent_claim": 0.02875,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.98475
+        },
+        "prevalence_G0.006": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 1.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.983
+        },
+        "null_G0": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 0.0,
+          "negligible_claim": 0.98625,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.98625
+        },
+        "negligible_boundary_G0.002": {
+          "consequential_claim": 0.0,
+          "prevalence_dependent_claim": 0.02325,
+          "any_positive_magnitude": 0.02325,
+          "negligible_claim": 0.0545,
+          "harm_bounded": 1.0,
+          "assay_sensitive": 0.98525
+        },
+        "harm_at_margin_H0.001": {
+          "consequential_claim": 0.02875,
+          "prevalence_dependent_claim": 0.0,
+          "any_positive_magnitude": 1.0,
+          "negligible_claim": 0.0,
+          "harm_bounded": 0.02875,
+          "assay_sensitive": 0.982
+        }
+      }
+    }
+  }
+}

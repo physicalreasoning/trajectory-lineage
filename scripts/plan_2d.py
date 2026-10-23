@@ -72,6 +72,7 @@ def main() -> None:
     ap.add_argument("--grid", type=str, default="300,400,600,800,1000,1200,1500")
     ap.add_argument("--sims", type=int, default=4000)
     ap.add_argument("--attrition", type=float, default=0.03)
+    ap.add_argument("--sd-scales", type=str, default="1,1.5,2")
     ap.add_argument(
         "--assay-effect",
         type=float,
@@ -79,7 +80,7 @@ def main() -> None:
         help="planning E gain; default = 90%-power detectable effect at the chosen N",
     )
     args = ap.parse_args()
-    sds = sds_from(args.pilot)
+    base_sds = sds_from(args.pilot)
     rng = np.random.default_rng(2026102302)
     scenarios = {
         "consequential_G0.015_H0": dict(S=0.015, H=0.0),
@@ -90,25 +91,41 @@ def main() -> None:
         "negligible_boundary_G0.002": dict(S=0.002, H=0.0),
         "harm_at_margin_H0.001": dict(S=0.014, H=0.001),
     }
-    out = {"planning_sds_80pct_upper": sds, "attrition": args.attrition, "grid": {}}
-    for scheduled in [int(x) for x in args.grid.split(",")]:
-        n = int(round(scheduled * (1 - args.attrition)))
-        e_mde = (NormalDist().inv_cdf(0.975) + NormalDist().inv_cdf(0.90)) * sds["E"] / np.sqrt(n)
-        e_plan = args.assay_effect if args.assay_effect is not None else e_mde
-        row = {"analyzed_blocks": n, "E_gain_detectable_at_90pct_power": float(e_mde)}
-        for name, sc in scenarios.items():
-            row[name] = simulate(n, sds, sc["S"], sc["H"], e_plan, args.sims, rng)
-        out["grid"][str(scheduled)] = row
-        print(
-            scheduled,
-            n,
-            {
-                k: (v["consequential_claim"], v["negligible_claim"])
-                for k, v in row.items()
-                if isinstance(v, dict)
-            },
-            flush=True,
-        )
+    out = {
+        "planning_sds_80pct_upper": base_sds,
+        "attrition": args.attrition,
+        "assay_effect": args.assay_effect,
+        "by_sd_scale": {},
+    }
+    for scale in [float(x) for x in args.sd_scales.split(",")]:
+        sds = {k: v * scale for k, v in base_sds.items()}
+        out["by_sd_scale"][f"{scale:g}"] = {}
+        for scheduled in [int(x) for x in args.grid.split(",")]:
+            n = int(round(scheduled * (1 - args.attrition)))
+            e_mde = (
+                (NormalDist().inv_cdf(0.975) + NormalDist().inv_cdf(0.90)) * sds["E"] / np.sqrt(n)
+            )
+            e_plan = args.assay_effect if args.assay_effect is not None else e_mde
+            row = {"analyzed_blocks": n, "E_gain_detectable_at_90pct_power": float(e_mde)}
+            for name, sc in scenarios.items():
+                row[name] = simulate(n, sds, sc["S"], sc["H"], e_plan, args.sims, rng)
+            out["by_sd_scale"][f"{scale:g}"][str(scheduled)] = row
+            print(
+                f"sd x{scale:g} N={scheduled} analyzed={n}",
+                "consequential@G.015,H.0005:",
+                row["consequential_G0.015_H0.0005"]["consequential_claim"],
+                "negligible@G0:",
+                row["null_G0"]["negligible_claim"],
+                "size(cons)@G.010:",
+                row["at_threshold_G0.010"]["consequential_claim"],
+                "size(negl)@G.002:",
+                row["negligible_boundary_G0.002"]["negligible_claim"],
+                "harm-size@H.001:",
+                row["harm_at_margin_H0.001"]["consequential_claim"],
+                "E_mde90:",
+                round(e_mde, 5),
+                flush=True,
+            )
     args.out.write_text(json.dumps(out, indent=2) + "\n")
 
 

@@ -2,7 +2,7 @@
   "name": "exposure2d_confirmation",
   "status": "draft_for_registration",
   "role": "confirmatory",
-  "blocks": 1000,
+  "blocks": 800,
   "experiment_seed": 2026103001,
   "observed_frames": 8,
   "future_frames": 16,
@@ -99,7 +99,7 @@
       "E_transfer_loss",
       "all arm-by-population errors"
     ],
-    "minimum_screened_blocks": 900,
+    "minimum_screened_blocks": 720,
     "break_even_rules": "pi* = m/G: finite interval [m/upper(G), m/lower(G)] when lower(G) > 0; unbounded above when lower(G) <= 0 < upper(G); no positive crossing when upper(G) <= 0; also reported intersected with [0, 1].",
     "crossover": "Fieller confidence set for mean(H)/mean(G): bounded interval, two rays, or the entire line",
     "analyzer": "scripts/analyze_2d.py (imports the frozen 1D validation, interval, Holm, break-even and Fieller code; SHA-256 bound in the freeze manifest)",
@@ -110,7 +110,7 @@
   },
   "freeze_requirement": "A manifest (template experiments/freeze_manifest.template.json) validated by scripts/freeze.py: confirmatory role; configuration and analyzer SHA-256; frozen code commit, with HEAD allowed to differ only by files under approvals/; dated, named sign-offs for paper_lead and evaluation_science (roles fixed in code, placeholders rejected); a decision statement; and every pilot seed in the repository registry.",
   "claim_boundary": "Effect of replacing 64 independent continuation events with same-trajectory 2D rerenders for this ConvLSTM, dose, and continuation phase.",
-  "sample_size_rationale": "[to be filled from the 2D pilot: scripts/plan_2d via dryrun_2d.py]",
+  "sample_size_rationale": "800 scheduled blocks: the smallest value on the grid {100,200,400,600,800,1000} giving at least 95% power for both primary decisions (consequential claim at G=0.015, H=0.0005; negligible claim with assay sensitivity at G=0, E=0.002) when true block SDs are twice the 80% upper limits from the effect-blinded 2D pilot (S 0.00519, H 0.00110, G 0.00547, Q 0.00411, E 0.00748; 23 screened blocks). Error rates at the boundaries stay near nominal (about 0.025 for a consequential call at G=0.010; about 0.05 for a negligible call at G=0.002). results/exposure2d_plan.json; end-to-end dry run through the analyzer: results/exposure2d_dryrun.json.",
   "base_competence_screen": "Pre-treatment screen on a separate 256-event competence population (never scored in contrasts): a block enters the primary analysis iff its base model's bounded error there is below constant velocity's. All blocks reported; an analysis over all completed blocks is a sensitivity analysis.",
   "closer_nearby": {
     "construction": "box-conditioned band distribution: uniform initial-state prior restricted to a sensitivity-scaled box (edge offset alone gives 6x the band maximum; capped at the full parameter range) and conditioned on RMS state distance in [0.25, 0.5] x the source's nearest base-training distance",
@@ -135,8 +135,8 @@
     2026102301,
     2026102399
   ],
-  "planning_analyzed_blocks": "[to be filled from the 2D pilot: scripts/plan_2d via dryrun_2d.py]",
-  "runtime_estimate": "[to be filled from the 2D pilot: scripts/plan_2d via dryrun_2d.py]",
+  "planning_analyzed_blocks": 768,
+  "runtime_estimate": "About 101 s per block on an Apple M4 Pro (2D pilot): about 22 hours for 800 blocks on one laptop; less on cloud GPUs.",
   "secondary_endpoints_note": "Raw records retain per-render bounded center-error losses only; contact-timing and post-contact-velocity endpoints are not part of this confirmation.",
   "dims": 2,
   "base_training_steps_rationale_2d": "Fixed from effect-blind base-only tuning (results/exposure2d_base_tuning.json): at 300 steps the 2D base model only marginally beats constant velocity on the screen (error ratio 0.93-0.98); at 600 steps it is clearly competent (0.68-0.72) and later checkpoints plateau."

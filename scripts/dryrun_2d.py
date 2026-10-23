@@ -119,14 +119,20 @@ def main() -> None:
     parser.add_argument("--replications", type=int, default=400)
     parser.add_argument("--blocks", type=str, default="")
     parser.add_argument("--competent-rate", type=float, default=0.97)
+    parser.add_argument("--sd-scale", type=float, default=1.0)
     args = parser.parse_args()
     config = json.loads(args.config.read_text())
-    sds = dispersion_from(args.pilot)
+    sds = {k: v * args.sd_scale for k, v in dispersion_from(args.pilot).items()}
     block_options = (
         [int(x) for x in args.blocks.split(",")] if args.blocks else [int(config["blocks"])]
     )
     rng = np.random.default_rng(20261023)
-    out = {"planning_sds_80pct_upper": sds, "competent_rate": args.competent_rate, "results": {}}
+    out = {
+        "planning_sds_80pct_upper": sds,
+        "sd_scale": args.sd_scale,
+        "competent_rate": args.competent_rate,
+        "results": {},
+    }
     for n in block_options:
         cfg = dict(config, blocks=n)
         cfg["decision_contract"] = dict(
