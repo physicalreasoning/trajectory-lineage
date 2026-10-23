@@ -1,0 +1,116 @@
+{
+  "note": "Effect-blind base-model tuning (no arms built or scored). Stopped after 2 full blocks once the step decision was clear; the 24-block pilot checks the choice.",
+  "decision": "base_training_steps=600, hidden_channels=16",
+  "rows": [
+    {
+      "block": 0,
+      "hidden": 16,
+      "steps": 300,
+      "screen_error": 0.07624330371618271,
+      "cv_error": 0.08153505818646498,
+      "ratio": 0.9350984154793832,
+      "competent": true,
+      "seconds": 11.564563916996121
+    },
+    {
+      "block": 0,
+      "hidden": 16,
+      "steps": 600,
+      "screen_error": 0.058400947600603104,
+      "cv_error": 0.08153505818646498,
+      "ratio": 0.7162679330778696,
+      "competent": true,
+      "seconds": 23.036405791994184
+    },
+    {
+      "block": 0,
+      "hidden": 16,
+      "steps": 1200,
+      "screen_error": 0.05828722566366196,
+      "cv_error": 0.08153505818646498,
+      "ratio": 0.7148731718613992,
+      "competent": true,
+      "seconds": 46.43209341703914
+    },
+    {
+      "block": 0,
+      "hidden": 16,
+      "steps": 2000,
+      "screen_error": 0.05760728567838669,
+      "cv_error": 0.08153505818646498,
+      "ratio": 0.7065339371763598,
+      "competent": true,
+      "seconds": 77.21690537501127
+    },
+    {
+      "block": 0,
+      "hidden": 32,
+      "steps": 300,
+      "screen_error": 0.06774161756038666,
+      "cv_error": 0.08153505818646498,
+      "ratio": 0.830828101029453,
+      "competent": true,
+      "seconds": 14.933437375118956
+    },
+    {
+      "block": 0,
+      "hidden": 32,
+      "steps": 600,
+      "screen_error": 0.05416146665811539,
+      "cv_error": 0.08153505818646498,
+      "ratio": 0.6642721286130918,
+      "competent": true,
+      "seconds": 29.258162875194103
+    },
+    {
+      "block": 0,
+      "hidden": 32,
+      "steps": 1200,
+      "screen_error": 0.05270541459321976,
+      "cv_error": 0.08153505818646498,
+      "ratio": 0.646414140929245,
+      "competent": true,
+      "seconds": 57.58201691717841
+    },
+    {
+      "block": 0,
+      "hidden": 32,
+      "steps": 2000,
+      "screen_error": 0.05224889516830444,
+      "cv_error": 0.08153505818646498,
+      "ratio": 0.6408150840932114,
+      "competent": true,
+      "seconds": 95.64947720919736
+    },
+    {
+      "block": 1,
+      "hidden": 16,
+      "steps": 300,
+      "screen_error": 0.07936642318964005,
+      "cv_error": 0.08073560655233876,
+      "ratio": 0.9830411460176358,
+      "competent": true,
+      "seconds": 12.67827095813118
+    },
+    {
+      "block": 1,
+      "hidden": 16,
+      "steps": 600,
+      "screen_error": 0.05487142875790596,
+      "cv_error": 0.08073560655233876,
+      "ratio": 0.6796434819912359,
+      "competent": true,
+      "seconds": 24.339615250006318
+    },
+    {
+      "block": 1,
+      "hidden": 16,
+      "steps": 1200,
+      "screen_error": 0.049600403755903244,
+      "cv_error": 0.08073560655233876,
+      "ratio": 0.6143559932722945,
+      "competent": true,
+      "seconds": 50.280843208078295
+    }
+  ]
+}

@@ -55,6 +55,7 @@ def spec_from(config: dict[str, Any]) -> EventSpec:
         future_frames=int(config["future_frames"]),
         frame_dt=float(config["frame_dt"]),
         image_size=int(config["image_size"]),
+        dims=int(config.get("dims", 1)),
     )
 
 

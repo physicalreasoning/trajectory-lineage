@@ -26,9 +26,17 @@ def sample_trajectory(
     frames: int,
     dt: float,
     observed_frames: int,
+    dims: int = 1,
 ) -> np.ndarray:
     """Sample an accepted collision with contact after observation and before the final frame."""
 
+    if dims == 2:
+        from trajectory_lineage.exposure import EventSpec, sample_event
+
+        spec = EventSpec(
+            observed_frames=observed_frames, future_frames=frames - observed_frames, frame_dt=dt, dims=2
+        )
+        return sample_event(rng, spec).trajectory.positions
     earliest = observed_frames * dt
     latest = (frames - 4) * dt
     for _ in range(10_000):
@@ -57,6 +65,7 @@ def sample_bank(
     frames: int,
     dt: float,
     observed_frames: int,
+    dims: int = 1,
 ) -> np.ndarray:
     return np.stack(
         [
@@ -65,6 +74,7 @@ def sample_bank(
                 frames=frames,
                 dt=dt,
                 observed_frames=observed_frames,
+                dims=dims,
             )
             for _ in range(count)
         ]
@@ -94,6 +104,7 @@ def run(config: dict[str, Any]) -> dict[str, Any]:
     frames = observed + future
     dt = float(config["frame_dt"])
     reuse_fraction = float(config["reuse_fraction"])
+    dims = int(config.get("dims", 1))
     block_results: list[dict[str, float | int]] = []
 
     started = time.perf_counter()
@@ -104,6 +115,7 @@ def run(config: dict[str, Any]) -> dict[str, Any]:
             frames=frames,
             dt=dt,
             observed_frames=observed,
+            dims=dims,
         )
         background_bank = sample_bank(
             rng,
@@ -111,6 +123,7 @@ def run(config: dict[str, Any]) -> dict[str, Any]:
             frames=frames,
             dt=dt,
             observed_frames=observed,
+            dims=dims,
         )
         independent_population = sample_bank(
             rng,
@@ -118,6 +131,7 @@ def run(config: dict[str, Any]) -> dict[str, Any]:
             frames=frames,
             dt=dt,
             observed_frames=observed,
+            dims=dims,
         )
 
         source_predictor = NearestTrajectoryPredictor().fit(
