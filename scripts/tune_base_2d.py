@@ -52,7 +52,9 @@ def main() -> None:
         seeds = AppearanceRegistry(rng)
         base_events = [sample_event(rng, spec) for _ in range(int(config["base_train_examples"]))]
         screen_events = [sample_event(rng, spec) for _ in range(int(config["screen_examples"]))]
-        base = to_tensors([render_event(e, spec, seeds.draw()) for e in base_events], base_events, spec)
+        base = to_tensors(
+            [render_event(e, spec, seeds.draw()) for e in base_events], base_events, spec
+        )
         screen = to_tensors(
             [render_event(e, spec, seeds.draw()) for e in screen_events], screen_events, spec
         )
@@ -67,14 +69,25 @@ def main() -> None:
             for ck in checkpoints:
                 batches = []
                 for _ in range(ck - done):
-                    idx = torch.from_numpy(batch_rng.integers(0, len(base[0]), int(config["batch_size"])))
+                    idx = torch.from_numpy(
+                        batch_rng.integers(0, len(base[0]), int(config["batch_size"]))
+                    )
                     batches.append((base[0][idx], base[1][idx]))
                 train_steps(model, opt, batches, device)
                 done = ck
                 err = evaluate(model, *screen, device, float(config["error_cap"]))
-                rows.append(dict(block=block, hidden=hidden, steps=ck, screen_error=err, cv_error=cv,
-                                 ratio=err / cv, competent=bool(err < cv),
-                                 seconds=time.perf_counter() - t0))
+                rows.append(
+                    dict(
+                        block=block,
+                        hidden=hidden,
+                        steps=ck,
+                        screen_error=err,
+                        cv_error=cv,
+                        ratio=err / cv,
+                        competent=bool(err < cv),
+                        seconds=time.perf_counter() - t0,
+                    )
+                )
                 print(json.dumps(rows[-1]), flush=True)
     summary = {}
     for hidden in sorted({r["hidden"] for r in rows}):
@@ -86,7 +99,16 @@ def main() -> None:
                 ratio_max=float(np.max([r["ratio"] for r in sel])),
                 seconds_median=float(np.median([r["seconds"] for r in sel])),
             )
-    args.out.write_text(json.dumps(dict(summary=summary, rows=rows, args=vars(args) | {"config": str(args.config), "out": str(args.out)}), indent=2))
+    args.out.write_text(
+        json.dumps(
+            dict(
+                summary=summary,
+                rows=rows,
+                args=vars(args) | {"config": str(args.config), "out": str(args.out)},
+            ),
+            indent=2,
+        )
+    )
     print(json.dumps(summary, indent=2))
 
 

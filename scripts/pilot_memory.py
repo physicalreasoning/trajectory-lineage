@@ -34,7 +34,10 @@ def sample_trajectory(
         from trajectory_lineage.exposure import EventSpec, sample_event
 
         spec = EventSpec(
-            observed_frames=observed_frames, future_frames=frames - observed_frames, frame_dt=dt, dims=2
+            observed_frames=observed_frames,
+            future_frames=frames - observed_frames,
+            frame_dt=dt,
+            dims=2,
         )
         return sample_event(rng, spec).trajectory.positions
     earliest = observed_frames * dt

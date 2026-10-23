@@ -130,7 +130,10 @@ def sample_event(rng: np.random.Generator, spec: EventSpec) -> Event:
     for _ in range(10_000):
         state = _make_state(
             spec,
-            {name: float(rng.uniform(low, high)) for name, (low, high) in state_ranges(spec).items()},
+            {
+                name: float(rng.uniform(low, high))
+                for name, (low, high) in state_ranges(spec).items()
+            },
         )
         trajectory = _valid_trajectory(state, spec)
         if trajectory is not None:
