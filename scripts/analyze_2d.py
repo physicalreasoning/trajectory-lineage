@@ -187,24 +187,27 @@ def analyze_2d(
         result["primary"] = analyze_blocks_2d(screened, contract)
     if len(completed) >= 2:
         result["all_completed_blocks_sensitivity"] = analyze_blocks_2d(completed, contract)
-    if len(screened) < minimum:
-        result["primary_claim"] = "inconclusive (too few screened blocks)"
+    reason = (
+        "unresolved block failures"
+        if failures
+        else "too few screened blocks"
+        if len(screened) < minimum
+        else None
+    )
+    if reason is None:
+        result["primary_claim"] = result["primary"]["primary_claim"]
         return result
-    claim = result["primary"]["primary_claim"]
-    if failures:
-        # Complete-block rule: estimates stay reported, but no decision anywhere survives.
-        for key in ("primary", "all_completed_blocks_sensitivity"):
-            if key in result:
-                section = result[key]
-                section["decisions_suppressed"] = "unresolved block failures"
-                section["primary_claim"] = "inconclusive (unresolved block failures)"
-                section["secondary_holm_rejections"] = dict.fromkeys(
-                    section["secondary_holm_rejections"], False
-                )
-                section["axes"]["event_identity"] = "unresolved"
-        if not claim.startswith("inconclusive"):
-            claim = "inconclusive (unresolved block failures)"
-    result["primary_claim"] = claim
+    # Complete-block and minimum-screened rules: estimates stay reported, no decision survives.
+    for key in ("primary", "all_completed_blocks_sensitivity"):
+        if key in result:
+            section = result[key]
+            section["decisions_suppressed"] = reason
+            section["primary_claim"] = f"inconclusive ({reason})"
+            section["secondary_holm_rejections"] = dict.fromkeys(
+                section["secondary_holm_rejections"], False
+            )
+            section["axes"]["event_identity"] = "unresolved"
+    result["primary_claim"] = f"inconclusive ({reason})"
     return result
 
 

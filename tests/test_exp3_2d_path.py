@@ -112,3 +112,17 @@ def test_identity_label_follows_holm(tmp_path):
         assert (p["axes"]["event_identity"] == "event_specific") == p["secondary_holm_rejections"][
             "identity_specific"
         ]
+
+
+def test_too_few_screened_blocks_suppresses_every_decision(tmp_path):
+    config, *_ = _setup(tmp_path)
+    runs = synthetic_runs(
+        np.random.default_rng(2), config, SCENARIOS["consequential_0.015"], SDS, 40, 1.0
+    )
+    for run in runs[:15]:  # 25 of 40 screened < minimum 30
+        run["screen_base_error"] = 0.09
+    result = analyze_2d(runs, config, check_records=True)
+    assert result["primary_claim"] == "inconclusive (too few screened blocks)"
+    nested = result["primary"]
+    assert nested["primary_claim"] == "inconclusive (too few screened blocks)"
+    assert not any(nested["secondary_holm_rejections"].values())
