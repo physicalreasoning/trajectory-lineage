@@ -10,6 +10,8 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
+pytest.importorskip("torch")  # the runner imports torch; covered by the model-unit CI job
+
 from analyze_2d import analyze_2d, check_identity  # noqa: E402
 from dryrun_2d import SCENARIOS, synthetic_runs  # noqa: E402
 from exposure_experiment import analyzer_for  # noqa: E402
