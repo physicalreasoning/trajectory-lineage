@@ -556,18 +556,24 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
-    parser.add_argument("--device", choices=("mps", "cpu"), default=None)
+    parser.add_argument("--device", choices=("cuda", "mps", "cpu"), default=None)
     parser.add_argument("--unblind", type=Path, default=None, help="Path for raw block records.")
     parser.add_argument("--freeze-manifest", type=Path, default=None)
     args = parser.parse_args()
-    if args.unblind is not None:
+    config = json.loads(args.config.read_text())
+    if args.unblind is not None or config.get("require_approval_to_run", False):
         if args.freeze_manifest is None:
-            raise SystemExit("--unblind requires --freeze-manifest")
+            raise SystemExit("this run requires --freeze-manifest (approved, confirmatory)")
         check_freeze(args.freeze_manifest, args.config)
 
-    config = json.loads(args.config.read_text())
     spec = spec_from(config)
-    device_name = args.device or ("mps" if torch.backends.mps.is_available() else "cpu")
+    device_name = args.device or (
+        "cuda"
+        if torch.cuda.is_available()
+        else "mps"
+        if torch.backends.mps.is_available()
+        else "cpu"
+    )
     device = torch.device(device_name)
     runs = []
     for block_index in range(int(config["blocks"])):

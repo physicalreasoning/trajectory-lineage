@@ -91,6 +91,16 @@ def test_any_missing_block_makes_every_claim_inconclusive(tmp_path):
     runs[3] = {"block_index": 3, "status": "algorithmic_failure", "error": "synthetic"}
     result = analyze_2d(runs, config, check_records=True)
     assert result["primary_claim"] == "inconclusive (unresolved block failures)"
+    nested = result["primary"]
+    assert nested["primary_claim"] == "inconclusive (unresolved block failures)"
+    assert not any(nested["secondary_holm_rejections"].values())
+    assert nested["axes"]["event_identity"] == "unresolved"
+
+
+def test_confirmatory_2d_run_requires_approval():
+    config = json.loads((ROOT / "experiments/exposure2d_confirmation.json").read_text())
+    assert config["require_approval_to_run"] is True
+    assert config["allow_provisional_freeze"] is False
 
 
 def test_identity_label_follows_holm(tmp_path):

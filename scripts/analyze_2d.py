@@ -191,8 +191,19 @@ def analyze_2d(
         result["primary_claim"] = "inconclusive (too few screened blocks)"
         return result
     claim = result["primary"]["primary_claim"]
-    if failures and not claim.startswith("inconclusive"):
-        claim = "inconclusive (unresolved block failures)"
+    if failures:
+        # Complete-block rule: estimates stay reported, but no decision anywhere survives.
+        for key in ("primary", "all_completed_blocks_sensitivity"):
+            if key in result:
+                section = result[key]
+                section["decisions_suppressed"] = "unresolved block failures"
+                section["primary_claim"] = "inconclusive (unresolved block failures)"
+                section["secondary_holm_rejections"] = dict.fromkeys(
+                    section["secondary_holm_rejections"], False
+                )
+                section["axes"]["event_identity"] = "unresolved"
+        if not claim.startswith("inconclusive"):
+            claim = "inconclusive (unresolved block failures)"
     result["primary_claim"] = claim
     return result
 
