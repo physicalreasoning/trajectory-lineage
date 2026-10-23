@@ -37,7 +37,8 @@ SCENARIOS = {
     "consequential_0.015_with_harm_0.0005": dict(S=0.0145, H=0.0005, Q=0.0, E=0.004),
     "consequential_but_harmful_0.002": dict(S=0.013, H=0.002, Q=0.0, E=0.004),
     "event_specific_Q_0.015": dict(S=0.015, H=0.0, Q=0.015, E=0.004),
-    "assay_insensitive": dict(S=0.0, H=0.0, Q=0.0, E=0.0),
+    "positive_control_dead": dict(S=0.0, H=0.0, Q=0.0, E=0.0),
+    "weak_positive_control_E_0.001": dict(S=0.0, H=0.0, Q=0.0, E=0.001),
     "reverse_-0.005": dict(S=-0.005, H=0.0, Q=0.0, E=0.004),
 }
 
@@ -142,16 +143,18 @@ def main() -> None:
         for name, truth in SCENARIOS.items():
             claims, axes = Counter(), Counter()
             mock = None
-            for rep in range(args.replications):
+            for _rep in range(args.replications):
                 runs = synthetic_runs(rng, cfg, truth, sds, n, args.competent_rate)
-                result = analyze_2d(runs, cfg, check_records=(rep == 0))
+                result = analyze_2d(
+                    runs, cfg, check_records=True
+                )  # full record validation, every dataset
                 claims[result["primary_claim"]] += 1
                 if "primary" in result:
                     ax = result["primary"]["axes"]
                     axes[f"magnitude={ax['magnitude']}"] += 1
                     axes[f"identity={ax['event_identity']}"] += 1
                     axes[f"harm_bounded={ax['harm_bounded']}"] += 1
-                    axes[f"assay_sensitive={ax['assay_sensitive']}"] += 1
+                    axes[f"positive_control_detected={ax['positive_control_detected']}"] += 1
                 if mock is None:
                     p = result["primary"]
                     mock = {

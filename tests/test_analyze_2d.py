@@ -32,5 +32,5 @@ def test_claims_combine_axes():
     assert (
         primary_claim("consequential", True, False, True) == "differential gap without safeguards"
     )
-    assert primary_claim("negligible", True, True, False) == "assay insensitive"
+    assert primary_claim("negligible", True, True, False) == "positive control not detected"
     assert primary_claim("negligible", False, False, True) == "negligible differential gap"

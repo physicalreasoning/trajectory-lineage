@@ -78,7 +78,7 @@ def pilot_registry(experiments: Path, config: dict) -> set[int]:
     """Every registered pilot seed: exposure_pilot_*.json files plus declared extra seeds."""
 
     seeds = {int(seed) for seed in config.get("excluded_pilot_seeds", [])}
-    for path in sorted(experiments.glob("exposure_pilot_*.json")):
+    for path in sorted(experiments.glob("exposure*_pilot_*.json")):
         pilot = json.loads(path.read_text())
         if "experiment_seed" in pilot:
             seeds.add(int(pilot["experiment_seed"]))
@@ -114,6 +114,10 @@ def validate(
     if manifest.get("analyzer_sha256") != sha256(analyzer_path):
         raise FreezeError("analysis code differs from the frozen analyzer")
     mode = manifest.get("mode", "confirmatory")
+    if mode == "provisional" and not config.get("allow_provisional_freeze", True):
+        raise FreezeError(
+            "this configuration requires confirmatory approvals (no provisional freeze)"
+        )
     if mode == "provisional":
         # Thresholds frozen by the workstream owner before unblinding while collaborator review is
         # pending. Outputs are stamped provisional; collaborator signatures are never implied.

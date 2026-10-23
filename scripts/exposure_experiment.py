@@ -410,7 +410,7 @@ def blinded_report(config: dict[str, Any], runs: list[dict[str, Any]]) -> dict[s
     balance = [
         run["base_errors"]["source"] - run["base_errors"]["independent"] for run in completed
     ]
-    return {
+    report = {
         "blinded": True,
         "blocks_scheduled": len(runs),
         "blocks_completed": len(completed_all),
@@ -478,12 +478,26 @@ def blinded_report(config: dict[str, Any], runs: list[dict[str, Any]]) -> dict[s
         },
     }
 
+    if not config.get("blinded_release_positive_control", True):
+        # The flag is derived from signs of arm E gains; withheld when the release must be
+        # dispersion-only (registered 2D confirmation).
+        report.pop("positive_control_passed")
+    return report
+
 
 ANALYZER = Path(__file__).with_name("analyze_confirmation.py")
 
 
 def config_hash(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def analyzer_for(config: dict[str, Any]) -> Path:
+    """The analyzer bound by the freeze manifest: the one the configuration names."""
+
+    return Path(__file__).resolve().parents[1] / config.get(
+        "analyzer_script", "scripts/analyze_confirmation.py"
+    )
 
 
 def check_freeze(manifest_path: Path, config_path: Path) -> None:
@@ -493,7 +507,7 @@ def check_freeze(manifest_path: Path, config_path: Path) -> None:
         validate_freeze(
             json.loads(manifest_path.read_text()),
             config_path,
-            ANALYZER,
+            analyzer_for(json.loads(config_path.read_text())),
             state=git_state,
             changes=changed_since,
         )

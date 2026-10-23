@@ -12,7 +12,9 @@ decision logic, which the 2D registration revises in four ways:
 3. The positive control is reachable: assay sensitivity requires the 95% lower bound of arm E's
    exact-render gain to exceed zero (the 1D rule's "E can detect 0.010" is not required).
 4. Magnitude, safeguards (source gain, harm) and event identity (Q) are separate axes; the
-   primary claim combines them by a fixed table.
+   primary claim combines them by a fixed table. The confirmatory event-identity label comes from
+   the Holm-adjusted secondary test, never from a nominal interval.
+5. Any unresolved block failure makes every claim inconclusive (complete-block rule).
 """
 
 from __future__ import annotations
@@ -86,7 +88,7 @@ def primary_claim(magnitude: str, source_ok: bool, harm_ok: bool, assay_ok: bool
             else "differential gap without safeguards"
         )
     if magnitude == "negligible":
-        return "negligible differential gap" if assay_ok else "assay insensitive"
+        return "negligible differential gap" if assay_ok else "positive control not detected"
     if magnitude == "reverse":
         return "reverse gap"
     return "inconclusive"
@@ -108,18 +110,19 @@ def analyze_blocks_2d(runs: list[dict[str, Any]], contract: dict[str, Any]) -> d
     harm_ok = s95["H"]["upper"] < harm_margin
     assay_ok = s95["E_exact_gain"]["lower"] > 0
     threshold = float(contract["consequential_threshold"])
-    identity = (
-        "event_specific"
-        if s95["Q"]["lower"] > threshold
-        else "not_event_specific"
-        if s95["Q"]["upper"] < threshold
-        else "unresolved"
-    )
     p_values = {
         "identity_specific": one_sided_p(values["Q"], threshold),
         "detectable": one_sided_p(values["G"], 0.0),
         "consequential_harm": one_sided_p(values["H"], harm_margin),
     }
+    holm_decisions = holm(p_values, alpha_support)
+    identity = (
+        "event_specific"
+        if holm_decisions["identity_specific"]
+        else "below_threshold"
+        if s95["Q"]["upper"] < threshold
+        else "unresolved"
+    )
     return {
         "blocks": len(runs),
         "arm_population_errors": arm_summaries(runs, alpha_support),
@@ -129,13 +132,13 @@ def analyze_blocks_2d(runs: list[dict[str, Any]], contract: dict[str, Any]) -> d
             "magnitude": magnitude,
             "source_gain_supported": bool(source_ok),
             "harm_bounded": bool(harm_ok),
-            "assay_sensitive": bool(assay_ok),
+            "positive_control_detected": bool(assay_ok),
             "event_identity": identity,
         },
         "E_exact_gain_positive_fraction": float(np.mean(values["E_exact_gain"] > 0)),
         "primary_claim": primary_claim(magnitude, source_ok, harm_ok, assay_ok),
         "secondary_p_values": p_values,
-        "secondary_holm_rejections": holm(p_values, alpha_support),
+        "secondary_holm_rejections": holm_decisions,
         "break_even_prevalence": break_even(s95["G"], float(contract["ranking_margin_m"])),
         "harm_to_gap_crossover_fieller": fieller(values["H"], values["G"], alpha_support),
     }
@@ -188,7 +191,7 @@ def analyze_2d(
         result["primary_claim"] = "inconclusive (too few screened blocks)"
         return result
     claim = result["primary"]["primary_claim"]
-    if failures and claim in DECISIVE:
+    if failures and not claim.startswith("inconclusive"):
         claim = "inconclusive (unresolved block failures)"
     result["primary_claim"] = claim
     return result
