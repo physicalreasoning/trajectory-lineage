@@ -55,6 +55,7 @@ def spec_from(config: dict[str, Any]) -> EventSpec:
         future_frames=int(config["future_frames"]),
         frame_dt=float(config["frame_dt"]),
         image_size=int(config["image_size"]),
+        dims=int(config.get("dims", 1)),
     )
 
 
@@ -409,7 +410,7 @@ def blinded_report(config: dict[str, Any], runs: list[dict[str, Any]]) -> dict[s
     balance = [
         run["base_errors"]["source"] - run["base_errors"]["independent"] for run in completed
     ]
-    return {
+    report = {
         "blinded": True,
         "blocks_scheduled": len(runs),
         "blocks_completed": len(completed_all),
@@ -477,12 +478,26 @@ def blinded_report(config: dict[str, Any], runs: list[dict[str, Any]]) -> dict[s
         },
     }
 
+    if not config.get("blinded_release_positive_control", True):
+        # The flag is derived from signs of arm E gains; withheld when the release must be
+        # dispersion-only (registered 2D confirmation).
+        report.pop("positive_control_passed")
+    return report
+
 
 ANALYZER = Path(__file__).with_name("analyze_confirmation.py")
 
 
 def config_hash(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def analyzer_for(config: dict[str, Any]) -> Path:
+    """The analyzer bound by the freeze manifest: the one the configuration names."""
+
+    return Path(__file__).resolve().parents[1] / config.get(
+        "analyzer_script", "scripts/analyze_confirmation.py"
+    )
 
 
 def check_freeze(manifest_path: Path, config_path: Path) -> None:
@@ -492,7 +507,7 @@ def check_freeze(manifest_path: Path, config_path: Path) -> None:
         validate_freeze(
             json.loads(manifest_path.read_text()),
             config_path,
-            ANALYZER,
+            analyzer_for(json.loads(config_path.read_text())),
             state=git_state,
             changes=changed_since,
         )
@@ -541,18 +556,24 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
-    parser.add_argument("--device", choices=("mps", "cpu"), default=None)
+    parser.add_argument("--device", choices=("cuda", "mps", "cpu"), default=None)
     parser.add_argument("--unblind", type=Path, default=None, help="Path for raw block records.")
     parser.add_argument("--freeze-manifest", type=Path, default=None)
     args = parser.parse_args()
-    if args.unblind is not None:
+    config = json.loads(args.config.read_text())
+    if args.unblind is not None or config.get("require_approval_to_run", False):
         if args.freeze_manifest is None:
-            raise SystemExit("--unblind requires --freeze-manifest")
+            raise SystemExit("this run requires --freeze-manifest (approved, confirmatory)")
         check_freeze(args.freeze_manifest, args.config)
 
-    config = json.loads(args.config.read_text())
     spec = spec_from(config)
-    device_name = args.device or ("mps" if torch.backends.mps.is_available() else "cpu")
+    device_name = args.device or (
+        "cuda"
+        if torch.cuda.is_available()
+        else "mps"
+        if torch.backends.mps.is_available()
+        else "cpu"
+    )
     device = torch.device(device_name)
     runs = []
     for block_index in range(int(config["blocks"])):

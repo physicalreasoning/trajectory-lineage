@@ -11,6 +11,7 @@ from numpy.typing import NDArray
 
 from trajectory_lineage.detectors import state_trajectory_distance
 from trajectory_lineage.simulator import InitialState, Trajectory, render, simulate
+from trajectory_lineage.simulator2d import InitialState2D, simulate_2d
 
 FloatArray = NDArray[np.float64]
 UInt8Array = NDArray[np.uint8]
@@ -24,6 +25,20 @@ STATE_RANGES: dict[str, tuple[float, float]] = {
     "radius": (0.04, 0.065),
 }
 
+# 2D study: collision-parameterized states (see simulator2d.py). Contact times lie inside the
+# window that ``_valid_trajectory`` requires (after the observed prefix, >= 4 frames before end).
+STATE_RANGES_2D: dict[str, tuple[float, float]] = {
+    "contact_time": (0.34, 0.76),
+    "contact_x": (0.40, 0.60),
+    "contact_y": (0.35, 0.65),
+    "vx0": (0.35, 0.65),
+    "vy0": (-0.25, 0.25),
+    "vx1": (-0.30, 0.00),
+    "vy1": (-0.25, 0.25),
+    "impact": (-0.85, 0.85),
+    "radius": (0.04, 0.065),
+}
+
 
 @dataclass(frozen=True)
 class EventSpec:
@@ -33,17 +48,32 @@ class EventSpec:
     future_frames: int = 16
     frame_dt: float = 0.04
     image_size: int = 64
+    dims: int = 1
 
     @property
     def frames(self) -> int:
         return self.observed_frames + self.future_frames
 
 
+def state_ranges(spec: EventSpec) -> dict[str, tuple[float, float]]:
+    """Initial-state parameter ranges for the configured physics (1D pilot or 2D study)."""
+
+    if spec.dims == 1:
+        return STATE_RANGES
+    if spec.dims == 2:
+        return STATE_RANGES_2D
+    raise ValueError("dims must be 1 or 2")
+
+
+def _make_state(spec: EventSpec, values: dict[str, float]) -> InitialState | InitialState2D:
+    return (InitialState2D if spec.dims == 2 else InitialState)(**values)
+
+
 @dataclass(frozen=True)
 class Event:
     """One physical trajectory and its initial condition."""
 
-    state: InitialState
+    state: InitialState | InitialState2D
     trajectory: Trajectory
 
 
@@ -81,14 +111,15 @@ class AppearanceRegistry:
         return len(self._used)
 
 
-def _valid_trajectory(state: InitialState, spec: EventSpec) -> Trajectory | None:
+def _valid_trajectory(state: InitialState | InitialState2D, spec: EventSpec) -> Trajectory | None:
     collision_time = state.collision_time()
     earliest = spec.observed_frames * spec.frame_dt
     latest = (spec.frames - 4) * spec.frame_dt
     if collision_time is None or not earliest <= collision_time <= latest:
         return None
     try:
-        return simulate(state, frames=spec.frames, dt=spec.frame_dt)
+        sim = simulate_2d if isinstance(state, InitialState2D) else simulate
+        return sim(state, frames=spec.frames, dt=spec.frame_dt)
     except ValueError:
         return None
 
@@ -97,8 +128,12 @@ def sample_event(rng: np.random.Generator, spec: EventSpec) -> Event:
     """Sample an independent visible collision whose contact follows the observed prefix."""
 
     for _ in range(10_000):
-        state = InitialState(
-            **{name: float(rng.uniform(low, high)) for name, (low, high) in STATE_RANGES.items()}
+        state = _make_state(
+            spec,
+            {
+                name: float(rng.uniform(low, high))
+                for name, (low, high) in state_ranges(spec).items()
+            },
         )
         trajectory = _valid_trajectory(state, spec)
         if trajectory is not None:
@@ -125,7 +160,7 @@ def sample_nearby_event(
         raise ValueError("distance band must satisfy 0 <= min < max")
     for _ in range(20_000):
         values = {}
-        for name, (low, high) in STATE_RANGES.items():
+        for name, (low, high) in state_ranges(spec).items():
             width = high - low
             proposed = (
                 getattr(source.state, name) + rng.uniform(-perturbation, perturbation) * width
@@ -241,10 +276,11 @@ def nearest_distances(sources: list[Event], pool: list[Event]) -> FloatArray:
 def _parameter_sensitivities(source: Event, spec: EventSpec, step: float = 0.01) -> FloatArray:
     """Finite-difference state distance per unit normalized offset for each parameter."""
 
-    names = list(STATE_RANGES)
+    ranges = state_ranges(spec)
+    names = list(ranges)
     sensitivities = np.full(len(names), np.nan)
     for index, name in enumerate(names):
-        low, high = STATE_RANGES[name]
+        low, high = ranges[name]
         for direction in (1.0, -1.0):
             value = getattr(source.state, name) + direction * step * (high - low)
             if not low <= value <= high:
@@ -268,8 +304,9 @@ def closer_neighbor_box(
     any source value, so insensitive parameters (for example the radius) are never truncated.
     """
 
-    names = list(STATE_RANGES)
-    widths = np.array([STATE_RANGES[name][1] - STATE_RANGES[name][0] for name in names])
+    ranges = state_ranges(spec)
+    names = list(ranges)
+    widths = np.array([ranges[name][1] - ranges[name][0] for name in names])
     sensitivities = _parameter_sensitivities(source, spec)
     with np.errstate(divide="ignore", invalid="ignore"):
         fractions = box_multiplier * max_distance / sensitivities
@@ -301,9 +338,10 @@ def sample_closer_neighbor(
 
     if not 0 <= min_distance < max_distance:
         raise ValueError("distance band must satisfy 0 <= min < max")
-    names = list(STATE_RANGES)
-    lows = np.array([STATE_RANGES[name][0] for name in names])
-    highs = np.array([STATE_RANGES[name][1] for name in names])
+    ranges = state_ranges(spec)
+    names = list(ranges)
+    lows = np.array([ranges[name][0] for name in names])
+    highs = np.array([ranges[name][1] for name in names])
     center = np.array([getattr(source.state, name) for name in names])
     half_widths = closer_neighbor_box(
         source, spec, max_distance=max_distance, box_multiplier=box_multiplier
@@ -313,7 +351,7 @@ def sample_closer_neighbor(
         proposal = center + offset * half_widths
         if np.any(proposal < lows) or np.any(proposal > highs):
             continue
-        state = InitialState(**dict(zip(names, map(float, proposal), strict=True)))
+        state = _make_state(spec, dict(zip(names, map(float, proposal), strict=True)))
         trajectory = _valid_trajectory(state, spec)
         if trajectory is None:
             continue

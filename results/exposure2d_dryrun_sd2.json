@@ -1,0 +1,550 @@
+{
+  "planning_sds_80pct_upper": {
+    "S": 0.01037119042,
+    "H": 0.00220363346,
+    "G": 0.01094728292,
+    "Q": 0.00822134008,
+    "Q2": 0.01033212522,
+    "E": 0.01496641672
+  },
+  "sd_scale": 2.0,
+  "competent_rate": 0.96,
+  "results": {
+    "800": {
+      "no_reuse_effect": {
+        "truth": {
+          "S": 0.0,
+          "H": 0.0,
+          "Q": 0.0,
+          "E": 0.004
+        },
+        "claim_probabilities": {
+          "negligible differential gap": 1.0
+        },
+        "axis_probabilities": {
+          "harm_bounded=True": 1.0,
+          "identity=below_threshold": 1.0,
+          "magnitude=negligible": 1.0,
+          "positive_control_detected=True": 1.0
+        },
+        "mock_dataset_decision": {
+          "primary_claim": "negligible differential gap",
+          "axes": {
+            "magnitude": "negligible",
+            "source_gain_supported": false,
+            "harm_bounded": true,
+            "positive_control_detected": true,
+            "event_identity": "below_threshold"
+          },
+          "G_95": [
+            -0.00054,
+            0.00101
+          ],
+          "G_90": [
+            -0.00042,
+            0.00088
+          ],
+          "H_upper_95": 0.00014,
+          "E_lower_95": 0.00379,
+          "break_even": {
+            "status": "unbounded above",
+            "interval": [
+              0.9931521333388711,
+              Infinity
+            ],
+            "within_unit_interval": [
+              0.9931521333388711,
+              1.0
+            ],
+            "point": 4.289201829516631
+          }
+        }
+      },
+      "tiny_gap_0.001": {
+        "truth": {
+          "S": 0.001,
+          "H": 0.0,
+          "Q": 0.0,
+          "E": 0.004
+        },
+        "claim_probabilities": {
+          "negligible differential gap": 0.8333333333333334,
+          "inconclusive": 0.16666666666666666
+        },
+        "axis_probabilities": {
+          "harm_bounded=True": 1.0,
+          "identity=below_threshold": 1.0,
+          "magnitude=inconclusive": 0.16666666666666666,
+          "magnitude=negligible": 0.8333333333333334,
+          "positive_control_detected=True": 1.0
+        },
+        "mock_dataset_decision": {
+          "primary_claim": "negligible differential gap",
+          "axes": {
+            "magnitude": "negligible",
+            "source_gain_supported": true,
+            "harm_bounded": true,
+            "positive_control_detected": true,
+            "event_identity": "below_threshold"
+          },
+          "G_95": [
+            0.00017,
+            0.00162
+          ],
+          "G_90": [
+            0.00029,
+            0.00151
+          ],
+          "H_upper_95": 0.00017,
+          "E_lower_95": 0.0032,
+          "break_even": {
+            "status": "finite",
+            "interval": [
+              0.6154129672727149,
+              5.925656311369042
+            ],
+            "within_unit_interval": [
+              0.6154129672727149,
+              1.0
+            ],
+            "point": 1.1150243418229473
+          }
+        }
+      },
+      "prevalence_dependent_0.006": {
+        "truth": {
+          "S": 0.006,
+          "H": 0.0,
+          "Q": 0.0,
+          "E": 0.004
+        },
+        "claim_probabilities": {
+          "prevalence_dependent reuse advantage": 1.0
+        },
+        "axis_probabilities": {
+          "harm_bounded=True": 1.0,
+          "identity=below_threshold": 1.0,
+          "magnitude=prevalence_dependent": 1.0,
+          "positive_control_detected=True": 1.0
+        },
+        "mock_dataset_decision": {
+          "primary_claim": "prevalence_dependent reuse advantage",
+          "axes": {
+            "magnitude": "prevalence_dependent",
+            "source_gain_supported": true,
+            "harm_bounded": true,
+            "positive_control_detected": true,
+            "event_identity": "below_threshold"
+          },
+          "G_95": [
+            0.00477,
+            0.00631
+          ],
+          "G_90": [
+            0.00489,
+            0.00619
+          ],
+          "H_upper_95": 0.00016,
+          "E_lower_95": 0.00225,
+          "break_even": {
+            "status": "finite",
+            "interval": [
+              0.1584649297747088,
+              0.20980703363784017
+            ],
+            "within_unit_interval": [
+              0.1584649297747088,
+              0.20980703363784017
+            ],
+            "point": 0.18055708907938772
+          }
+        }
+      },
+      "at_consequential_threshold_0.010": {
+        "truth": {
+          "S": 0.01,
+          "H": 0.0,
+          "Q": 0.0,
+          "E": 0.004
+        },
+        "claim_probabilities": {
+          "detectable reuse advantage, magnitude unresolved": 0.9416666666666667,
+          "consequential reuse advantage": 0.05,
+          "prevalence_dependent reuse advantage": 0.008333333333333333
+        },
+        "axis_probabilities": {
+          "harm_bounded=True": 1.0,
+          "identity=below_threshold": 1.0,
+          "magnitude=consequential": 0.05,
+          "magnitude=detectable_magnitude_unresolved": 0.9416666666666667,
+          "magnitude=prevalence_dependent": 0.008333333333333333,
+          "positive_control_detected=True": 1.0
+        },
+        "mock_dataset_decision": {
+          "primary_claim": "consequential reuse advantage",
+          "axes": {
+            "magnitude": "consequential",
+            "source_gain_supported": true,
+            "harm_bounded": true,
+            "positive_control_detected": true,
+            "event_identity": "below_threshold"
+          },
+          "G_95": [
+            0.01039,
+            0.012
+          ],
+          "G_90": [
+            0.01052,
+            0.01187
+          ],
+          "H_upper_95": 0.00032,
+          "E_lower_95": 0.00273,
+          "break_even": {
+            "status": "finite",
+            "interval": [
+              0.08332226065013955,
+              0.09625820591682495
+            ],
+            "within_unit_interval": [
+              0.08332226065013955,
+              0.09625820591682495
+            ],
+            "point": 0.0893243176882572
+          }
+        }
+      },
+      "consequential_0.015": {
+        "truth": {
+          "S": 0.015,
+          "H": 0.0,
+          "Q": 0.0,
+          "E": 0.004
+        },
+        "claim_probabilities": {
+          "consequential reuse advantage": 1.0
+        },
+        "axis_probabilities": {
+          "harm_bounded=True": 1.0,
+          "identity=below_threshold": 1.0,
+          "magnitude=consequential": 1.0,
+          "positive_control_detected=True": 1.0
+        },
+        "mock_dataset_decision": {
+          "primary_claim": "consequential reuse advantage",
+          "axes": {
+            "magnitude": "consequential",
+            "source_gain_supported": true,
+            "harm_bounded": true,
+            "positive_control_detected": true,
+            "event_identity": "below_threshold"
+          },
+          "G_95": [
+            0.01467,
+            0.01616
+          ],
+          "G_90": [
+            0.01479,
+            0.01604
+          ],
+          "H_upper_95": 0.00017,
+          "E_lower_95": 0.00231,
+          "break_even": {
+            "status": "finite",
+            "interval": [
+              0.06187084523954172,
+              0.06817015534599831
+            ],
+            "within_unit_interval": [
+              0.06187084523954172,
+              0.06817015534599831
+            ],
+            "point": 0.06486792799772986
+          }
+        }
+      },
+      "consequential_0.015_with_harm_0.0005": {
+        "truth": {
+          "S": 0.0145,
+          "H": 0.0005,
+          "Q": 0.0,
+          "E": 0.004
+        },
+        "claim_probabilities": {
+          "consequential reuse advantage": 1.0
+        },
+        "axis_probabilities": {
+          "harm_bounded=True": 1.0,
+          "identity=below_threshold": 1.0,
+          "magnitude=consequential": 1.0,
+          "positive_control_detected=True": 1.0
+        },
+        "mock_dataset_decision": {
+          "primary_claim": "consequential reuse advantage",
+          "axes": {
+            "magnitude": "consequential",
+            "source_gain_supported": true,
+            "harm_bounded": true,
+            "positive_control_detected": true,
+            "event_identity": "below_threshold"
+          },
+          "G_95": [
+            0.01474,
+            0.01631
+          ],
+          "G_90": [
+            0.01487,
+            0.01619
+          ],
+          "H_upper_95": 0.00065,
+          "E_lower_95": 0.00249,
+          "break_even": {
+            "status": "finite",
+            "interval": [
+              0.061298358662847885,
+              0.06784623778542914
+            ],
+            "within_unit_interval": [
+              0.061298358662847885,
+              0.06784623778542914
+            ],
+            "point": 0.06440630319924753
+          }
+        }
+      },
+      "consequential_but_harmful_0.002": {
+        "truth": {
+          "S": 0.013,
+          "H": 0.002,
+          "Q": 0.0,
+          "E": 0.004
+        },
+        "claim_probabilities": {
+          "differential gap without safeguards": 1.0
+        },
+        "axis_probabilities": {
+          "harm_bounded=False": 1.0,
+          "identity=below_threshold": 1.0,
+          "magnitude=consequential": 1.0,
+          "positive_control_detected=True": 1.0
+        },
+        "mock_dataset_decision": {
+          "primary_claim": "differential gap without safeguards",
+          "axes": {
+            "magnitude": "consequential",
+            "source_gain_supported": true,
+            "harm_bounded": false,
+            "positive_control_detected": true,
+            "event_identity": "below_threshold"
+          },
+          "G_95": [
+            0.01458,
+            0.01617
+          ],
+          "G_90": [
+            0.01471,
+            0.01604
+          ],
+          "H_upper_95": 0.00216,
+          "E_lower_95": 0.00284,
+          "break_even": {
+            "status": "finite",
+            "interval": [
+              0.06184560428731148,
+              0.06860168425010454
+            ],
+            "within_unit_interval": [
+              0.06184560428731148,
+              0.06860168425010454
+            ],
+            "point": 0.06504869001333242
+          }
+        }
+      },
+      "event_specific_Q_0.015": {
+        "truth": {
+          "S": 0.015,
+          "H": 0.0,
+          "Q": 0.015,
+          "E": 0.004
+        },
+        "claim_probabilities": {
+          "consequential reuse advantage": 1.0
+        },
+        "axis_probabilities": {
+          "harm_bounded=True": 1.0,
+          "identity=event_specific": 1.0,
+          "magnitude=consequential": 1.0,
+          "positive_control_detected=True": 1.0
+        },
+        "mock_dataset_decision": {
+          "primary_claim": "consequential reuse advantage",
+          "axes": {
+            "magnitude": "consequential",
+            "source_gain_supported": true,
+            "harm_bounded": true,
+            "positive_control_detected": true,
+            "event_identity": "event_specific"
+          },
+          "G_95": [
+            0.01401,
+            0.01565
+          ],
+          "G_90": [
+            0.01414,
+            0.01552
+          ],
+          "H_upper_95": 0.00015,
+          "E_lower_95": 0.00304,
+          "break_even": {
+            "status": "finite",
+            "interval": [
+              0.0638884482217959,
+              0.0713664339930076
+            ],
+            "within_unit_interval": [
+              0.0638884482217959,
+              0.0713664339930076
+            ],
+            "point": 0.06742071928605693
+          }
+        }
+      },
+      "positive_control_dead": {
+        "truth": {
+          "S": 0.0,
+          "H": 0.0,
+          "Q": 0.0,
+          "E": 0.0
+        },
+        "claim_probabilities": {
+          "positive control not detected": 0.9666666666666667,
+          "negligible differential gap": 0.03333333333333333
+        },
+        "axis_probabilities": {
+          "harm_bounded=True": 1.0,
+          "identity=below_threshold": 1.0,
+          "magnitude=negligible": 1.0,
+          "positive_control_detected=False": 0.9666666666666667,
+          "positive_control_detected=True": 0.03333333333333333
+        },
+        "mock_dataset_decision": {
+          "primary_claim": "positive control not detected",
+          "axes": {
+            "magnitude": "negligible",
+            "source_gain_supported": false,
+            "harm_bounded": true,
+            "positive_control_detected": false,
+            "event_identity": "below_threshold"
+          },
+          "G_95": [
+            -0.00063,
+            0.00092
+          ],
+          "G_90": [
+            -0.0005,
+            0.0008
+          ],
+          "H_upper_95": 0.00017,
+          "E_lower_95": -0.00036,
+          "break_even": {
+            "status": "unbounded above",
+            "interval": [
+              1.0848282708078616,
+              Infinity
+            ],
+            "within_unit_interval": null,
+            "point": 6.835326353260551
+          }
+        }
+      },
+      "weak_positive_control_E_0.001": {
+        "truth": {
+          "S": 0.0,
+          "H": 0.0,
+          "Q": 0.0,
+          "E": 0.001
+        },
+        "claim_probabilities": {
+          "positive control not detected": 0.5083333333333333,
+          "negligible differential gap": 0.49166666666666664
+        },
+        "axis_probabilities": {
+          "harm_bounded=True": 1.0,
+          "identity=below_threshold": 1.0,
+          "magnitude=negligible": 1.0,
+          "positive_control_detected=False": 0.5083333333333333,
+          "positive_control_detected=True": 0.49166666666666664
+        },
+        "mock_dataset_decision": {
+          "primary_claim": "positive control not detected",
+          "axes": {
+            "magnitude": "negligible",
+            "source_gain_supported": false,
+            "harm_bounded": true,
+            "positive_control_detected": false,
+            "event_identity": "below_threshold"
+          },
+          "G_95": [
+            -0.00082,
+            0.00077
+          ],
+          "G_90": [
+            -0.00069,
+            0.00064
+          ],
+          "H_upper_95": 0.00012,
+          "E_lower_95": -0.00117,
+          "break_even": {
+            "status": "unbounded above",
+            "interval": [
+              1.305605369270431,
+              Infinity
+            ],
+            "within_unit_interval": null,
+            "point": null
+          }
+        }
+      },
+      "reverse_-0.005": {
+        "truth": {
+          "S": -0.005,
+          "H": 0.0,
+          "Q": 0.0,
+          "E": 0.004
+        },
+        "claim_probabilities": {
+          "reverse gap": 1.0
+        },
+        "axis_probabilities": {
+          "harm_bounded=True": 1.0,
+          "identity=below_threshold": 1.0,
+          "magnitude=reverse": 1.0,
+          "positive_control_detected=True": 1.0
+        },
+        "mock_dataset_decision": {
+          "primary_claim": "reverse gap",
+          "axes": {
+            "magnitude": "reverse",
+            "source_gain_supported": false,
+            "harm_bounded": true,
+            "positive_control_detected": true,
+            "event_identity": "below_threshold"
+          },
+          "G_95": [
+            -0.00582,
+            -0.00427
+          ],
+          "G_90": [
+            -0.00569,
+            -0.00439
+          ],
+          "H_upper_95": 7e-05,
+          "E_lower_95": 0.00361,
+          "break_even": {
+            "status": "no positive crossing"
+          }
+        }
+      }
+    }
+  }
+}

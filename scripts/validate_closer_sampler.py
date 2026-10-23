@@ -17,13 +17,14 @@ from pathlib import Path
 import numpy as np
 
 from trajectory_lineage.exposure import (
-    STATE_RANGES,
+    STATE_RANGES,  # noqa: F401  (kept for the 1D default)
     EventSpec,
     _pairwise_state_distances,
     closer_neighbor_box,
     nearest_distances,
     sample_closer_neighbor,
     sample_event,
+    state_ranges,
 )
 
 
@@ -44,22 +45,32 @@ def main() -> None:
     parser.add_argument("--sources", type=int, default=30)
     parser.add_argument("--per-source", type=int, default=8)
     parser.add_argument("--out", type=Path, default=Path("results/closer_sampler_validation.json"))
+    parser.add_argument("--dims", type=int, default=1)
+    parser.add_argument("--multipliers", type=str, default="6,9")
+    parser.add_argument(
+        "--band-scale",
+        type=str,
+        default="",
+        help="2D: reservoir band as fractions of median base NN distance",
+    )
     args = parser.parse_args()
     started = time.perf_counter()
-    spec = EventSpec()
-    names = list(STATE_RANGES)
-    widths = np.array([STATE_RANGES[name][1] - STATE_RANGES[name][0] for name in names])
+    spec = EventSpec(dims=args.dims)
+    ranges = state_ranges(spec)
+    names = list(ranges)
+    widths = np.array([ranges[name][1] - ranges[name][0] for name in names])
+    small, large = (float(x) for x in args.multipliers.split(","))
     rng = np.random.default_rng(np.random.SeedSequence(20261016))
 
     base = [sample_event(rng, spec) for _ in range(512)]
-    offsets: dict[float, list[np.ndarray]] = {6.0: [], 9.0: []}
-    ratios: dict[float, list[float]] = {6.0: [], 9.0: []}
+    offsets: dict[float, list[np.ndarray]] = {small: [], large: []}
+    ratios: dict[float, list[float]] = {small: [], large: []}
     capped = []
     for _ in range(args.sources):
         source = sample_event(rng, spec)
         reference = float(nearest_distances([source], base)[0])
         center = np.array([getattr(source.state, name) for name in names])
-        half = closer_neighbor_box(source, spec, max_distance=0.5 * reference, box_multiplier=6.0)
+        half = closer_neighbor_box(source, spec, max_distance=0.5 * reference, box_multiplier=small)
         capped.append(np.isclose(half, widths))
         for multiplier in offsets:
             for _ in range(args.per_source):
@@ -76,8 +87,8 @@ def main() -> None:
                 ratios[multiplier].append(distance / reference)
     enlargement = {}
     for index, name in enumerate(names):
-        six = np.array([row[index] for row in offsets[6.0]])
-        nine = np.array([row[index] for row in offsets[9.0]])
+        six = np.array([row[index] for row in offsets[small]])
+        nine = np.array([row[index] for row in offsets[large]])
         enlargement[name] = {
             "mean_offset_fraction": [float(six.mean()), float(nine.mean())],
             "q95_offset_fraction": [float(np.quantile(six, 0.95)), float(np.quantile(nine, 0.95))],
@@ -88,6 +99,12 @@ def main() -> None:
     reservoir = [sample_event(rng, spec) for _ in range(40_000)]
     positions = np.stack([event.trajectory.positions for event in reservoir])
     low, high = 0.012, 0.016
+    if args.band_scale:
+        reference_nn = float(
+            np.median(nearest_distances([sample_event(rng, spec) for _ in range(64)], base))
+        )
+        fa, fb = (float(x) for x in args.band_scale.split(","))
+        low, high = fa * reference_nn, fb * reference_nn
     from_reservoir, from_box = [], []
     for _ in range(120):
         source = sample_event(rng, spec)
@@ -96,7 +113,7 @@ def main() -> None:
         if eligible.size:
             from_reservoir.append(float(rng.choice(eligible)))
         _, distance, _ = sample_closer_neighbor(
-            rng, source, spec, min_distance=low, max_distance=high
+            rng, source, spec, min_distance=low, max_distance=high, box_multiplier=small
         )
         from_box.append(distance)
     reservoir_check = {
@@ -107,13 +124,18 @@ def main() -> None:
         "ks_critical_0.05": ks_critical(len(from_reservoir), len(from_box)),
     }
     result = {
-        "box_enlargement_6_vs_9": enlargement,
-        "distance_over_reference_mean": [float(np.mean(ratios[6.0])), float(np.mean(ratios[9.0]))],
+        "dims": args.dims,
+        "multipliers_compared": [small, large],
+        f"box_enlargement_{small:g}_vs_{large:g}": enlargement,
+        "distance_over_reference_mean": [
+            float(np.mean(ratios[small])),
+            float(np.mean(ratios[large])),
+        ],
         "reservoir_agreement": reservoir_check,
         "capped_fraction_by_parameter": dict(
             zip(names, np.mean(capped, axis=0).astype(float).tolist(), strict=True)
         ),
-        "samples_per_multiplier": len(offsets[6.0]),
+        "samples_per_multiplier": len(offsets[small]),
         "seconds": time.perf_counter() - started,
         "interpretation": "Containment is supported when no enlargement KS statistic exceeds its "
         "critical value and mean offsets agree; it is an empirical check, not a proof.",
