@@ -145,6 +145,7 @@ def _synthetic_runs(rng, config, truth, sds, n_blocks, competent_rate):
                 "errors": errors,
                 "item_losses": items,
                 "source_family_of_render": [i // renders for i in range(lengths["source"])],
+                "state_sha256": {"all": "0" * 64},
                 "screen_base_error": 0.055 if competent else 0.09,
                 "screen_constant_velocity_error": 0.08,
                 "base_competent": competent,

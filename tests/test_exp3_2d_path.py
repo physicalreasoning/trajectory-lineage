@@ -36,8 +36,8 @@ def _setup(tmp_path, mode="confirmatory"):
         "analyzer_sha256": sha256(analyzer),
         "code_commit": "abc123",
         "signoffs": {
-            "paper_lead": "Jiankai Sun",
-            "evaluation_science": "Yining Hua",
+            "paper_lead": "Paper Lead",
+            "stats_check": "Internal Statistician",
             "workstream_owner": "Lovejesh Bangar",
         },
         "signoff_date": "2026-10-29",

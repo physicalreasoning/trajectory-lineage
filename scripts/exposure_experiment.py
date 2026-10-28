@@ -214,6 +214,22 @@ def build_block(config: dict[str, Any], rng: np.random.Generator, spec: EventSpe
     }
 
 
+def block_state_hash(block: dict) -> dict[str, str]:
+    """SHA-256 of every population's initial states (the generated events), so a block can be
+    re-derived from (configuration, seed, index) and checked byte for byte at analysis."""
+
+    from dataclasses import asdict
+
+    digests: dict[str, str] = {}
+    populations = dict(block["events"])
+    populations["screen"] = block["screen_events"]
+    for name, events in populations.items():
+        payload = json.dumps([asdict(event.state) for event in events], sort_keys=True, separators=(",", ":"))
+        digests[name] = hashlib.sha256(payload.encode()).hexdigest()
+    digests["all"] = hashlib.sha256("".join(digests[k] for k in sorted(digests)).encode()).hexdigest()
+    return digests
+
+
 def constant_velocity_error(events: list[Event], spec: EventSpec, cap: float) -> float:
     """Bounded error of constant-velocity extrapolation from the last two observed states."""
 
@@ -366,6 +382,7 @@ def run_block(
         "hidden_channels": hidden,
         "base_training_steps": base_steps_for(config, hidden),
         "model_parameters": int(sum(p.numel() for p in model.parameters())),
+        "state_sha256": block_state_hash(block),
         "errors": errors,
         "item_losses": items,
         "source_family_of_render": block["source_family_of_render"],

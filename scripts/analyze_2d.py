@@ -238,6 +238,10 @@ def analyze_2d(
     levels = capacity_levels(config)
     schedule = capacity_schedule(config)
     multi = len(levels) > 1
+    for run in completed:  # every record carries its generated-state hashes
+        digests = run.get("state_sha256")
+        if not isinstance(digests, dict) or "all" not in digests or len(str(digests["all"])) != 64:
+            raise RecordError(f"block {run['block_index']} lacks per-block state hashes")
     for run in completed:  # a record's capacity must be the registered one for its block index
         recorded = run.get("hidden_channels", levels[0] if not multi else None)
         if recorded != schedule[run["block_index"]]:

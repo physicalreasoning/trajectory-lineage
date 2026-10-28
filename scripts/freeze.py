@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Callable
 
 PLACEHOLDERS = {"full name", "name", "tbd", "todo", "x", "a", "approver"}
-REQUIRED_ROLES = ("paper_lead", "evaluation_science")
+REQUIRED_ROLES = ("paper_lead", "stats_check")
 PROVISIONAL_ROLES = ("workstream_owner",)
 REPOSITORY = Path(__file__).resolve().parents[1]
 EXPERIMENTS = REPOSITORY / "experiments"
