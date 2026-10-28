@@ -61,6 +61,10 @@ def main() -> None:
             [render_event(e, spec, seeds.draw()) for e in screen_events], screen_events, spec
         )
         cv = constant_velocity_error(screen_events, spec, float(config["error_cap"]))
+        if predictor_config(config)["type"] == "latent":  # frozen encoder: tokens once per block
+            encoder = get_encoder(predictor_config(config)["encoder"], device)
+            base = (encoder.encode(base[0]), base[1])
+            screen = (encoder.encode(screen[0]), screen[1])
         for hidden in [int(h) for h in args.hidden.split(",")]:
             torch.manual_seed(1000 * block + hidden)
             cfg = dict(config, hidden_channels=hidden)

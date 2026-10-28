@@ -28,6 +28,7 @@ from freeze import FreezeError, changed_since, git_state, run_identity  # noqa: 
 from freeze import validate as validate_freeze  # noqa: E402
 
 from trajectory_lineage.convlstm import ConvLSTMStatePredictor
+from trajectory_lineage.latent import LatentStatePredictor, get_encoder
 from trajectory_lineage.detectors import state_trajectory_distance
 from trajectory_lineage.exposure import (
     AppearanceRegistry,
@@ -278,9 +279,55 @@ def train_steps(model, optimizer, batches, device) -> list[float]:
     return losses
 
 
-def new_model(
-    config: dict[str, Any], spec: EventSpec, device, hidden_channels: int | None = None
-) -> ConvLSTMStatePredictor:
+def predictor_config(config: dict[str, Any]) -> dict[str, Any]:
+    """The predictor block: ``{"type": "convlstm"}`` (default) or a latent world model
+    ``{"type": "latent", "encoder": "dinov2-small" | "vjepa2-vitl" | "fake-<dim>", "depth", "heads"}``.
+    For both types ``hidden_channels`` (and ``capacity_levels``) set the capacity: ConvLSTM hidden
+    channels, or the latent transformer's width."""
+
+    return dict({"type": "convlstm"}, **(config.get("predictor") or {}))
+
+
+def encode_block(block: dict, config: dict[str, Any], device) -> dict:
+    """For latent predictors: replace every population's video tensor by frozen-encoder tokens.
+
+    The encoder never trains, so the block's training trajectories never touch it; tokens are
+    computed once per block for all populations and arms (arm E and the exact population share one)."""
+
+    pc = predictor_config(config)
+    if pc["type"] != "latent":
+        return block
+    encoder = get_encoder(pc["encoder"], device)
+    cache: dict[int, torch.Tensor] = {}
+
+    def tokens_for(video: torch.Tensor) -> torch.Tensor:
+        key = id(video)
+        if key not in cache:
+            cache[key] = encoder.encode(video)
+        return cache[key]
+
+    out = dict(block)
+    for population in ("base", "source", "exact", "independent", "screen"):
+        video, target = block[population]
+        out[population] = (tokens_for(video), target)
+    out["arms"] = {arm: (tokens_for(video), target) for arm, (video, target) in block["arms"].items()}
+    return out
+
+
+def new_model(config: dict[str, Any], spec: EventSpec, device, hidden_channels: int | None = None):
+    pc = predictor_config(config)
+    if pc["type"] == "latent":
+        encoder = get_encoder(pc["encoder"], device)
+        steps = spec.observed_frames // 2 if pc["encoder"].startswith("vjepa2") else spec.observed_frames
+        return LatentStatePredictor(
+            token_dim=encoder.token_dim,
+            steps=steps,
+            tokens_per_step=encoder.tokens_per_step,
+            future_frames=spec.future_frames,
+            width=int(hidden_channels or config["hidden_channels"]),  # capacity levels = transformer width
+            depth=int(pc.get("depth", 4)),
+            heads=int(pc.get("heads", 8)),
+        ).to(device)
     return ConvLSTMStatePredictor(
         future_frames=spec.future_frames,
         hidden_channels=int(hidden_channels or config["hidden_channels"]),
@@ -314,6 +361,9 @@ def run_block(
     torch.manual_seed(int(streams["torch"].generate_state(1)[0]))
     block = build_block(config, np.random.default_rng(streams["data"]), spec)
     build_seconds = time.perf_counter() - started
+    encode_started = time.perf_counter()
+    block = encode_block(block, config, device)
+    encode_seconds = time.perf_counter() - encode_started
     cap = float(config["error_cap"])
 
     base_video, base_target = block["base"]
@@ -383,6 +433,8 @@ def run_block(
         "base_training_steps": base_steps_for(config, hidden),
         "model_parameters": int(sum(p.numel() for p in model.parameters())),
         "state_sha256": block_state_hash(block),
+        "predictor": predictor_config(config),
+        "encode_seconds": encode_seconds,
         "errors": errors,
         "item_losses": items,
         "source_family_of_render": block["source_family_of_render"],
@@ -392,6 +444,7 @@ def run_block(
         "base_competent": bool(base_competent),
         "contrasts": reuse_contrasts(errors),
         "build_seconds": build_seconds,
+        "learning_rate": float(config["learning_rate"]),
         "total_seconds": time.perf_counter() - started,
         "base_final_loss": float(np.mean(base_losses[-20:])),
         "arm_final_losses": final_losses,
