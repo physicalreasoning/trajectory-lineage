@@ -27,6 +27,8 @@ sys.path.insert(0, str(Path(__file__).parent))
 from analyze_2d import analyze_2d  # noqa: E402
 from analyze_confirmation import expected_lengths  # noqa: E402
 
+from trajectory_lineage.exposure import capacity_levels, capacity_schedule, scaled_capacity_config  # noqa: E402
+
 SCENARIOS = {
     # name: true means of S (source gain), H (harm), Q (C-D gap), E (exact gain)
     "no_reuse_effect": dict(S=0.0, H=0.0, Q=0.0, E=0.004),
@@ -40,6 +42,17 @@ SCENARIOS = {
     "positive_control_dead": dict(S=0.0, H=0.0, Q=0.0, E=0.0),
     "weak_positive_control_E_0.001": dict(S=0.0, H=0.0, Q=0.0, E=0.001),
     "reverse_-0.005": dict(S=-0.005, H=0.0, Q=0.0, E=0.004),
+    # capacity scenarios (multipliers apply to S, Q and E at the named hidden-channel levels; the
+    # smallest level keeps the base truth). In a single-level study they reduce to the base truth.
+    "capacity_dependent_x2_x3": dict(
+        S=0.006, H=0.0, Q=0.0, E=0.004, capacity_multipliers={"64": 2.0, "256": 3.0}
+    ),
+    "capacity_flat_consequential": dict(
+        S=0.015, H=0.0, Q=0.0, E=0.004, capacity_multipliers={"64": 1.0, "256": 1.0}
+    ),
+    "capacity_dependent_from_null": dict(
+        S=0.0, H=0.0, Q=0.0, E=0.004, capacity_multipliers={"64": 1.0, "256": 1.0}, capacity_add={"64": 0.004, "256": 0.010}
+    ),
 }
 
 
@@ -59,7 +72,37 @@ def dispersion_from(path: Path) -> dict[str, float]:
     }
 
 
+def level_truth(truth: dict, level: int, base_level: int) -> dict:
+    """Truth at one capacity level: base truth scaled by the level's multiplier plus an additive gap."""
+
+    if level == base_level:
+        return truth
+    mult = float(truth.get("capacity_multipliers", {}).get(str(level), 1.0))
+    add = float(truth.get("capacity_add", {}).get(str(level), 0.0))
+    return dict(truth, S=truth["S"] * mult + add, Q=truth["Q"] * mult, E=truth["E"] * mult)
+
+
 def synthetic_runs(rng, config, truth, sds, n_blocks, competent_rate):
+    levels = capacity_levels(config)
+    if len(levels) > 1:
+        schedule = capacity_schedule(scaled_capacity_config(config, n_blocks))
+        runs = []
+        for level in levels:
+            indices = [b for b in range(n_blocks) if schedule[b] == level]
+            level_runs = _synthetic_runs(rng, config, level_truth(truth, level, min(levels)), sds, len(indices), competent_rate)
+            for run, b in zip(level_runs, indices, strict=True):
+                run["block_index"] = b
+                run["hidden_channels"] = level
+                run["model_parameters"] = level * 1000
+            runs += level_runs
+        return sorted(runs, key=lambda run: run["block_index"])
+    runs = _synthetic_runs(rng, config, truth, sds, n_blocks, competent_rate)
+    for run in runs:
+        run["hidden_channels"] = levels[0]
+    return runs
+
+
+def _synthetic_runs(rng, config, truth, sds, n_blocks, competent_rate):
     var_s, var_h, var_g = sds["S"] ** 2, sds["H"] ** 2, sds["G"] ** 2
     cov = (var_g - var_s - var_h) / 2
     cov = float(np.clip(cov, -0.999 * sds["S"] * sds["H"], 0.999 * sds["S"] * sds["H"]))
@@ -135,10 +178,16 @@ def main() -> None:
         "results": {},
     }
     for n in block_options:
-        cfg = dict(config, blocks=n)
+        cfg = scaled_capacity_config(config, n)
+        primary_level = int(config["decision_contract"].get("primary_capacity", capacity_levels(config)[0]))
+        primary_blocks = int(cfg.get("capacity_blocks", {}).get(str(primary_level), n))
         cfg["decision_contract"] = dict(
-            config["decision_contract"], minimum_screened_blocks=int(0.9 * n)
+            config["decision_contract"], minimum_screened_blocks=int(0.9 * primary_blocks)
         )
+        if "minimum_screened_blocks_by_capacity" in config["decision_contract"]:
+            cfg["decision_contract"]["minimum_screened_blocks_by_capacity"] = {
+                str(k): int(0.9 * int(v)) for k, v in cfg["capacity_blocks"].items()
+            }
         per = {}
         for name, truth in SCENARIOS.items():
             claims, axes = Counter(), Counter()
@@ -155,6 +204,8 @@ def main() -> None:
                     axes[f"identity={ax['event_identity']}"] += 1
                     axes[f"harm_bounded={ax['harm_bounded']}"] += 1
                     axes[f"positive_control_detected={ax['positive_control_detected']}"] += 1
+                if "capacity" in result:
+                    axes[f"capacity={result['capacity']['label']}"] += 1
                 if mock is None:
                     p = result["primary"]
                     mock = {
@@ -169,6 +220,14 @@ def main() -> None:
                         "E_lower_95": round(p["contrasts_95"]["E_exact_gain"]["lower"], 5),
                         "break_even": p["break_even_prevalence"],
                     }
+                    if "capacity" in result:
+                        cap = result["capacity"]
+                        mock["capacity"] = {
+                            "label": cap["label"],
+                            "trend_95": None
+                            if cap["trend"] is None
+                            else [round(cap["trend"]["ci95"]["lower"], 5), round(cap["trend"]["ci95"]["upper"], 5)],
+                        }
             per[name] = {
                 "truth": truth,
                 "claim_probabilities": {k: v / args.replications for k, v in claims.most_common()},

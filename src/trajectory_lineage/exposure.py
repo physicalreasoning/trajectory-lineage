@@ -476,3 +476,73 @@ def blinded_summary(values: list[float], *, confidence: float = 0.8) -> dict[str
         "standard_deviation_upper_limit": released(upper),
         "upper_limit_confidence": confidence,
     }
+
+
+# ---------------------------------------------------------------------------------------------
+# Predictor capacity as a registered block factor
+
+
+def capacity_levels(config: dict) -> list[int]:
+    """Hidden-channel levels of the study; a single-level study is the registered default."""
+
+    levels = config.get("capacity_levels")
+    if not levels:
+        return [int(config["hidden_channels"])] if "hidden_channels" in config else []
+    out = [int(level) for level in levels]
+    if len(set(out)) != len(out) or any(level <= 0 for level in out):
+        raise ValueError("capacity_levels must be distinct positive integers")
+    return out
+
+
+def capacity_schedule(config: dict) -> list[int]:
+    """Hidden channels of every block index, interleaved in proportion to the per-level counts.
+
+    Level counts come from ``capacity_blocks`` (keys are the levels as strings) and must sum to
+    ``blocks``; with a single level every block uses it. Interleaving is deterministic: level
+    ``l`` with ``n_l`` blocks occupies fractional positions ``(i + 0.5) / n_l``, and the merged
+    order of all positions (ties broken by level order) is the block order. Any contiguous
+    stretch of blocks therefore contains every level in proportion, so a run stopped early or
+    a GPU session that ends still leaves a balanced design.
+    """
+
+    blocks = int(config["blocks"])
+    levels = capacity_levels(config)
+    if not levels:
+        raise ValueError("configuration names no predictor capacity (hidden_channels)")
+    if len(levels) == 1:
+        return [levels[0]] * blocks
+    raw = config.get("capacity_blocks")
+    if raw is None:
+        if blocks % len(levels):
+            raise ValueError("blocks must divide evenly across capacity levels or capacity_blocks must be given")
+        counts = {level: blocks // len(levels) for level in levels}
+    else:
+        counts = {int(key): int(value) for key, value in raw.items()}
+    if sorted(counts) != sorted(levels) or any(value <= 0 for value in counts.values()):
+        raise ValueError("capacity_blocks must give a positive count for every capacity level")
+    if sum(counts.values()) != blocks:
+        raise ValueError(f"capacity_blocks sum to {sum(counts.values())}, but blocks is {blocks}")
+    positions = sorted(
+        ((index + 0.5) / counts[level], rank, level)
+        for rank, level in enumerate(levels)
+        for index in range(counts[level])
+    )
+    return [level for _, _, level in positions]
+
+
+def scaled_capacity_config(config: dict, blocks: int) -> dict:
+    """A copy of ``config`` with ``blocks`` changed and per-level counts rescaled in proportion.
+
+    For planning and tests only: registered artefacts must state their counts exactly."""
+
+    out = dict(config, blocks=int(blocks))
+    if len(capacity_levels(config)) > 1 and "capacity_blocks" in config:
+        base = {int(k): int(v) for k, v in config["capacity_blocks"].items()}
+        total = sum(base.values())
+        scaled = {k: max(2, int(round(v * blocks / total))) for k, v in base.items()}
+        first = next(iter(scaled))
+        scaled[first] += int(blocks) - sum(scaled.values())
+        if scaled[first] < 2:
+            raise ValueError(f"{blocks} blocks are too few for {len(scaled)} capacity levels")
+        out["capacity_blocks"] = {str(k): v for k, v in scaled.items()}
+    return out

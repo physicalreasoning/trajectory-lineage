@@ -2,7 +2,7 @@
   "name": "exposure2d_confirmation",
   "status": "draft_for_registration",
   "role": "confirmatory",
-  "blocks": 800,
+  "blocks": 1600,
   "experiment_seed": 2026103001,
   "observed_frames": 8,
   "future_frames": 16,
@@ -107,7 +107,13 @@
     "completeness_rule": "Decisive claims require every registered block to complete. The metric is bounded in [0, 1], so one missing block could move mean harm by up to 1/800, more than the harm margin; no observed-data imputation is conservative. Infrastructure failures are deterministic to rerun with identical seeds and must be resolved before analysis; any remaining failure makes decisive claims inconclusive (estimates still reported). For Experiment 3 this complete-block rule takes precedence over the general missing-data rule.",
     "scope_of_confirmatory_claims": "Confirmatory: the matched exposure assay (magnitude, safeguards, positive control) and the Holm secondary family (identity_specific, detectable, consequential_harm). Detector predictions H3.3-H3.5 become confirmatory only if their audit contract (thresholds and ties, negative-family resampling, extraction-failure handling, Holm family) is frozen in the November 20 amendment before any 2D test outcome is scored; otherwise exploratory. Filtering (H3.6) is confirmatory only if frozen before unblinding; otherwise exploratory. Q2 and the distance profile are descriptive.",
     "alpha_absence_one_sided": 0.05,
-    "error_control_statement": "Each declaration controls its own error: support at one-sided 2.5%, absence by TOST at 5% per side, secondary claims by Holm at familywise one-sided 2.5%. Competing declarations are not jointly controlled: at G = 0.002 the probability of a false positive-magnitude or false negligible declaration is about 7.5%. No study-wide FWER across experiments is claimed."
+    "error_control_statement": "Each declaration controls its own error: support at one-sided 2.5%, absence by TOST at 5% per side, secondary claims by Holm at familywise one-sided 2.5%. Competing declarations are not jointly controlled: at G = 0.002 the probability of a false positive-magnitude or false negligible declaration is about 7.5%. No study-wide FWER across experiments is claimed.",
+    "primary_capacity": 16,
+    "minimum_screened_blocks_by_capacity": {
+      "64": 360,
+      "256": 360
+    },
+    "capacity_secondary": "Reuse gap G at the largest level minus G at the smallest level (Welch t). 'capacity_dependent' if its one-sided p is rejected in the Holm family of secondaries (identity_specific, detectable, consequential_harm, capacity_increase) at alpha_one_sided; 'capacity_independent' if the two-sided 90% interval of the difference lies inside +/- negligible_bound; otherwise unresolved. Per-level gap classifications are descriptive. The primary claim uses primary_capacity blocks only."
   },
   "freeze_requirement": "A confirmatory manifest validated by scripts/freeze.py BEFORE the run starts (require_approval_to_run) and again at analysis: configuration and analyzer (scripts/analyze_2d.py) SHA-256; frozen code commit, HEAD differing only under approvals/; dated, named sign-offs for paper_lead and evaluation_science; a decision statement; every pilot seed in the registry. Provisional (owner-only) manifests are rejected (allow_provisional_freeze: false).",
   "claim_boundary": "Effect of replacing 64 independent continuation events with same-trajectory 2D rerenders for this ConvLSTM, dose, and continuation phase.",
@@ -134,15 +140,28 @@
     2026101624,
     2026102300,
     2026102301,
-    2026102399
+    2026102399,
+    2026102701
   ],
   "planning_analyzed_blocks": 768,
-  "runtime_estimate": "About 101 s per block on an Apple M4 Pro (2D pilot): about 22 hours for 800 blocks on one laptop. CUDA execution is supported but not yet benchmarked.",
+  "runtime_estimate": "About 101 s per block at 16 channels on an Apple M4 Pro (2D pilot); CUDA per-block times for 16/64/256 channels are measured by the capacity pilot. The confirmation is scheduled for a CUDA GPU (Colab) with per-block checkpointing.",
   "secondary_endpoints_note": "Raw records retain per-render bounded center-error losses only; contact-timing and post-contact-velocity endpoints are not part of this confirmation.",
   "dims": 2,
   "base_training_steps_rationale_2d": "Fixed from effect-blind base-only tuning (results/exposure2d_base_tuning.json): at 300 steps the 2D base model only marginally beats constant velocity on the screen (error ratio 0.93-0.98); at 600 steps it is clearly competent (0.68-0.72) and later checkpoints plateau.",
   "analyzer_script": "scripts/analyze_2d.py",
   "allow_provisional_freeze": false,
   "blinded_release_positive_control": false,
-  "require_approval_to_run": true
+  "require_approval_to_run": true,
+  "capacity_levels": [
+    16,
+    64,
+    256
+  ],
+  "capacity_blocks": {
+    "16": 800,
+    "64": 400,
+    "256": 400
+  },
+  "capacity_assignment": "capacity_schedule: deterministic proportional interleaving over block indices; the 800 primary-level blocks are the registered primary design, the 400 + 400 larger-capacity blocks serve the capacity secondary",
+  "capacity_rationale": "DRAFT pending the effect-blind capacity pilot (exposure2d_capacity_pilot_v1): per-level block counts for 64 and 256 channels are fixed from the pilot's per-level dispersions before registration; the primary level keeps 800 blocks."
 }

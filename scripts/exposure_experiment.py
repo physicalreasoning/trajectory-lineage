@@ -35,6 +35,8 @@ from trajectory_lineage.exposure import (
     EventSpec,
     blinded_summary,
     block_streams,
+    capacity_levels,
+    capacity_schedule,
     independent_distance_band,
     matched_arm_schedule,
     nearest_distances,
@@ -261,12 +263,21 @@ def train_steps(model, optimizer, batches, device) -> list[float]:
     return losses
 
 
-def new_model(config: dict[str, Any], spec: EventSpec, device) -> ConvLSTMStatePredictor:
+def new_model(
+    config: dict[str, Any], spec: EventSpec, device, hidden_channels: int | None = None
+) -> ConvLSTMStatePredictor:
     return ConvLSTMStatePredictor(
         future_frames=spec.future_frames,
-        hidden_channels=int(config["hidden_channels"]),
+        hidden_channels=int(hidden_channels or config["hidden_channels"]),
         image_size=spec.image_size,
     ).to(device)
+
+
+def base_steps_for(config: dict[str, Any], hidden_channels: int) -> int:
+    """Base training steps for a capacity level (a registered per-level override, else the default)."""
+
+    overrides = config.get("base_training_steps_by_capacity") or {}
+    return int(overrides.get(str(hidden_channels), config["base_training_steps"]))
 
 
 def run_block(
@@ -283,6 +294,7 @@ def run_block(
     """
 
     started = time.perf_counter()
+    hidden = capacity_schedule(config)[block_index]
     streams = block_streams(int(config["experiment_seed"]), block_index)
     torch.manual_seed(int(streams["torch"].generate_state(1)[0]))
     block = build_block(config, np.random.default_rng(streams["data"]), spec)
@@ -293,11 +305,11 @@ def run_block(
     batch_size = int(config["batch_size"])
     base_rng = np.random.default_rng(streams["base_batches"])
     base_batches = []
-    for _ in range(int(config["base_training_steps"])):
+    for _ in range(base_steps_for(config, hidden)):
         index = torch.from_numpy(base_rng.integers(0, len(base_video), size=batch_size))
         base_batches.append((base_video[index], base_target[index]))
 
-    model = new_model(config, spec, device)
+    model = new_model(config, spec, device, hidden)
     optimizer = torch.optim.AdamW(model.parameters(), lr=float(config["learning_rate"]))
     base_losses = train_steps(model, optimizer, base_batches, device)
     base_state = copy.deepcopy(model.state_dict())
@@ -324,7 +336,7 @@ def run_block(
     for arm in ARMS:
         content = block["arms"][arm_content_override or arm]
         arm_video, arm_target = content
-        arm_model = new_model(config, spec, device)
+        arm_model = new_model(config, spec, device, hidden)
         arm_model.load_state_dict(base_state)
         arm_optimizer = torch.optim.AdamW(arm_model.parameters(), lr=float(config["learning_rate"]))
         arm_optimizer.load_state_dict(copy.deepcopy(optimizer_state))
@@ -353,6 +365,9 @@ def run_block(
     return {
         "block_index": block_index,
         "status": "completed",
+        "hidden_channels": hidden,
+        "base_training_steps": base_steps_for(config, hidden),
+        "model_parameters": int(sum(p.numel() for p in model.parameters())),
         "errors": errors,
         "item_losses": items,
         "source_family_of_render": block["source_family_of_render"],
@@ -478,6 +493,38 @@ def blinded_report(config: dict[str, Any], runs: list[dict[str, Any]]) -> dict[s
         },
     }
 
+    levels = capacity_levels(config)
+    if len(levels) > 1:
+        schedule = capacity_schedule(config)
+        by_level: dict[str, Any] = {}
+        for level in levels:
+            level_runs = [run for run in runs if schedule[run["block_index"]] == level]
+            level_all = [run for run in level_runs if run["status"] == "completed"]
+            level_ok = [run for run in level_all if run.get("base_competent", True)]
+            by_level[str(level)] = {
+                "blocks_scheduled": len(level_runs),
+                "blocks_completed": len(level_all),
+                "blocks_base_competent": len(level_ok),
+                "base_competence_failures": [
+                    run["block_index"] for run in level_all if not run.get("base_competent", True)
+                ],
+                "model_parameters": level_ok[0]["model_parameters"] if level_ok else None,
+                "dispersion": {
+                    name: blinded_summary(
+                        [run["contrasts"][name] for run in level_ok], confidence=confidence
+                    )
+                    for name in names
+                }
+                if len(level_ok) >= 2
+                else {},
+                "seconds_per_block_mean": float(
+                    np.mean([run["total_seconds"] for run in level_ok])
+                )
+                if level_ok
+                else None,
+            }
+        report["by_capacity"] = by_level
+
     if not config.get("blinded_release_positive_control", True):
         # The flag is derived from signs of arm E gains; withheld when the release must be
         # dispersion-only (registered 2D confirmation).
@@ -552,6 +599,32 @@ def run_with_policy(config, block_index, spec, device) -> dict[str, Any]:
     }
 
 
+def load_checkpoint(path: Path, expected_config_hash: str) -> list[dict[str, Any]]:
+    """Raw block records written so far; refuses a file produced under another configuration."""
+
+    if not path.exists():
+        return []
+    runs: list[dict[str, Any]] = []
+    for line in path.read_text().splitlines():
+        if not line.strip():
+            continue
+        record = json.loads(line)
+        if record.get("config_sha256") != expected_config_hash:
+            raise SystemExit(f"checkpoint {path} was written under a different configuration")
+        runs.append(record["run"])
+    indices = [run["block_index"] for run in runs]
+    if len(set(indices)) != len(indices):
+        raise SystemExit(f"checkpoint {path} records a block twice")
+    return runs
+
+
+def append_checkpoint(path: Path, config_sha256: str, run: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a") as handle:
+        handle.write(json.dumps({"config_sha256": config_sha256, "run": run}, sort_keys=True) + "\n")
+        handle.flush()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, required=True)
@@ -559,12 +632,21 @@ def main() -> None:
     parser.add_argument("--device", choices=("cuda", "mps", "cpu"), default=None)
     parser.add_argument("--unblind", type=Path, default=None, help="Path for raw block records.")
     parser.add_argument("--freeze-manifest", type=Path, default=None)
+    parser.add_argument(
+        "--checkpoint",
+        type=Path,
+        default=None,
+        help="JSONL of raw block records, appended per block and resumed on restart. Raw records "
+        "carry effects, so this is allowed only for approved confirmatory runs (--freeze-manifest).",
+    )
     args = parser.parse_args()
     config = json.loads(args.config.read_text())
     if args.unblind is not None or config.get("require_approval_to_run", False):
         if args.freeze_manifest is None:
             raise SystemExit("this run requires --freeze-manifest (approved, confirmatory)")
         check_freeze(args.freeze_manifest, args.config)
+    if args.checkpoint is not None and args.freeze_manifest is None:
+        raise SystemExit("--checkpoint writes raw block records; it requires --freeze-manifest")
 
     spec = spec_from(config)
     device_name = args.device or (
@@ -575,11 +657,19 @@ def main() -> None:
         else "cpu"
     )
     device = torch.device(device_name)
-    runs = []
+    runs = load_checkpoint(args.checkpoint, config_hash(args.config)) if args.checkpoint else []
+    done = {run["block_index"] for run in runs}
+    if done:
+        print(f"resuming: {len(done)} blocks already recorded in {args.checkpoint}", flush=True)
     for block_index in range(int(config["blocks"])):
+        if block_index in done:
+            continue
         run = run_with_policy(config, block_index, spec, device)
         runs.append(run)
+        if args.checkpoint is not None:
+            append_checkpoint(args.checkpoint, config_hash(args.config), run)
         print(f"block {block_index + 1}/{config['blocks']}: {run['status']}", flush=True)
+    runs.sort(key=lambda run: run["block_index"])
 
     report = blinded_report(config, runs)
     report["config"] = config
