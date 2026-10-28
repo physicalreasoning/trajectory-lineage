@@ -144,7 +144,7 @@
     2026102701
   ],
   "planning_analyzed_blocks": 768,
-  "runtime_estimate": "About 101 s per block at 16 channels on an Apple M4 Pro (2D pilot); CUDA per-block times for 16/64/256 channels are measured by the capacity pilot. The confirmation is scheduled for a CUDA GPU (Colab) with per-block checkpointing.",
+  "runtime_estimate": "Capacity pilot on an A100 with a concurrent extraction job: 76 / 79 / 96 s per block at 16 / 64 / 256 channels (run 2, parallel sampler; run 1 with the sequential sampler took 252 / 260 / 349 s). The 1,600-block confirmation therefore needs about 36 GPU-hours sequentially; per-block checkpoints allow splitting across sessions, and block-level concurrency on one GPU is to be benchmarked before the run.",
   "secondary_endpoints_note": "Raw records retain per-render bounded center-error losses only; contact-timing and post-contact-velocity endpoints are not part of this confirmation.",
   "dims": 2,
   "base_training_steps_rationale_2d": "Fixed from effect-blind base-only tuning (results/exposure2d_base_tuning.json): at 300 steps the 2D base model only marginally beats constant velocity on the screen (error ratio 0.93-0.98); at 600 steps it is clearly competent (0.68-0.72) and later checkpoints plateau.",
@@ -163,5 +163,10 @@
     "256": 400
   },
   "capacity_assignment": "capacity_schedule: deterministic proportional interleaving over block indices; the 800 primary-level blocks are the registered primary design, the 400 + 400 larger-capacity blocks serve the capacity secondary",
-  "capacity_rationale": "DRAFT pending the effect-blind capacity pilot (exposure2d_capacity_pilot_v1): per-level block counts for 64 and 256 channels are fixed from the pilot's per-level dispersions before registration; the primary level keeps 800 blocks."
+  "capacity_rationale": "Per-level block counts fixed from the effect-blind capacity pilot (exposure2d_capacity_pilot_v1, seed 2026102701, two runs on an A100: run 1 with the sequential arm-D sampler, run 2 with the worker-invariant parallel sampler; 72 blocks each, 24 per level; 72/72 completed, 71 base-competent in both runs, pooled positive control passed, zero failures). 80% upper limits of the block SD of the reuse gap G: 16 channels 0.0050 / 0.0052, 64 channels 0.0037 / 0.0035, 256 channels 0.0054 / 0.0057 (run 1 / run 2), consistent with the Oct 23 pilot (0.0055). With 800 blocks at 16 channels and 400 at each larger level, the Welch standard error of G(256) - G(16) is about 0.00034 at these SDs, so a trend of 0.002 (the negligible bound) is detected with power above 0.99 and a flat truth is called capacity-independent in about 98% of simulated datasets (75-82% at twice the pilot SDs). Run 1 showed inflated SDs of C's source gain and independent harm at 256 channels (0.034 / 0.030 vs 0.006 / 0.001 in run 2), consistent with one unstable continuation arm in one block; the metric is bounded, the gap SD was unaffected, and the per-level estimates are descriptive.",
+  "capacity_pilot_reports": [
+    "results/exposure2d_capacity_pilot_v1_blinded.json",
+    "results/exposure2d_capacity_pilot_v1_run1_sequential_sampler_blinded.json",
+    "results/exposure2d_capacity_base_tuning.json"
+  ]
 }
