@@ -125,3 +125,49 @@ def test_checkpoint_round_trip_and_refusals(tmp_path):
     append_checkpoint(path, "abc", {"block_index": 0, "status": "completed"})
     with pytest.raises(SystemExit):
         load_checkpoint(path, "abc")
+
+
+def test_blinded_record_hides_locations_but_keeps_dispersion_and_flag(tmp_path):
+    from exposure_experiment import blind_record, blinded_report, load_blinding_key, ARMS, POPULATIONS
+    from trajectory_lineage.exposure import reuse_contrasts
+
+    zero = {arm: dict.fromkeys(POPULATIONS, 0.0) for arm in ARMS}
+    key = load_blinding_key(tmp_path / "key.json", sorted(reuse_contrasts(zero)))
+    assert key == load_blinding_key(tmp_path / "key.json", sorted(reuse_contrasts(zero)))  # stable on reload
+    rng = np.random.default_rng(0)
+    runs = []
+    for b in range(6):
+        errors = {arm: {pop: float(0.05 + 0.01 * rng.random()) for pop in POPULATIONS} for arm in ARMS}
+        errors["E"]["exact"] = 0.01  # arm E clearly wins on its own renders
+        runs.append({"block_index": b, "status": "completed", "errors": errors, "item_losses": {}, "source_family_of_render": [],
+                     "contrasts": reuse_contrasts(errors), "base_errors": {"source": 0.05, "independent": 0.05}, "base_competent": True,
+                     "presentations_per_source": [12, 13], "nearby_band": [0.01, 0.02], "nearby_distance_median": 0.015,
+                     "closer_distance_median": 0.005, "base_nearest_distance_median": 0.014, "closer_box_offset_max": 0.5,
+                     "replacement_distance_median": 0.1, "total_seconds": 1.0, "hidden_channels": 16, "model_parameters": 1})
+    blinded = [blind_record(run, key) for run in runs]
+    assert all("errors" not in r and "item_losses" not in r and r["blinded"] for r in blinded)
+    for name in runs[0]["contrasts"]:
+        raw = np.array([r["contrasts"][name] for r in runs])
+        shifted = np.array([r["contrasts"][name] for r in blinded])
+        assert np.allclose(shifted - raw, key[name])  # locations are offset by the secret key
+    config = {"sd_upper_limit_confidence": 0.8}
+    a, b = blinded_report(config, runs), blinded_report(config, blinded)
+    assert a["dispersion"] == b["dispersion"] and a["positive_control_passed"] == b["positive_control_passed"] is True
+
+
+def test_closer_neighbors_are_worker_count_invariant():
+    import json as _json
+    from exposure_experiment import spec_from
+    from trajectory_lineage.exposure import nearest_distances, sample_closer_neighbors, sample_event
+
+    config = _json.loads((ROOT / "experiments" / "exposure2d_capacity_pilot_v1.json").read_text())
+    spec = spec_from(config)
+    rng = np.random.default_rng(3)
+    base = [sample_event(rng, spec) for _ in range(64)]
+    sources = [sample_event(rng, spec) for _ in range(3)]
+    ref = nearest_distances(sources, base)
+    kw = dict(min_distances=[0.25 * r for r in ref], max_distances=[0.5 * r for r in ref], box_multiplier=2.5)
+    one = sample_closer_neighbors(np.random.default_rng(11), sources, spec, workers=1, **kw)
+    two = sample_closer_neighbors(np.random.default_rng(11), sources, spec, workers=3, **kw)
+    assert [n.state for n, _, _ in one] == [n.state for n, _, _ in two]
+    assert all(lo <= d <= hi for (_, d, _), lo, hi in zip(one, kw["min_distances"], kw["max_distances"], strict=True))

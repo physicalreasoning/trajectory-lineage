@@ -42,7 +42,7 @@ from trajectory_lineage.exposure import (
     nearest_distances,
     render_event,
     reuse_contrasts,
-    sample_closer_neighbor,
+    sample_closer_neighbors,
     sample_event,
     select_reservoir_neighbors,
 )
@@ -127,19 +127,18 @@ def build_block(config: dict[str, Any], rng: np.random.Generator, spec: EventSpe
     # nearest base-training distance r_i.
     closer_config = config["closer_nearby"]
     base_nearest = nearest_distances(sources, base_events)
-    nearby, nearby_distances, box_offsets = [], [], []
-    for source, reference in zip(sources, base_nearest, strict=True):
-        neighbor, distance, offset = sample_closer_neighbor(
-            rng,
-            source,
-            spec,
-            min_distance=float(closer_config["low_fraction"]) * float(reference),
-            max_distance=float(closer_config["high_fraction"]) * float(reference),
-            box_multiplier=float(closer_config["box_multiplier"]),
-        )
-        nearby.append(neighbor)
-        nearby_distances.append(distance)
-        box_offsets.append(offset)
+    sampled = sample_closer_neighbors(
+        rng,
+        sources,
+        spec,
+        min_distances=[float(closer_config["low_fraction"]) * float(r) for r in base_nearest],
+        max_distances=[float(closer_config["high_fraction"]) * float(r) for r in base_nearest],
+        box_multiplier=float(closer_config["box_multiplier"]),
+        workers=config.get("build_workers"),
+    )
+    nearby = [neighbor for neighbor, _, _ in sampled]
+    nearby_distances = [distance for _, distance, _ in sampled]
+    box_offsets = [offset for _, _, offset in sampled]
     render_seeds["nearby"] = [seeds.draw() for _ in nearby]
     nearby_videos = [
         render_event(event, spec, seed_value)
@@ -304,10 +303,12 @@ def run_block(
     base_video, base_target = block["base"]
     batch_size = int(config["batch_size"])
     base_rng = np.random.default_rng(streams["base_batches"])
-    base_batches = []
-    for _ in range(base_steps_for(config, hidden)):
-        index = torch.from_numpy(base_rng.integers(0, len(base_video), size=batch_size))
-        base_batches.append((base_video[index], base_target[index]))
+    base_indices = [
+        torch.from_numpy(base_rng.integers(0, len(base_video), size=batch_size))
+        for _ in range(base_steps_for(config, hidden))
+    ]
+    # gathered lazily: identical batches and order, without materializing ~600 copies (gigabytes)
+    base_batches = ((base_video[index], base_target[index]) for index in base_indices)
 
     model = new_model(config, spec, device, hidden)
     optimizer = torch.optim.AdamW(model.parameters(), lr=float(config["learning_rate"]))
@@ -340,16 +341,13 @@ def run_block(
         arm_model.load_state_dict(base_state)
         arm_optimizer = torch.optim.AdamW(arm_model.parameters(), lr=float(config["learning_rate"]))
         arm_optimizer.load_state_dict(copy.deepcopy(optimizer_state))
-        batches = []
-        for arm_indices, replay_indices in zip(arm_schedule, replay_schedule, strict=True):
-            arm_index = torch.from_numpy(arm_indices)
-            replay_index = torch.from_numpy(replay_indices)
-            batches.append(
-                (
-                    torch.cat((arm_video[arm_index], base_video[replay_index])),
-                    torch.cat((arm_target[arm_index], base_target[replay_index])),
-                )
+        batches = (
+            (
+                torch.cat((arm_video[torch.from_numpy(a)], base_video[torch.from_numpy(r)])),
+                torch.cat((arm_target[torch.from_numpy(a)], base_target[torch.from_numpy(r)])),
             )
+            for a, r in zip(arm_schedule, replay_schedule, strict=True)
+        )
         losses = train_steps(arm_model, arm_optimizer, batches, device)
         final_losses[arm] = float(np.mean(losses[-10:]))
         item_losses = {
@@ -421,7 +419,10 @@ def blinded_report(config: dict[str, Any], runs: list[dict[str, Any]]) -> dict[s
             )
             for name in names
         }
-    exact_positive = sum(run["contrasts"]["E_exact_gain"] > 0 for run in completed)
+    exact_positive = sum(
+        run.get("E_exact_gain_positive", run["contrasts"].get("E_exact_gain", 0.0) > 0)
+        for run in completed
+    )
     balance = [
         run["base_errors"]["source"] - run["base_errors"]["independent"] for run in completed
     ]
@@ -599,6 +600,43 @@ def run_with_policy(config, block_index, spec, device) -> dict[str, Any]:
     }
 
 
+BLIND_DROP = ("errors", "item_losses", "source_family_of_render")
+
+
+def load_blinding_key(path: Path, names: list[str]) -> dict[str, float]:
+    """Per-contrast random offsets. Created once per run; must never be opened by the owner."""
+
+    if path.exists():
+        key = json.loads(path.read_text())
+        missing = [name for name in names if name not in key]
+        if missing:
+            raise SystemExit(f"blinding key {path} lacks offsets for {missing}")
+        return {name: float(key[name]) for name in key}
+    rng = np.random.default_rng()
+    key = {name: float(rng.normal(0.0, 10.0)) for name in names}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(key, indent=2, sort_keys=True) + "\n")
+    return key
+
+
+def blind_record(run: dict[str, Any], key: dict[str, float]) -> dict[str, Any]:
+    """A block record safe to store: no component errors, contrasts shifted by the key.
+
+    Dispersions (standard deviations) are invariant to the shift, the positive-control flag is
+    kept as a boolean, and pre-treatment base errors stay (they carry no reuse effect)."""
+
+    if run.get("status") != "completed" or run.get("blinded"):
+        return run
+    record = {k: v for k, v in run.items() if k not in BLIND_DROP}
+    missing = [name for name in run["contrasts"] if name not in key]
+    if missing:
+        raise SystemExit(f"blinding key lacks offsets for {missing}")
+    record["contrasts"] = {name: float(value) + key[name] for name, value in run["contrasts"].items()}
+    record["E_exact_gain_positive"] = bool(run["contrasts"]["E_exact_gain"] > 0)
+    record["blinded"] = True
+    return record
+
+
 def load_checkpoint(path: Path, expected_config_hash: str) -> list[dict[str, Any]]:
     """Raw block records written so far; refuses a file produced under another configuration."""
 
@@ -639,6 +677,19 @@ def main() -> None:
         help="JSONL of raw block records, appended per block and resumed on restart. Raw records "
         "carry effects, so this is allowed only for approved confirmatory runs (--freeze-manifest).",
     )
+    parser.add_argument(
+        "--blinded-checkpoint",
+        type=Path,
+        default=None,
+        help="JSONL of BLINDED block records (contrasts shifted by a random key, no component "
+        "errors), appended per block and resumed on restart. Safe for effect-blinded pilots.",
+    )
+    parser.add_argument(
+        "--blinding-key",
+        type=Path,
+        default=None,
+        help="Where the random offsets live (default: next to the blinded checkpoint). Never open it.",
+    )
     args = parser.parse_args()
     config = json.loads(args.config.read_text())
     if args.unblind is not None or config.get("require_approval_to_run", False):
@@ -647,6 +698,15 @@ def main() -> None:
         check_freeze(args.freeze_manifest, args.config)
     if args.checkpoint is not None and args.freeze_manifest is None:
         raise SystemExit("--checkpoint writes raw block records; it requires --freeze-manifest")
+    if args.blinded_checkpoint is not None and args.unblind is not None:
+        raise SystemExit("--blinded-checkpoint keeps no raw records; it cannot be combined with --unblind")
+    if args.blinded_checkpoint is not None and args.checkpoint is not None:
+        raise SystemExit("use either --checkpoint (confirmatory, raw) or --blinded-checkpoint (pilot)")
+    blinding_key: dict[str, float] | None = None
+    if args.blinded_checkpoint is not None:
+        key_path = args.blinding_key or args.blinded_checkpoint.with_name("DO_NOT_OPEN_blinding_key.json")
+        zero = {arm: dict.fromkeys(POPULATIONS, 0.0) for arm in ARMS}
+        blinding_key = load_blinding_key(key_path, sorted(reuse_contrasts(zero)))
 
     spec = spec_from(config)
     device_name = args.device or (
@@ -657,18 +717,28 @@ def main() -> None:
         else "cpu"
     )
     device = torch.device(device_name)
-    runs = load_checkpoint(args.checkpoint, config_hash(args.config)) if args.checkpoint else []
+    checkpoint = args.checkpoint or args.blinded_checkpoint
+    runs = load_checkpoint(checkpoint, config_hash(args.config)) if checkpoint else []
     done = {run["block_index"] for run in runs}
     if done:
-        print(f"resuming: {len(done)} blocks already recorded in {args.checkpoint}", flush=True)
+        print(f"resuming: {len(done)} blocks already recorded in {checkpoint}", flush=True)
+    started = time.perf_counter()
     for block_index in range(int(config["blocks"])):
         if block_index in done:
             continue
         run = run_with_policy(config, block_index, spec, device)
+        if blinding_key is not None:
+            run = blind_record(run, blinding_key)
         runs.append(run)
-        if args.checkpoint is not None:
-            append_checkpoint(args.checkpoint, config_hash(args.config), run)
-        print(f"block {block_index + 1}/{config['blocks']}: {run['status']}", flush=True)
+        if checkpoint is not None:
+            append_checkpoint(checkpoint, config_hash(args.config), run)
+        elapsed = time.perf_counter() - started
+        print(
+            f"block {block_index + 1}/{config['blocks']}: {run['status']}"
+            f" (hidden {run.get('hidden_channels', '?')}, {run.get('total_seconds', 0):.0f} s;"
+            f" {elapsed / 60:.1f} min elapsed this session)",
+            flush=True,
+        )
     runs.sort(key=lambda run: run["block_index"])
 
     report = blinded_report(config, runs)

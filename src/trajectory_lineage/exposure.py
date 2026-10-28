@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import math
+import os
+from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass, replace
 from statistics import NormalDist
 
@@ -546,3 +548,45 @@ def scaled_capacity_config(config: dict, blocks: int) -> dict:
             raise ValueError(f"{blocks} blocks are too few for {len(scaled)} capacity levels")
         out["capacity_blocks"] = {str(k): v for k, v in scaled.items()}
     return out
+
+
+def _closer_neighbor_task(args: tuple) -> tuple[Event, float, float]:
+    seed_sequence, source, spec, min_distance, max_distance, box_multiplier = args
+    return sample_closer_neighbor(
+        np.random.default_rng(seed_sequence),
+        source,
+        spec,
+        min_distance=min_distance,
+        max_distance=max_distance,
+        box_multiplier=box_multiplier,
+    )
+
+
+def sample_closer_neighbors(
+    rng: np.random.Generator,
+    sources: list[Event],
+    spec: EventSpec,
+    *,
+    min_distances: list[float],
+    max_distances: list[float],
+    box_multiplier: float,
+    workers: int | None = None,
+) -> list[tuple[Event, float, float]]:
+    """Arm D neighbours for every source, each from its own spawned stream, sampled in parallel.
+
+    The result is identical for any number of workers: source ``i`` always uses the ``i``-th child
+    of the block's data stream, and spawning children does not advance the parent generator, so
+    every other draw in the block is unchanged. Rejection sampling (about 6,000 proposals per
+    source) is the block's dominant cost, which is why this is the one parallel section.
+    """
+
+    children = rng.bit_generator.seed_seq.spawn(len(sources))
+    tasks = [
+        (child, source, spec, float(low), float(high), float(box_multiplier))
+        for child, source, low, high in zip(children, sources, min_distances, max_distances, strict=True)
+    ]
+    workers = int(workers or os.environ.get("TRAJECTORY_LINEAGE_WORKERS") or os.cpu_count() or 1)
+    if workers <= 1 or len(tasks) <= 1:
+        return [_closer_neighbor_task(task) for task in tasks]
+    with ProcessPoolExecutor(max_workers=min(workers, len(tasks))) as pool:
+        return list(pool.map(_closer_neighbor_task, tasks, chunksize=1))
