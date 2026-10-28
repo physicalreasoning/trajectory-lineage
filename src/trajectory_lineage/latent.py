@@ -78,9 +78,12 @@ class FrozenEncoder:
     @torch.no_grad()
     def encode(self, video: Tensor) -> Tensor:
         outputs = []
+        use_autocast = str(self.device).startswith("cuda") and self.model is not None
         for start in range(0, video.shape[0], self.batch_size):
             chunk = self._prepare(video[start : start + self.batch_size])
-            outputs.append(self._encode_chunk(chunk).float().cpu())
+            with torch.autocast("cuda", dtype=torch.bfloat16, enabled=use_autocast):
+                tokens = self._encode_chunk(chunk)
+            outputs.append(tokens.float().cpu())
         return torch.cat(outputs)
 
     def _encode_chunk(self, x: Tensor) -> Tensor:

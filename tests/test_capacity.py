@@ -171,3 +171,27 @@ def test_closer_neighbors_are_worker_count_invariant():
     two = sample_closer_neighbors(np.random.default_rng(11), sources, spec, workers=3, **kw)
     assert [n.state for n, _, _ in one] == [n.state for n, _, _ in two]
     assert all(lo <= d <= hi for (_, d, _), lo, hi in zip(one, kw["min_distances"], kw["max_distances"], strict=True))
+
+
+def test_parallel_workers_do_not_change_results(tmp_path):
+    """Blocks are seeded independently, so the blinded dispersion is identical for any worker count."""
+
+    import json as _json
+    import subprocess, sys as _sys
+
+    cfg = _json.loads((ROOT / "experiments" / "exposure2d_pilot_v1.json").read_text())
+    cfg.update(blocks=3, base_train_examples=16, source_trajectories=4, heldout_renders_per_source=2, independent_eval_examples=8,
+               batch_size=8, base_training_steps=3, continuation_steps=2, arm_examples_per_batch=2, replay_examples_per_batch=6,
+               hidden_channels=4, screen_examples=8)
+    cfg["nearby"] = dict(cfg["nearby"], reservoir_size=4000)
+    path = tmp_path / "cfg.json"; path.write_text(_json.dumps(cfg))
+    outs = []
+    for workers in (1, 2):
+        out = tmp_path / f"out{workers}.json"
+        subprocess.run([_sys.executable, str(ROOT / "scripts" / "exposure_experiment.py"), "--config", str(path), "--out", str(out), "--device", "cpu", "--workers", str(workers)],
+                       check=True, capture_output=True, env={**__import__("os").environ, "PYTHONPATH": str(ROOT / "src")})
+        outs.append(_json.loads(out.read_text()))
+    a, b = outs
+    assert a["blocks_completed"] == b["blocks_completed"] == 3
+    for name in a["dispersion"]:
+        assert abs(a["dispersion"][name]["standard_deviation"] - b["dispersion"][name]["standard_deviation"]) < 1e-9

@@ -12,6 +12,7 @@ import argparse
 import copy
 import hashlib
 import json
+import os
 import platform
 import subprocess
 import sys
@@ -644,6 +645,50 @@ def is_infrastructure(error: BaseException) -> bool:
     )
 
 
+def configure_backend(device) -> None:
+    """Speed knobs that do not change the registered computation's meaning: TF32 matmuls and cuDNN
+    autotuning on CUDA. Training stays in float32; only frozen encoders run under bf16 autocast."""
+
+    if str(device).startswith("cuda"):
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32 = True
+        torch.backends.cudnn.benchmark = True
+        torch.set_float32_matmul_precision("high")
+
+
+def _worker_run(config_path: str, block_index: int, device_name: str, sampler_workers: int) -> dict[str, Any]:
+    """Process-pool entry: one block, in its own process with its own CUDA context and encoder."""
+
+    import os
+
+    os.environ["TRAJECTORY_LINEAGE_WORKERS"] = str(max(1, sampler_workers))
+    config = json.loads(Path(config_path).read_text())
+    device = torch.device(device_name)
+    configure_backend(device)
+    return run_with_policy(config, block_index, spec_from(config), device)
+
+
+def run_blocks_parallel(config_path: Path, indices: list[int], device_name: str, workers: int, on_done) -> None:
+    """Run blocks concurrently in ``workers`` spawned processes sharing one device.
+
+    Blocks are independent (per-block seeds), so results do not depend on which worker runs which
+    block or on completion order; ``on_done(run)`` is called as each block finishes. The arm-D
+    sampler inside each worker gets an equal share of the CPU cores."""
+
+    import multiprocessing as mp
+    from concurrent.futures import ProcessPoolExecutor, as_completed
+
+    sampler_workers = max(1, (os.cpu_count() or 2) // max(1, workers))
+    context = mp.get_context("spawn")
+    with ProcessPoolExecutor(max_workers=workers, mp_context=context) as pool:
+        futures = {
+            pool.submit(_worker_run, str(config_path), index, device_name, sampler_workers): index
+            for index in indices
+        }
+        for future in as_completed(futures):
+            on_done(future.result())
+
+
 def run_with_policy(config, block_index, spec, device) -> dict[str, Any]:
     """Run a block; retry once on infrastructure errors; record every failure by class."""
 
@@ -760,6 +805,13 @@ def main() -> None:
         default=None,
         help="Where the random offsets live (default: next to the blinded checkpoint). Never open it.",
     )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=1,
+        help="Blocks trained concurrently in separate processes on the same device (GPU runs: 2-4). "
+        "Results do not depend on this value.",
+    )
     args = parser.parse_args()
     config = json.loads(args.config.read_text())
     if args.unblind is not None or config.get("require_approval_to_run", False):
@@ -793,22 +845,33 @@ def main() -> None:
     if done:
         print(f"resuming: {len(done)} blocks already recorded in {checkpoint}", flush=True)
     started = time.perf_counter()
-    for block_index in range(int(config["blocks"])):
-        if block_index in done:
-            continue
-        run = run_with_policy(config, block_index, spec, device)
+    configure_backend(device)
+    pending = [index for index in range(int(config["blocks"])) if index not in done]
+    finished = {"n": 0}
+
+    def record(run: dict[str, Any]) -> None:
         if blinding_key is not None:
             run = blind_record(run, blinding_key)
         runs.append(run)
         if checkpoint is not None:
             append_checkpoint(checkpoint, config_hash(args.config), run)
+        finished["n"] += 1
         elapsed = time.perf_counter() - started
+        rate = elapsed / finished["n"]
+        remaining = (len(pending) - finished["n"]) * rate / max(1, args.workers)
         print(
-            f"block {block_index + 1}/{config['blocks']}: {run['status']}"
+            f"block {run['block_index'] + 1}/{config['blocks']}: {run['status']}"
             f" (hidden {run.get('hidden_channels', '?')}, {run.get('total_seconds', 0):.0f} s;"
-            f" {elapsed / 60:.1f} min elapsed this session)",
+            f" {finished['n']}/{len(pending)} this session, {elapsed / 60:.1f} min elapsed,"
+            f" about {remaining / 60:.0f} min left)",
             flush=True,
         )
+
+    if args.workers > 1 and len(pending) > 1:
+        run_blocks_parallel(args.config, pending, device_name, args.workers, record)
+    else:
+        for block_index in pending:
+            record(run_with_policy(config, block_index, spec, device))
     runs.sort(key=lambda run: run["block_index"])
 
     report = blinded_report(config, runs)
