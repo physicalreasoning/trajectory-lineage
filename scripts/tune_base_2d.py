@@ -44,7 +44,9 @@ def main() -> None:
     args = parser.parse_args()
     config = json.loads(args.config.read_text())
     spec = spec_from(config)
-    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+    device = torch.device(
+        "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+    )
     checkpoints = [int(x) for x in args.checkpoints.split(",")]
     rows = []
     for block in range(args.blocks):
