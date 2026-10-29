@@ -17,7 +17,9 @@
 
 ## Status
 
-**Interim result available; confirmation running.** In an independent 16-run interim sample, reusing a physical trajectory under new colors gave a detectable but negligible evaluation advantage (reuse gap +0.0015, 95% CI 0.0011–0.0018; about 6% lower error on reused trajectories), no larger than training on very close independent trajectories. Standard duplicate checks miss this reuse; trajectory matching catches it. The pre-registered 352-run confirmation runs under a provisional freeze (`approvals/provisional_freeze.json`) and will replace the interim numbers.
+**Registered 2D study; confirmation runs after registration.** The registered study is the 2D collision design ([Registered 2D study](#registered-2d-study)) with three added axes: predictor capacity, a latent world-model recipe with frozen pretrained encoders, and exposure dose. All of its pilots are effect-blind: they release dispersions, counts and runtime only.
+
+**1D record.** In an independent 16-run 1D interim sample, reusing a physical trajectory under new colors gave a detectable but negligible evaluation advantage (reuse gap +0.0015, 95% CI 0.0011–0.0018; about 6% lower error on reused trajectories), no larger than training on very close independent trajectories. Standard duplicate checks miss this reuse; trajectory matching catches it. The 352-run 1D confirmation finished on October 20 under a provisional freeze (`approvals/provisional_freeze.json`). It is sealed, not analyzed, and not pooled with the 2D study.
 
 The broad claim that trajectory overlap causes benchmark contamination did not survive adversarial review. This repository begins with the narrower question that remained:
 
@@ -79,9 +81,14 @@ If these fail after two documented pilot revisions, the experiment stops rather 
 - A matched exposure runner (`scripts/exposure_experiment.py`) with cloned model and optimizer state, bounded metric, role-separated random streams, a separate competence screen, and per-item losses;
 - A frozen confirmatory analyzer (`scripts/analyze_confirmation.py`) and freeze gate (`scripts/freeze.py`);
 - A duplicate-detector benchmark (`scripts/detector_benchmark.py`, `scripts/analyze_detectors.py`) and an exploratory filtering analysis (`scripts/exposure_filtering.py`); and
-- A validated loader for the PhyWorld collision evaluation set.
+- A validated loader for the PhyWorld collision evaluation set;
+- A 2D collision simulator (`src/trajectory_lineage/simulator2d.py`) and the registered 2D analyzer (`scripts/analyze_2d.py`);
+- Predictor capacity as a registered block factor (ConvLSTM with 16, 64 or 256 hidden channels);
+- A latent world-model predictor (`src/trajectory_lineage/latent.py`): a frozen DINOv2-small or V-JEPA 2-L encoder and a trained width-256 transformer;
+- A joint analyzer with one Holm family across the 2D confirmation and its axes (`scripts/analyze_exp3_axes.py`); and
+- Parallel block workers on one GPU, blinded resumable checkpoints for pilots, and per-block state hashes.
 
-Claims are limited to this synthetic assay and a small predictor; no claim is made about policy success or released world models.
+Claims are limited to this synthetic assay and the predictors listed; no claim is made about policy success or released world models.
 
 ## First local pilot
 
@@ -136,7 +143,7 @@ A compact pixel-conditioned ConvLSTM was trained for 300 updates on 512 generate
 
 The ConvLSTM reduces error by 39.3% relative to constant velocity and lands within 2.1% of nearest-trajectory retrieval.
 
-## Matched exposure experiment
+## Matched exposure experiment (1D)
 
 Each independent training run trains a base ConvLSTM on 512 events, then continues matched copies (identical updates, batch positions, and 12–13 presentations per example) on independent trajectories (B), the evaluation-source trajectories under new appearances (C), independent trajectories closer than anything in base training (D), banded neighbors (D2), or the exact evaluation renders (E). Thresholds were fixed before any result was observed (`docs/EFFECT_SIZE.md`): consequential if the reuse gap's lower bound exceeds 0.010, negligible if its interval lies within ±0.002, harm margin 0.001.
 
@@ -148,6 +155,29 @@ Each independent training run trains a base ConvLSTM on 512 events, then continu
 | Same trajectory vs closer independent neighbor | +0.00008 | [−0.00017, +0.00032] |
 
 Outcome under the contract: **negligible differential gap**, while still detectable. Reuse would need to make up 56–89% of an evaluation set to move a model comparison by the 0.001 margin, and the advantage matches that from very close independent trajectories, consistent with local generalization. See `FINDINGS.md` §5 and §7.
+
+## Registered 2D study
+
+Two disks with one exact elastic collision in 2D. Each block trains a base model, then five matched continuations (arms B, C, D, D2, E, as in 1D). The contrasts and margins are the same as in 1D, with two revised rules (whole-interval prevalence rule, reachable positive control).
+
+| Configuration | Predictor | Reused sources | Blocks | Role |
+|---|---|---|---:|---|
+| `exposure2d_confirmation` | ConvLSTM, 16 / 64 / 256 channels | 64 | 800 + 400 + 400 | primary claim (16 channels); capacity secondary |
+| `exposure2d_confirm_latent_dinov2` | frozen DINOv2-small + latent transformer | 64 | 200 | architecture secondary |
+| `exposure2d_confirm_latent_vjepa2` | frozen V-JEPA 2-L + latent transformer | 64 | 200 | architecture secondary |
+| `exposure2d_confirm_dose16` | ConvLSTM, 16 channels | 16 (about 50 presentations each) | 200 | dose secondary |
+| `exposure2d_confirm_dose256` | ConvLSTM, 16 channels | 256 (about 3 presentations each) | 200 | dose secondary |
+
+Effect-blind pilots (24 blocks per level; capacity, architecture and dose) all completed with every block competent, the positive control passing and no failures. Their blinded reports are in `results/*_blinded.json`. The confirmation starts only with an approved freeze manifest. The runner checkpoints every block, and the analyzers refuse to run without the manifest.
+
+```bash
+# effect-blind pilot on a GPU, three blocks at a time, resumable
+PYTHONPATH=src python scripts/exposure_experiment.py --config experiments/exposure2d_latent_vjepa2_pilot_v1.json \
+  --out results/latent_vjepa2_pilot_v1_blinded.json --device cuda --workers 3 \
+  --blinded-checkpoint ck.jsonl --blinding-key DO_NOT_OPEN/key.json
+```
+
+The latent predictor needs `transformers` (`pip install transformers`). On an A100 with three workers, a block takes about 20 s to 2.5 min of wall time, depending on the configuration.
 
 ## Duplicate-detector audit
 
@@ -169,7 +199,7 @@ Applied to the exposure experiment (8 interim runs, exploratory), SSCD filtering
 Python 3.11+ and [uv](https://docs.astral.sh/uv/):
 
 ```bash
-uv sync
+uv sync                      # add --extra models for torch (model tests and experiments)
 uv run pytest -q
 uv run ruff check src scripts tests
 uv run python scripts/smoke.py
