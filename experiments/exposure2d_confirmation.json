@@ -141,7 +141,11 @@
     2026102300,
     2026102301,
     2026102399,
-    2026102701
+    2026102701,
+    2026102801,
+    2026102802,
+    2026102811,
+    2026102812
   ],
   "planning_analyzed_blocks": 768,
   "runtime_estimate": "Capacity pilot on an A100 with a concurrent extraction job: 76 / 79 / 96 s per block at 16 / 64 / 256 channels (run 2, parallel sampler; run 1 with the sequential sampler took 252 / 260 / 349 s). The 1,600-block confirmation therefore needs about 36 GPU-hours sequentially; per-block checkpoints allow splitting across sessions, and block-level concurrency on one GPU is to be benchmarked before the run.",

@@ -1,0 +1,152 @@
+{
+  "summary": {
+    "h256_s300": {
+      "competent_fraction": 0.5,
+      "ratio_median": 1.004432480768398,
+      "ratio_max": 1.0400062137049502,
+      "seconds_median": 3.7531526044999737
+    },
+    "h256_s600": {
+      "competent_fraction": 1.0,
+      "ratio_median": 0.8884532598416635,
+      "ratio_max": 0.9393967691901322,
+      "seconds_median": 7.5172624880000285
+    },
+    "h256_s1200": {
+      "competent_fraction": 1.0,
+      "ratio_median": 0.7721700889692679,
+      "ratio_max": 0.8246965263284063,
+      "seconds_median": 15.016895863000059
+    }
+  },
+  "rows": [
+    {
+      "block": 0,
+      "hidden": 256,
+      "steps": 300,
+      "screen_error": 0.08400683850049973,
+      "cv_error": 0.08153505818646498,
+      "ratio": 1.0303155522178198,
+      "competent": false,
+      "seconds": 4.038842069000111
+    },
+    {
+      "block": 0,
+      "hidden": 256,
+      "steps": 600,
+      "screen_error": 0.06707660108804703,
+      "cv_error": 0.08153505818646498,
+      "ratio": 0.8226718981992694,
+      "competent": true,
+      "seconds": 7.883782489000168
+    },
+    {
+      "block": 0,
+      "hidden": 256,
+      "steps": 1200,
+      "screen_error": 0.05925416201353073,
+      "cv_error": 0.08153505818646498,
+      "ratio": 0.7267323202004787,
+      "competent": true,
+      "seconds": 15.422640600000022
+    },
+    {
+      "block": 1,
+      "hidden": 256,
+      "steps": 300,
+      "screen_error": 0.08396553248167038,
+      "cv_error": 0.08073560655233875,
+      "ratio": 1.0400062137049502,
+      "competent": false,
+      "seconds": 3.7737225260000287
+    },
+    {
+      "block": 1,
+      "hidden": 256,
+      "steps": 600,
+      "screen_error": 0.07584276795387268,
+      "cv_error": 0.08073560655233875,
+      "ratio": 0.9393967691901322,
+      "competent": true,
+      "seconds": 7.569617355999981
+    },
+    {
+      "block": 1,
+      "hidden": 256,
+      "steps": 1200,
+      "screen_error": 0.06658237427473068,
+      "cv_error": 0.08073560655233875,
+      "ratio": 0.8246965263284063,
+      "competent": true,
+      "seconds": 15.119065326000054
+    },
+    {
+      "block": 2,
+      "hidden": 256,
+      "steps": 300,
+      "screen_error": 0.07716850936412811,
+      "cv_error": 0.07929840559527623,
+      "ratio": 0.9731407433080218,
+      "competent": true,
+      "seconds": 3.7325826829999187
+    },
+    {
+      "block": 2,
+      "hidden": 256,
+      "steps": 600,
+      "screen_error": 0.07153365761041641,
+      "cv_error": 0.07929840559527623,
+      "ratio": 0.902081915436111,
+      "competent": true,
+      "seconds": 7.464907620000076
+    },
+    {
+      "block": 2,
+      "hidden": 256,
+      "steps": 1200,
+      "screen_error": 0.06236863136291504,
+      "cv_error": 0.07929840559527623,
+      "ratio": 0.7865054901763411,
+      "competent": true,
+      "seconds": 14.914726400000063
+    },
+    {
+      "block": 3,
+      "hidden": 256,
+      "steps": 300,
+      "screen_error": 0.08061843365430832,
+      "cv_error": 0.08238565460932108,
+      "ratio": 0.978549409318976,
+      "competent": true,
+      "seconds": 3.709773289000168
+    },
+    {
+      "block": 3,
+      "hidden": 256,
+      "steps": 600,
+      "screen_error": 0.07207299768924713,
+      "cv_error": 0.08238565460932108,
+      "ratio": 0.8748246042472159,
+      "competent": true,
+      "seconds": 7.4333890150001025
+    },
+    {
+      "block": 3,
+      "hidden": 256,
+      "steps": 1200,
+      "screen_error": 0.06243470683693886,
+      "cv_error": 0.08238565460932108,
+      "ratio": 0.7578346877621946,
+      "competent": true,
+      "seconds": 14.843123741
+    }
+  ],
+  "args": {
+    "config": "experiments/exposure2d_latent_dinov2_pilot_v1.json",
+    "out": "results/latent_dinov2_base_tuning.json",
+    "blocks": 4,
+    "seed": 2026102399,
+    "checkpoints": "300,600,1200",
+    "hidden": "256"
+  }
+}

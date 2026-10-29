@@ -1,0 +1,152 @@
+{
+  "summary": {
+    "h256_s300": {
+      "competent_fraction": 1.0,
+      "ratio_median": 0.8626012759272572,
+      "ratio_max": 0.8888770695707564,
+      "seconds_median": 4.009128388500017
+    },
+    "h256_s600": {
+      "competent_fraction": 1.0,
+      "ratio_median": 0.6543709472867845,
+      "ratio_max": 0.678792169286643,
+      "seconds_median": 8.020895333500107
+    },
+    "h256_s1200": {
+      "competent_fraction": 1.0,
+      "ratio_median": 0.583734504155026,
+      "ratio_max": 0.6027828807071755,
+      "seconds_median": 16.051312444000132
+    }
+  },
+  "rows": [
+    {
+      "block": 0,
+      "hidden": 256,
+      "steps": 300,
+      "screen_error": 0.0724746435880661,
+      "cv_error": 0.08153505818646498,
+      "ratio": 0.8888770695707564,
+      "competent": true,
+      "seconds": 4.279964190000101
+    },
+    {
+      "block": 0,
+      "hidden": 256,
+      "steps": 600,
+      "screen_error": 0.054765522480010986,
+      "cv_error": 0.08153505818646498,
+      "ratio": 0.6716806696177988,
+      "competent": true,
+      "seconds": 8.402455073000056
+    },
+    {
+      "block": 0,
+      "hidden": 256,
+      "steps": 1200,
+      "screen_error": 0.04815221577882767,
+      "cv_error": 0.08153505818646498,
+      "ratio": 0.5905706925321242,
+      "competent": true,
+      "seconds": 16.504168587000095
+    },
+    {
+      "block": 1,
+      "hidden": 256,
+      "steps": 300,
+      "screen_error": 0.06815508008003235,
+      "cv_error": 0.08073560655233875,
+      "ratio": 0.8441762314109726,
+      "competent": true,
+      "seconds": 3.919420245000083
+    },
+    {
+      "block": 1,
+      "hidden": 256,
+      "steps": 600,
+      "screen_error": 0.05114233121275902,
+      "cv_error": 0.08073560655233875,
+      "ratio": 0.6334544743849148,
+      "competent": true,
+      "seconds": 7.831758370999978
+    },
+    {
+      "block": 1,
+      "hidden": 256,
+      "steps": 1200,
+      "screen_error": 0.04657623544335365,
+      "cv_error": 0.08073560655233875,
+      "ratio": 0.5768983157779278,
+      "competent": true,
+      "seconds": 15.695436636000068
+    },
+    {
+      "block": 2,
+      "hidden": 256,
+      "steps": 300,
+      "screen_error": 0.06986398249864578,
+      "cv_error": 0.07929840559527623,
+      "ratio": 0.8810263204435418,
+      "competent": true,
+      "seconds": 4.022653921000028
+    },
+    {
+      "block": 2,
+      "hidden": 256,
+      "steps": 600,
+      "screen_error": 0.053827136754989624,
+      "cv_error": 0.07929840559527623,
+      "ratio": 0.678792169286643,
+      "competent": true,
+      "seconds": 8.067971606000128
+    },
+    {
+      "block": 2,
+      "hidden": 256,
+      "steps": 1200,
+      "screen_error": 0.047799721360206604,
+      "cv_error": 0.07929840559527623,
+      "ratio": 0.6027828807071755,
+      "competent": true,
+      "seconds": 16.109361056000125
+    },
+    {
+      "block": 3,
+      "hidden": 256,
+      "steps": 300,
+      "screen_error": 0.06485730409622192,
+      "cv_error": 0.08238565460932108,
+      "ratio": 0.7872402592876162,
+      "competent": true,
+      "seconds": 3.995602856000005
+    },
+    {
+      "block": 3,
+      "hidden": 256,
+      "steps": 600,
+      "screen_error": 0.05248470604419708,
+      "cv_error": 0.08238565460932108,
+      "ratio": 0.6370612249557702,
+      "competent": true,
+      "seconds": 7.973819061000086
+    },
+    {
+      "block": 3,
+      "hidden": 256,
+      "steps": 1200,
+      "screen_error": 0.046078652143478394,
+      "cv_error": 0.08238565460932108,
+      "ratio": 0.5593043153202678,
+      "competent": true,
+      "seconds": 15.993263832000139
+    }
+  ],
+  "args": {
+    "config": "experiments/exposure2d_latent_vjepa2_pilot_v1.json",
+    "out": "results/latent_vjepa2_base_tuning.json",
+    "blocks": 4,
+    "seed": 2026102399,
+    "checkpoints": "300,600,1200",
+    "hidden": "256"
+  }
+}

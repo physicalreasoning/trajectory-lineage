@@ -195,3 +195,40 @@ def test_parallel_workers_do_not_change_results(tmp_path):
     assert a["blocks_completed"] == b["blocks_completed"] == 3
     for name in a["dispersion"]:
         assert abs(a["dispersion"][name]["standard_deviation"] - b["dispersion"][name]["standard_deviation"]) < 1e-9
+
+
+@pytest.mark.skipif(not PILOT_REPORT.exists(), reason="pilot report not available")
+def test_joint_axes_analysis_labels_and_family(tmp_path):
+    """Joint Holm family across the main confirmation and the architecture/dose axes; axis failures never touch the primary."""
+
+    from analyze_confirmation import validate_records
+    from analyze_exp3_axes import AXES, analyze_axes
+    from trajectory_lineage.exposure import scaled_capacity_config
+
+    main_cfg = scaled_capacity_config(CONFIG, 80)
+    main_cfg["decision_contract"] = dict(CONFIG["decision_contract"], minimum_screened_blocks=30, minimum_screened_blocks_by_capacity={"64": 15, "256": 15})
+    sds = dispersion_from(PILOT_REPORT)
+    rng = np.random.default_rng(5)
+    main_runs = validate_records(synthetic_runs(rng, main_cfg, dict(S=0.015, H=0.0, Q=0.0, E=0.004), sds, 80, 1.0), 80, main_cfg)
+    main_result = analyze_2d(main_runs, main_cfg, check_records=False)
+    axes = {}
+    truths = {"latent_dinov2": 0.004, "latent_vjepa2": 0.0, "dose16": 0.015, "dose256": 0.004}
+    for name in AXES:
+        cfg = json.loads((ROOT / "experiments" / f"exposure2d_confirm_{name}.json").read_text())
+        cfg = dict(cfg, blocks=40); cfg["decision_contract"] = dict(cfg["decision_contract"], minimum_screened_blocks=30)
+        axis_sds = dispersion_from(ROOT / "results" / f"{name}_pilot_v1_blinded.json")
+        runs = synthetic_runs(rng, cfg, dict(S=truths[name], H=0.0, Q=0.0, E=0.004), axis_sds, 40, 1.0)
+        axes[name] = (validate_records(runs, 40, cfg), cfg)
+    joint = analyze_axes({"result": main_result, "config": main_cfg}, axes)
+    assert set(joint["joint_family_p_values"]) == {"identity_specific", "detectable", "consequential_harm", "capacity_increase",
+                                                   "detectable_latent_dinov2", "detectable_latent_vjepa2", "dose_increase"}
+    assert joint["labels"]["latent_dinov2"] == "reuse_detectable_under_recipe"
+    assert joint["labels"]["latent_vjepa2"] == "negligible_under_recipe"
+    assert joint["labels"]["dose"] == "dose_dependent"
+    assert joint["main_primary_claim"] == main_result["primary_claim"] == "consequential reuse advantage"
+    # an axis with a failed block drops out of the family and is unresolved; the primary is untouched
+    broken = dict(axes); runs, cfg = broken["dose16"]; runs = list(runs); runs[0] = {"block_index": 0, "status": "infrastructure_failure", "error": "x", "attempts": ["x"]}
+    broken["dose16"] = (runs, cfg)
+    joint2 = analyze_axes({"result": main_result, "config": main_cfg}, broken)
+    assert "dose_increase" not in joint2["joint_family_p_values"] and joint2["labels"]["dose"] == "unresolved"
+    assert joint2["main_primary_claim"] == main_result["primary_claim"]
