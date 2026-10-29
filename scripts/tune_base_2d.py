@@ -18,13 +18,17 @@ import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from exposure_experiment import (  # noqa: E402
+    configure_backend,
     constant_velocity_error,
     evaluate,
     new_model,
+    predictor_config,
     spec_from,
     to_tensors,
     train_steps,
 )
+
+from trajectory_lineage.latent import get_encoder  # noqa: E402
 
 from trajectory_lineage.exposure import (  # noqa: E402
     AppearanceRegistry,
@@ -47,6 +51,7 @@ def main() -> None:
     device = torch.device(
         "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
     )
+    configure_backend(device)
     checkpoints = [int(x) for x in args.checkpoints.split(",")]
     rows = []
     for block in range(args.blocks):

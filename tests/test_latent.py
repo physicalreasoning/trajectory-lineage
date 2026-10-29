@@ -79,3 +79,22 @@ def test_vjepa_step_count_follows_tubelets():
     assert new_model(cfg, spec, torch.device("cpu"), 16).steps == spec.observed_frames
     # a V-JEPA-named fake is not available, so check the rule directly
     assert (spec.observed_frames // 2) == 4
+
+
+def test_tune_base_2d_runs_for_latent_and_convlstm(tmp_path):
+    """The tuning script must run end to end for both predictor types (it is the first thing the Colab notebook runs)."""
+
+    import os
+    import subprocess
+
+    base = json.loads((ROOT / "experiments" / "exposure2d_pilot_v1.json").read_text())
+    tiny = dict(base, base_train_examples=16, screen_examples=8, batch_size=8, hidden_channels=8)
+    for name, extra in (("convlstm", {}), ("latent", {"predictor": {"type": "latent", "encoder": "fake-16", "depth": 1, "heads": 2}})):
+        cfg = dict(tiny, **extra)
+        path = tmp_path / f"{name}.json"
+        path.write_text(json.dumps(cfg))
+        out = tmp_path / f"{name}_tuning.json"
+        subprocess.run([sys.executable, str(ROOT / "scripts" / "tune_base_2d.py"), "--config", str(path), "--out", str(out), "--blocks", "1",
+                        "--checkpoints", "2,4", "--hidden", "8"], check=True, capture_output=True, env={**os.environ, "PYTHONPATH": str(ROOT / "src")})
+        result = json.loads(out.read_text())
+        assert "h8_s4" in result["summary"]
