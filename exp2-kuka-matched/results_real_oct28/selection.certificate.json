@@ -1,0 +1,4128 @@
+{
+ "feasible": true,
+ "n_checks": 673,
+ "n_failed": 0,
+ "failed": [],
+ "design_B_budget": 31600,
+ "design_B_reduced": false,
+ "design_B": {
+  "budget_transitions": 31600,
+  "reduced_from": null,
+  "A_comparators_at_budget": false,
+  "unit": 20,
+  "need_S_per_unit": 18,
+  "need_F_per_unit": 13,
+  "caps": [
+   0,
+   0,
+   5,
+   6,
+   6,
+   12,
+   16,
+   21,
+   23,
+   20,
+   16,
+   13,
+   10,
+   8,
+   5,
+   5,
+   3,
+   3,
+   13,
+   0,
+   0,
+   0
+  ],
+  "max_feasible_transitions": 41880,
+  "requested_transitions": 31600,
+  "feasible": true,
+  "k": [
+   0,
+   0,
+   5,
+   6,
+   6,
+   7,
+   9,
+   12,
+   15,
+   13,
+   11,
+   9,
+   7,
+   7,
+   4,
+   5,
+   3,
+   3,
+   13,
+   0,
+   0,
+   0
+  ],
+  "episodes_per_arm": 2700,
+  "lengths_used": [
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20,
+   21
+  ],
+  "objective": 1.5743942830542679
+ },
+ "checks": [
+  {
+   "run_id": "O_phi0.10_s100",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s100",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s100",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s100",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s100",
+   "check": "O_counts",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s100",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s100",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s100",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s100",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s100",
+   "check": "O_counts",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s100",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s100",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s100",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s100",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s100",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.00_s100",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "0/2980"
+  },
+  {
+   "run_id": "A_phi0.10_s100",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s100",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s100",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s100",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s100",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.10_s100",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "284/2840"
+  },
+  {
+   "run_id": "A_phi0.25_s100",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s100",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s100",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s100",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s100",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.25_s100",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "665/2660"
+  },
+  {
+   "run_id": "A_phi0.50_s100",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s100",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s100",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s100",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s100",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.50_s100",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1210/2420"
+  },
+  {
+   "run_id": "A_phi0.65_s100",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s100",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s100",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s100",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s100",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.65_s100",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1482/2280"
+  },
+  {
+   "run_id": "B_phi0.10_s100",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s100",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s100",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s100",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s100",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "B_phi0.10_s100",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "270/2700"
+  },
+  {
+   "run_id": "B_phi0.10_s100",
+   "check": "B_conditional_length_distributions_equal",
+   "pass": true,
+   "detail": "hist_S * n_F == hist_F * n_S at every length"
+  },
+  {
+   "run_id": "B_phi0.65_s100",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s100",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s100",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s100",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s100",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "B_phi0.65_s100",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1755/2700"
+  },
+  {
+   "run_id": "B_phi0.65_s100",
+   "check": "B_conditional_length_distributions_equal",
+   "pass": true,
+   "detail": "hist_S * n_F == hist_F * n_S at every length"
+  },
+  {
+   "run_id": "V_V+S_s100",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s100",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s100",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s100",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s100",
+   "check": "V_added_transitions_exact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s100",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s100",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s100",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s100",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s100",
+   "check": "V_added_transitions_exact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s101",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s101",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s101",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s101",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s101",
+   "check": "O_counts",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s101",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s101",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s101",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s101",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s101",
+   "check": "O_counts",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s101",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s101",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s101",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s101",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s101",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.00_s101",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "0/3000"
+  },
+  {
+   "run_id": "A_phi0.10_s101",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s101",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s101",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s101",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s101",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.10_s101",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "286/2860"
+  },
+  {
+   "run_id": "A_phi0.25_s101",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s101",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s101",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s101",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s101",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.25_s101",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "670/2680"
+  },
+  {
+   "run_id": "A_phi0.50_s101",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s101",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s101",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s101",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s101",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.50_s101",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1210/2420"
+  },
+  {
+   "run_id": "A_phi0.65_s101",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s101",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s101",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s101",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s101",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.65_s101",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1495/2300"
+  },
+  {
+   "run_id": "B_phi0.10_s101",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s101",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s101",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s101",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s101",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "B_phi0.10_s101",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "270/2700"
+  },
+  {
+   "run_id": "B_phi0.10_s101",
+   "check": "B_conditional_length_distributions_equal",
+   "pass": true,
+   "detail": "hist_S * n_F == hist_F * n_S at every length"
+  },
+  {
+   "run_id": "B_phi0.65_s101",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s101",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s101",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s101",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s101",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "B_phi0.65_s101",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1755/2700"
+  },
+  {
+   "run_id": "B_phi0.65_s101",
+   "check": "B_conditional_length_distributions_equal",
+   "pass": true,
+   "detail": "hist_S * n_F == hist_F * n_S at every length"
+  },
+  {
+   "run_id": "V_V+S_s101",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s101",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s101",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s101",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s101",
+   "check": "V_added_transitions_exact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s101",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s101",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s101",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s101",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s101",
+   "check": "V_added_transitions_exact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s102",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s102",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s102",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s102",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s102",
+   "check": "O_counts",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s102",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s102",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s102",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s102",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s102",
+   "check": "O_counts",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s102",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s102",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s102",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s102",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s102",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.00_s102",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "0/3000"
+  },
+  {
+   "run_id": "A_phi0.10_s102",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s102",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s102",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s102",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s102",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.10_s102",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "286/2860"
+  },
+  {
+   "run_id": "A_phi0.25_s102",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s102",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s102",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s102",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s102",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.25_s102",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "675/2700"
+  },
+  {
+   "run_id": "A_phi0.50_s102",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s102",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s102",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s102",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s102",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.50_s102",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1210/2420"
+  },
+  {
+   "run_id": "A_phi0.65_s102",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s102",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s102",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s102",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s102",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.65_s102",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1482/2280"
+  },
+  {
+   "run_id": "B_phi0.10_s102",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s102",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s102",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s102",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s102",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "B_phi0.10_s102",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "270/2700"
+  },
+  {
+   "run_id": "B_phi0.10_s102",
+   "check": "B_conditional_length_distributions_equal",
+   "pass": true,
+   "detail": "hist_S * n_F == hist_F * n_S at every length"
+  },
+  {
+   "run_id": "B_phi0.65_s102",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s102",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s102",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s102",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s102",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "B_phi0.65_s102",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1755/2700"
+  },
+  {
+   "run_id": "B_phi0.65_s102",
+   "check": "B_conditional_length_distributions_equal",
+   "pass": true,
+   "detail": "hist_S * n_F == hist_F * n_S at every length"
+  },
+  {
+   "run_id": "V_V+S_s102",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s102",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s102",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s102",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s102",
+   "check": "V_added_transitions_exact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s102",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s102",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s102",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s102",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s102",
+   "check": "V_added_transitions_exact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s103",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s103",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s103",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s103",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s103",
+   "check": "O_counts",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s103",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s103",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s103",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s103",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s103",
+   "check": "O_counts",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s103",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s103",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s103",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s103",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s103",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.00_s103",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "0/3000"
+  },
+  {
+   "run_id": "A_phi0.10_s103",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s103",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s103",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s103",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s103",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.10_s103",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "286/2860"
+  },
+  {
+   "run_id": "A_phi0.25_s103",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s103",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s103",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s103",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s103",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.25_s103",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "670/2680"
+  },
+  {
+   "run_id": "A_phi0.50_s103",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s103",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s103",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s103",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s103",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.50_s103",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1210/2420"
+  },
+  {
+   "run_id": "A_phi0.65_s103",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s103",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s103",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s103",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s103",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.65_s103",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1495/2300"
+  },
+  {
+   "run_id": "B_phi0.10_s103",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s103",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s103",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s103",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s103",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "B_phi0.10_s103",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "270/2700"
+  },
+  {
+   "run_id": "B_phi0.10_s103",
+   "check": "B_conditional_length_distributions_equal",
+   "pass": true,
+   "detail": "hist_S * n_F == hist_F * n_S at every length"
+  },
+  {
+   "run_id": "B_phi0.65_s103",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s103",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s103",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s103",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s103",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "B_phi0.65_s103",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1755/2700"
+  },
+  {
+   "run_id": "B_phi0.65_s103",
+   "check": "B_conditional_length_distributions_equal",
+   "pass": true,
+   "detail": "hist_S * n_F == hist_F * n_S at every length"
+  },
+  {
+   "run_id": "V_V+S_s103",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s103",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s103",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s103",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s103",
+   "check": "V_added_transitions_exact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s103",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s103",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s103",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s103",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s103",
+   "check": "V_added_transitions_exact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s104",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s104",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s104",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s104",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s104",
+   "check": "O_counts",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s104",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s104",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s104",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s104",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s104",
+   "check": "O_counts",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s104",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s104",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s104",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s104",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s104",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.00_s104",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "0/3040"
+  },
+  {
+   "run_id": "A_phi0.10_s104",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s104",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s104",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s104",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s104",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.10_s104",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "290/2900"
+  },
+  {
+   "run_id": "A_phi0.25_s104",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s104",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s104",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s104",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s104",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.25_s104",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "670/2680"
+  },
+  {
+   "run_id": "A_phi0.50_s104",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s104",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s104",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s104",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s104",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.50_s104",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1210/2420"
+  },
+  {
+   "run_id": "A_phi0.65_s104",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s104",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s104",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s104",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s104",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.65_s104",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1495/2300"
+  },
+  {
+   "run_id": "B_phi0.10_s104",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s104",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s104",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s104",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s104",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "B_phi0.10_s104",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "270/2700"
+  },
+  {
+   "run_id": "B_phi0.10_s104",
+   "check": "B_conditional_length_distributions_equal",
+   "pass": true,
+   "detail": "hist_S * n_F == hist_F * n_S at every length"
+  },
+  {
+   "run_id": "B_phi0.65_s104",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s104",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s104",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s104",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s104",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "B_phi0.65_s104",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1755/2700"
+  },
+  {
+   "run_id": "B_phi0.65_s104",
+   "check": "B_conditional_length_distributions_equal",
+   "pass": true,
+   "detail": "hist_S * n_F == hist_F * n_S at every length"
+  },
+  {
+   "run_id": "V_V+S_s104",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s104",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s104",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s104",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s104",
+   "check": "V_added_transitions_exact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s104",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s104",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s104",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s104",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s104",
+   "check": "V_added_transitions_exact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s105",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s105",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s105",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s105",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s105",
+   "check": "O_counts",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s105",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s105",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s105",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s105",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s105",
+   "check": "O_counts",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s105",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s105",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s105",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s105",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s105",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.00_s105",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "0/3000"
+  },
+  {
+   "run_id": "A_phi0.10_s105",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s105",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s105",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s105",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s105",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.10_s105",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "284/2840"
+  },
+  {
+   "run_id": "A_phi0.25_s105",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s105",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s105",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s105",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s105",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.25_s105",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "670/2680"
+  },
+  {
+   "run_id": "A_phi0.50_s105",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s105",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s105",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s105",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s105",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.50_s105",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1220/2440"
+  },
+  {
+   "run_id": "A_phi0.65_s105",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s105",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s105",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s105",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s105",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.65_s105",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1495/2300"
+  },
+  {
+   "run_id": "B_phi0.10_s105",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s105",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s105",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s105",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s105",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "B_phi0.10_s105",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "270/2700"
+  },
+  {
+   "run_id": "B_phi0.10_s105",
+   "check": "B_conditional_length_distributions_equal",
+   "pass": true,
+   "detail": "hist_S * n_F == hist_F * n_S at every length"
+  },
+  {
+   "run_id": "B_phi0.65_s105",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s105",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s105",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s105",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s105",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "B_phi0.65_s105",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1755/2700"
+  },
+  {
+   "run_id": "B_phi0.65_s105",
+   "check": "B_conditional_length_distributions_equal",
+   "pass": true,
+   "detail": "hist_S * n_F == hist_F * n_S at every length"
+  },
+  {
+   "run_id": "V_V+S_s105",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s105",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s105",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s105",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s105",
+   "check": "V_added_transitions_exact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s105",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s105",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s105",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s105",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s105",
+   "check": "V_added_transitions_exact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s106",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s106",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s106",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s106",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s106",
+   "check": "O_counts",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s106",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s106",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s106",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s106",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s106",
+   "check": "O_counts",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s106",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s106",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s106",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s106",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s106",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.00_s106",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "0/3000"
+  },
+  {
+   "run_id": "A_phi0.10_s106",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s106",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s106",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s106",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s106",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.10_s106",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "290/2900"
+  },
+  {
+   "run_id": "A_phi0.25_s106",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s106",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s106",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s106",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s106",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.25_s106",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "680/2720"
+  },
+  {
+   "run_id": "A_phi0.50_s106",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s106",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s106",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s106",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s106",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.50_s106",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1230/2460"
+  },
+  {
+   "run_id": "A_phi0.65_s106",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s106",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s106",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s106",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s106",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.65_s106",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1521/2340"
+  },
+  {
+   "run_id": "B_phi0.10_s106",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s106",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s106",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s106",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s106",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "B_phi0.10_s106",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "270/2700"
+  },
+  {
+   "run_id": "B_phi0.10_s106",
+   "check": "B_conditional_length_distributions_equal",
+   "pass": true,
+   "detail": "hist_S * n_F == hist_F * n_S at every length"
+  },
+  {
+   "run_id": "B_phi0.65_s106",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s106",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s106",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s106",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s106",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "B_phi0.65_s106",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1755/2700"
+  },
+  {
+   "run_id": "B_phi0.65_s106",
+   "check": "B_conditional_length_distributions_equal",
+   "pass": true,
+   "detail": "hist_S * n_F == hist_F * n_S at every length"
+  },
+  {
+   "run_id": "V_V+S_s106",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s106",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s106",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s106",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s106",
+   "check": "V_added_transitions_exact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s106",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s106",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s106",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s106",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s106",
+   "check": "V_added_transitions_exact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s107",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s107",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s107",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s107",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s107",
+   "check": "O_counts",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s107",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s107",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s107",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s107",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s107",
+   "check": "O_counts",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s107",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s107",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s107",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s107",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s107",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.00_s107",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "0/2980"
+  },
+  {
+   "run_id": "A_phi0.10_s107",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s107",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s107",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s107",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s107",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.10_s107",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "286/2860"
+  },
+  {
+   "run_id": "A_phi0.25_s107",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s107",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s107",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s107",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s107",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.25_s107",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "670/2680"
+  },
+  {
+   "run_id": "A_phi0.50_s107",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s107",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s107",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s107",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s107",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.50_s107",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1210/2420"
+  },
+  {
+   "run_id": "A_phi0.65_s107",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s107",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s107",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s107",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s107",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.65_s107",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1495/2300"
+  },
+  {
+   "run_id": "B_phi0.10_s107",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s107",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s107",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s107",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s107",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "B_phi0.10_s107",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "270/2700"
+  },
+  {
+   "run_id": "B_phi0.10_s107",
+   "check": "B_conditional_length_distributions_equal",
+   "pass": true,
+   "detail": "hist_S * n_F == hist_F * n_S at every length"
+  },
+  {
+   "run_id": "B_phi0.65_s107",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s107",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s107",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s107",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s107",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "B_phi0.65_s107",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1755/2700"
+  },
+  {
+   "run_id": "B_phi0.65_s107",
+   "check": "B_conditional_length_distributions_equal",
+   "pass": true,
+   "detail": "hist_S * n_F == hist_F * n_S at every length"
+  },
+  {
+   "run_id": "V_V+S_s107",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s107",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s107",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s107",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s107",
+   "check": "V_added_transitions_exact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s107",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s107",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s107",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s107",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s107",
+   "check": "V_added_transitions_exact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s108",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s108",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s108",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s108",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s108",
+   "check": "O_counts",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s108",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s108",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s108",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s108",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s108",
+   "check": "O_counts",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s108",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s108",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s108",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s108",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s108",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.00_s108",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "0/3000"
+  },
+  {
+   "run_id": "A_phi0.10_s108",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s108",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s108",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s108",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s108",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.10_s108",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "288/2880"
+  },
+  {
+   "run_id": "A_phi0.25_s108",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s108",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s108",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s108",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s108",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.25_s108",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "675/2700"
+  },
+  {
+   "run_id": "A_phi0.50_s108",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s108",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s108",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s108",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s108",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.50_s108",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1220/2440"
+  },
+  {
+   "run_id": "A_phi0.65_s108",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s108",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s108",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s108",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s108",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.65_s108",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1508/2320"
+  },
+  {
+   "run_id": "B_phi0.10_s108",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s108",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s108",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s108",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s108",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "B_phi0.10_s108",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "270/2700"
+  },
+  {
+   "run_id": "B_phi0.10_s108",
+   "check": "B_conditional_length_distributions_equal",
+   "pass": true,
+   "detail": "hist_S * n_F == hist_F * n_S at every length"
+  },
+  {
+   "run_id": "B_phi0.65_s108",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s108",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s108",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s108",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s108",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "B_phi0.65_s108",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1755/2700"
+  },
+  {
+   "run_id": "B_phi0.65_s108",
+   "check": "B_conditional_length_distributions_equal",
+   "pass": true,
+   "detail": "hist_S * n_F == hist_F * n_S at every length"
+  },
+  {
+   "run_id": "V_V+S_s108",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s108",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s108",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s108",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s108",
+   "check": "V_added_transitions_exact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s108",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s108",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s108",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s108",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s108",
+   "check": "V_added_transitions_exact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s109",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s109",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s109",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s109",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.10_s109",
+   "check": "O_counts",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s109",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s109",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s109",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s109",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "O_phi0.65_s109",
+   "check": "O_counts",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s109",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s109",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s109",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s109",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.00_s109",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.00_s109",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "0/3000"
+  },
+  {
+   "run_id": "A_phi0.10_s109",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s109",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s109",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s109",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.10_s109",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.10_s109",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "286/2860"
+  },
+  {
+   "run_id": "A_phi0.25_s109",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s109",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s109",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s109",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.25_s109",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.25_s109",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "665/2660"
+  },
+  {
+   "run_id": "A_phi0.50_s109",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s109",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s109",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s109",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.50_s109",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.50_s109",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1210/2420"
+  },
+  {
+   "run_id": "A_phi0.65_s109",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s109",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s109",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s109",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "A_phi0.65_s109",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "A_phi0.65_s109",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1495/2300"
+  },
+  {
+   "run_id": "B_phi0.10_s109",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s109",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s109",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s109",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.10_s109",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "B_phi0.10_s109",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "270/2700"
+  },
+  {
+   "run_id": "B_phi0.10_s109",
+   "check": "B_conditional_length_distributions_equal",
+   "pass": true,
+   "detail": "hist_S * n_F == hist_F * n_S at every length"
+  },
+  {
+   "run_id": "B_phi0.65_s109",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s109",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s109",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s109",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_phi0.65_s109",
+   "check": "transitions_exact",
+   "pass": true,
+   "detail": "31600 vs 31600"
+  },
+  {
+   "run_id": "B_phi0.65_s109",
+   "check": "phi_exact",
+   "pass": true,
+   "detail": "1755/2700"
+  },
+  {
+   "run_id": "B_phi0.65_s109",
+   "check": "B_conditional_length_distributions_equal",
+   "pass": true,
+   "detail": "hist_S * n_F == hist_F * n_S at every length"
+  },
+  {
+   "run_id": "V_V+S_s109",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s109",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s109",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s109",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+S_s109",
+   "check": "V_added_transitions_exact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s109",
+   "check": "ids_distinct",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s109",
+   "check": "ids_in_eligible_train_split",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s109",
+   "check": "ids_hash_matches",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s109",
+   "check": "counts_match_record",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_V+F_s109",
+   "check": "V_added_transitions_exact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_seed100",
+   "check": "B_total_histograms_identical_across_arms",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_seed101",
+   "check": "B_total_histograms_identical_across_arms",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_seed102",
+   "check": "B_total_histograms_identical_across_arms",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_seed103",
+   "check": "B_total_histograms_identical_across_arms",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_seed104",
+   "check": "B_total_histograms_identical_across_arms",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_seed105",
+   "check": "B_total_histograms_identical_across_arms",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_seed106",
+   "check": "B_total_histograms_identical_across_arms",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_seed107",
+   "check": "B_total_histograms_identical_across_arms",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_seed108",
+   "check": "B_total_histograms_identical_across_arms",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "B_seed109",
+   "check": "B_total_histograms_identical_across_arms",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_seed100",
+   "check": "V_base_shared",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_seed100",
+   "check": "V_additions_disjoint",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_seed101",
+   "check": "V_base_shared",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_seed101",
+   "check": "V_additions_disjoint",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_seed102",
+   "check": "V_base_shared",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_seed102",
+   "check": "V_additions_disjoint",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_seed103",
+   "check": "V_base_shared",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_seed103",
+   "check": "V_additions_disjoint",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_seed104",
+   "check": "V_base_shared",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_seed104",
+   "check": "V_additions_disjoint",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_seed105",
+   "check": "V_base_shared",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_seed105",
+   "check": "V_additions_disjoint",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_seed106",
+   "check": "V_base_shared",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_seed106",
+   "check": "V_additions_disjoint",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_seed107",
+   "check": "V_base_shared",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_seed107",
+   "check": "V_additions_disjoint",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_seed108",
+   "check": "V_base_shared",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_seed108",
+   "check": "V_additions_disjoint",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_seed109",
+   "check": "V_base_shared",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "V_seed109",
+   "check": "V_additions_disjoint",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "run_id": "ALL",
+   "check": "run_count",
+   "pass": true,
+   "detail": "110 runs, expected 110; problems: []"
+  },
+  {
+   "run_id": "ALL",
+   "check": "seeds_registered",
+   "pass": true,
+   "detail": "[100, 101, 102, 103, 104, 105, 106, 107, 108, 109]"
+  },
+  {
+   "run_id": "ALL",
+   "check": "historical_seeds_excluded",
+   "pass": true,
+   "detail": ""
+  }
+ ]
+}
