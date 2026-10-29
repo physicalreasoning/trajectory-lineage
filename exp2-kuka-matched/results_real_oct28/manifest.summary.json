@@ -1,0 +1,30 @@
+{
+ "sha256": "4db0497364ea934d33941ca379f68d94f860265593eedc8016b8ac62e69b57a6",
+ "episodes": 13678,
+ "eligible": 13678,
+ "train": {
+  "episodes": 10918,
+  "successes": 3981,
+  "failures": 6937,
+  "transitions": 148877
+ },
+ "test": {
+  "episodes": 2760,
+  "successes": 982,
+  "prevalence": 0.35579710144927534
+ },
+ "length_range": [
+  3,
+  24
+ ],
+ "header": {
+  "kind": "real",
+  "source": "/content/rwmo/data/kuka",
+  "shards": 342,
+  "split_rule": "(shard // 3) % 5 == 0 is test",
+  "eligibility": {
+   "length_min": 3,
+   "length_max": 24
+  }
+ }
+}

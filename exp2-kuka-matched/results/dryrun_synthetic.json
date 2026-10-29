@@ -1,0 +1,1525 @@
+{
+ "scenarios": {
+  "global_null": {
+   "O": 0,
+   "A": 0,
+   "B": 0,
+   "V": 0
+  },
+  "A_at_margin_3": {
+   "O": 0,
+   "A": 3,
+   "B": 0,
+   "V": 0
+  },
+  "A_at_minus_margin_-3": {
+   "O": 0,
+   "A": -3,
+   "B": 0,
+   "V": 0
+  },
+  "A_5_planning": {
+   "O": 10,
+   "A": 5,
+   "B": 5,
+   "V": 5
+  },
+  "historical_10": {
+   "O": 10,
+   "A": 10,
+   "B": 10,
+   "V": 10
+  },
+  "transition_confound": {
+   "O": 10,
+   "A": 0,
+   "B": 0,
+   "V": 0
+  },
+  "length_shortcut": {
+   "O": 10,
+   "A": 10,
+   "B": 0,
+   "V": 10
+  },
+  "persists_after_balancing": {
+   "O": 8,
+   "A": 8,
+   "B": 8,
+   "V": 8
+  },
+  "reverse_-5": {
+   "O": 0,
+   "A": -5,
+   "B": 0,
+   "V": 0
+  },
+  "missing_run_historical_10": {
+   "O": 10,
+   "A": 10,
+   "B": 10,
+   "V": 10,
+   "missing": [
+    "A_phi0.65_s104"
+   ]
+  },
+  "A_5_stress_sd5": {
+   "O": 10,
+   "A": 5,
+   "B": 5,
+   "V": 5,
+   "sd": 5.0
+  }
+ },
+ "by_sd": {
+  "1.88": {
+   "sd_points": 1.88,
+   "n_datasets": 500,
+   "analytic_power_A5": 0.9267465634376787,
+   "scenarios": {
+    "global_null": {
+     "truth": {
+      "O": 0,
+      "A": 0,
+      "B": 0,
+      "V": 0
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 0.0,
+       "equivalent": 0.998,
+       "inconclusive": 0.002
+      },
+      "O": {
+       "supported": 0.0,
+       "equivalent": 0.898,
+       "inconclusive": 0.102
+      },
+      "B": {
+       "supported": 0.0,
+       "equivalent": 0.912,
+       "inconclusive": 0.088
+      },
+      "V": {
+       "supported": 0.0,
+       "equivalent": 0.894,
+       "inconclusive": 0.106
+      },
+      "O_minus_A": {
+       "supported": 0.0,
+       "equivalent": 0.464,
+       "inconclusive": 0.536
+      },
+      "A_minus_B": {
+       "supported": 0.0,
+       "equivalent": 0.492,
+       "inconclusive": 0.508
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 0.0,
+      "survives_matching": 0.0,
+      "length_balancing_attenuates": 0.0,
+      "persists_after_balancing": 0.0,
+      "insufficient_evidence": 0.09,
+      "V_failures_lower": 0.0
+     },
+     "realized_paired_sd_A": {
+      "mean": 1.7945530868553063
+     },
+     "mock_first_dataset": {
+      "A": "equivalent",
+      "O": "equivalent",
+      "B": "equivalent",
+      "V": "equivalent",
+      "O_minus_A": "inconclusive",
+      "A_minus_B": "inconclusive"
+     },
+     "A_worst_case_bounds_first_dataset": null
+    },
+    "A_at_margin_3": {
+     "truth": {
+      "O": 0,
+      "A": 3,
+      "B": 0,
+      "V": 0
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 0.032,
+       "equivalent": 0.048,
+       "inconclusive": 0.92
+      },
+      "O": {
+       "supported": 0.0,
+       "equivalent": 0.884,
+       "inconclusive": 0.116
+      },
+      "B": {
+       "supported": 0.0,
+       "equivalent": 0.908,
+       "inconclusive": 0.092
+      },
+      "V": {
+       "supported": 0.0,
+       "equivalent": 0.882,
+       "inconclusive": 0.118
+      },
+      "O_minus_A": {
+       "supported": 0.0,
+       "equivalent": 0.006,
+       "inconclusive": 0.994
+      },
+      "A_minus_B": {
+       "supported": 0.014,
+       "equivalent": 0.01,
+       "inconclusive": 0.976
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 0.0,
+      "survives_matching": 0.032,
+      "length_balancing_attenuates": 0.004,
+      "persists_after_balancing": 0.0,
+      "insufficient_evidence": 0.924,
+      "V_failures_lower": 0.0
+     },
+     "realized_paired_sd_A": {
+      "mean": 1.8270572359263804
+     },
+     "mock_first_dataset": {
+      "A": "inconclusive",
+      "O": "equivalent",
+      "B": "equivalent",
+      "V": "equivalent",
+      "O_minus_A": "inconclusive",
+      "A_minus_B": "inconclusive"
+     },
+     "A_worst_case_bounds_first_dataset": null
+    },
+    "A_at_minus_margin_-3": {
+     "truth": {
+      "O": 0,
+      "A": -3,
+      "B": 0,
+      "V": 0
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 0.0,
+       "equivalent": 0.05,
+       "inconclusive": 0.95
+      },
+      "O": {
+       "supported": 0.0,
+       "equivalent": 0.918,
+       "inconclusive": 0.082
+      },
+      "B": {
+       "supported": 0.0,
+       "equivalent": 0.896,
+       "inconclusive": 0.104
+      },
+      "V": {
+       "supported": 0.0,
+       "equivalent": 0.896,
+       "inconclusive": 0.104
+      },
+      "O_minus_A": {
+       "supported": 0.006,
+       "equivalent": 0.006,
+       "inconclusive": 0.988
+      },
+      "A_minus_B": {
+       "supported": 0.0,
+       "equivalent": 0.006,
+       "inconclusive": 0.994
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 0.0,
+      "survives_matching": 0.0,
+      "length_balancing_attenuates": 0.0,
+      "persists_after_balancing": 0.0,
+      "insufficient_evidence": 0.956,
+      "V_failures_lower": 0.0
+     },
+     "realized_paired_sd_A": {
+      "mean": 1.786210247885352
+     },
+     "mock_first_dataset": {
+      "A": "inconclusive",
+      "O": "equivalent",
+      "B": "equivalent",
+      "V": "equivalent",
+      "O_minus_A": "inconclusive",
+      "A_minus_B": "inconclusive"
+     },
+     "A_worst_case_bounds_first_dataset": null
+    },
+    "A_5_planning": {
+     "truth": {
+      "O": 10,
+      "A": 5,
+      "B": 5,
+      "V": 5
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 0.934,
+       "equivalent": 0.0,
+       "inconclusive": 0.066
+      },
+      "O": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "B": {
+       "supported": 0.66,
+       "equivalent": 0.0,
+       "inconclusive": 0.34
+      },
+      "V": {
+       "supported": 0.62,
+       "equivalent": 0.0,
+       "inconclusive": 0.38
+      },
+      "O_minus_A": {
+       "supported": 0.348,
+       "equivalent": 0.0,
+       "inconclusive": 0.652
+      },
+      "A_minus_B": {
+       "supported": 0.0,
+       "equivalent": 0.48,
+       "inconclusive": 0.52
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 0.0,
+      "survives_matching": 0.934,
+      "length_balancing_attenuates": 0.0,
+      "persists_after_balancing": 0.66,
+      "insufficient_evidence": 0.38,
+      "V_failures_lower": 0.62
+     },
+     "realized_paired_sd_A": {
+      "mean": 1.806796860330977
+     },
+     "mock_first_dataset": {
+      "A": "supported",
+      "O": "supported",
+      "B": "inconclusive",
+      "V": "supported",
+      "O_minus_A": "inconclusive",
+      "A_minus_B": "equivalent"
+     },
+     "A_worst_case_bounds_first_dataset": null
+    },
+    "historical_10": {
+     "truth": {
+      "O": 10,
+      "A": 10,
+      "B": 10,
+      "V": 10
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "O": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "B": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "V": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "O_minus_A": {
+       "supported": 0.0,
+       "equivalent": 0.494,
+       "inconclusive": 0.506
+      },
+      "A_minus_B": {
+       "supported": 0.0,
+       "equivalent": 0.518,
+       "inconclusive": 0.482
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 0.0,
+      "survives_matching": 1.0,
+      "length_balancing_attenuates": 0.0,
+      "persists_after_balancing": 1.0,
+      "insufficient_evidence": 0.0,
+      "V_failures_lower": 1.0
+     },
+     "realized_paired_sd_A": {
+      "mean": 1.7789119249240088
+     },
+     "mock_first_dataset": {
+      "A": "supported",
+      "O": "supported",
+      "B": "supported",
+      "V": "supported",
+      "O_minus_A": "inconclusive",
+      "A_minus_B": "equivalent"
+     },
+     "A_worst_case_bounds_first_dataset": null
+    },
+    "transition_confound": {
+     "truth": {
+      "O": 10,
+      "A": 0,
+      "B": 0,
+      "V": 0
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 0.0,
+       "equivalent": 1.0,
+       "inconclusive": 0.0
+      },
+      "O": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "B": {
+       "supported": 0.0,
+       "equivalent": 0.92,
+       "inconclusive": 0.08
+      },
+      "V": {
+       "supported": 0.0,
+       "equivalent": 0.926,
+       "inconclusive": 0.074
+      },
+      "O_minus_A": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "A_minus_B": {
+       "supported": 0.0,
+       "equivalent": 0.516,
+       "inconclusive": 0.484
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 1.0,
+      "survives_matching": 0.0,
+      "length_balancing_attenuates": 0.0,
+      "persists_after_balancing": 0.0,
+      "insufficient_evidence": 0.08,
+      "V_failures_lower": 0.0
+     },
+     "realized_paired_sd_A": {
+      "mean": 1.8077262886077394
+     },
+     "mock_first_dataset": {
+      "A": "equivalent",
+      "O": "supported",
+      "B": "equivalent",
+      "V": "equivalent",
+      "O_minus_A": "supported",
+      "A_minus_B": "inconclusive"
+     },
+     "A_worst_case_bounds_first_dataset": null
+    },
+    "length_shortcut": {
+     "truth": {
+      "O": 10,
+      "A": 10,
+      "B": 0,
+      "V": 10
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "O": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "B": {
+       "supported": 0.0,
+       "equivalent": 0.93,
+       "inconclusive": 0.07
+      },
+      "V": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "O_minus_A": {
+       "supported": 0.0,
+       "equivalent": 0.488,
+       "inconclusive": 0.512
+      },
+      "A_minus_B": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 0.0,
+      "survives_matching": 1.0,
+      "length_balancing_attenuates": 0.93,
+      "persists_after_balancing": 0.0,
+      "insufficient_evidence": 0.07,
+      "V_failures_lower": 1.0
+     },
+     "realized_paired_sd_A": {
+      "mean": 1.8050459110982116
+     },
+     "mock_first_dataset": {
+      "A": "supported",
+      "O": "supported",
+      "B": "equivalent",
+      "V": "supported",
+      "O_minus_A": "inconclusive",
+      "A_minus_B": "supported"
+     },
+     "A_worst_case_bounds_first_dataset": null
+    },
+    "persists_after_balancing": {
+     "truth": {
+      "O": 8,
+      "A": 8,
+      "B": 8,
+      "V": 8
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "O": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "B": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "V": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "O_minus_A": {
+       "supported": 0.0,
+       "equivalent": 0.53,
+       "inconclusive": 0.47
+      },
+      "A_minus_B": {
+       "supported": 0.0,
+       "equivalent": 0.508,
+       "inconclusive": 0.492
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 0.0,
+      "survives_matching": 1.0,
+      "length_balancing_attenuates": 0.0,
+      "persists_after_balancing": 1.0,
+      "insufficient_evidence": 0.0,
+      "V_failures_lower": 1.0
+     },
+     "realized_paired_sd_A": {
+      "mean": 1.7811752731489081
+     },
+     "mock_first_dataset": {
+      "A": "supported",
+      "O": "supported",
+      "B": "supported",
+      "V": "supported",
+      "O_minus_A": "inconclusive",
+      "A_minus_B": "equivalent"
+     },
+     "A_worst_case_bounds_first_dataset": null
+    },
+    "reverse_-5": {
+     "truth": {
+      "O": 0,
+      "A": -5,
+      "B": 0,
+      "V": 0
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 0.0,
+       "equivalent": 0.0,
+       "inconclusive": 1.0
+      },
+      "O": {
+       "supported": 0.0,
+       "equivalent": 0.896,
+       "inconclusive": 0.104
+      },
+      "B": {
+       "supported": 0.0,
+       "equivalent": 0.902,
+       "inconclusive": 0.098
+      },
+      "V": {
+       "supported": 0.0,
+       "equivalent": 0.902,
+       "inconclusive": 0.098
+      },
+      "O_minus_A": {
+       "supported": 0.354,
+       "equivalent": 0.0,
+       "inconclusive": 0.646
+      },
+      "A_minus_B": {
+       "supported": 0.0,
+       "equivalent": 0.0,
+       "inconclusive": 1.0
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 0.0,
+      "survives_matching": 0.0,
+      "length_balancing_attenuates": 0.0,
+      "persists_after_balancing": 0.0,
+      "insufficient_evidence": 1.0,
+      "V_failures_lower": 0.0
+     },
+     "realized_paired_sd_A": {
+      "mean": 1.8233296213456525
+     },
+     "mock_first_dataset": {
+      "A": "inconclusive",
+      "O": "equivalent",
+      "B": "equivalent",
+      "V": "equivalent",
+      "O_minus_A": "inconclusive",
+      "A_minus_B": "inconclusive"
+     },
+     "A_worst_case_bounds_first_dataset": null
+    },
+    "missing_run_historical_10": {
+     "truth": {
+      "O": 10,
+      "A": 10,
+      "B": 10,
+      "V": 10,
+      "missing": [
+       "A_phi0.65_s104"
+      ]
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 0.0,
+       "equivalent": 0.0,
+       "inconclusive": 1.0
+      },
+      "O": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "B": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "V": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "O_minus_A": {
+       "supported": 0.0,
+       "equivalent": 0.0,
+       "inconclusive": 1.0
+      },
+      "A_minus_B": {
+       "supported": 0.0,
+       "equivalent": 0.0,
+       "inconclusive": 1.0
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 0.0,
+      "survives_matching": 0.0,
+      "length_balancing_attenuates": 0.0,
+      "persists_after_balancing": 1.0,
+      "insufficient_evidence": 1.0,
+      "V_failures_lower": 1.0
+     },
+     "realized_paired_sd_A": {
+      "mean": null
+     },
+     "mock_first_dataset": {
+      "A": "inconclusive",
+      "O": "supported",
+      "B": "supported",
+      "V": "supported",
+      "O_minus_A": "inconclusive",
+      "A_minus_B": "inconclusive"
+     },
+     "A_worst_case_bounds_first_dataset": [
+      3.3612850968200823,
+      13.36128509682008
+     ]
+    },
+    "A_5_stress_sd5": {
+     "truth": {
+      "O": 10,
+      "A": 5,
+      "B": 5,
+      "V": 5,
+      "sd": 5.0
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 0.336,
+       "equivalent": 0.0,
+       "inconclusive": 0.664
+      },
+      "O": {
+       "supported": 0.842,
+       "equivalent": 0.0,
+       "inconclusive": 0.158
+      },
+      "B": {
+       "supported": 0.066,
+       "equivalent": 0.0,
+       "inconclusive": 0.934
+      },
+      "V": {
+       "supported": 0.066,
+       "equivalent": 0.0,
+       "inconclusive": 0.934
+      },
+      "O_minus_A": {
+       "supported": 0.046,
+       "equivalent": 0.0,
+       "inconclusive": 0.954
+      },
+      "A_minus_B": {
+       "supported": 0.0,
+       "equivalent": 0.0,
+       "inconclusive": 1.0
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 0.0,
+      "survives_matching": 0.336,
+      "length_balancing_attenuates": 0.0,
+      "persists_after_balancing": 0.066,
+      "insufficient_evidence": 0.99,
+      "V_failures_lower": 0.066
+     },
+     "realized_paired_sd_A": {
+      "mean": 4.946703898679178
+     },
+     "mock_first_dataset": {
+      "A": "inconclusive",
+      "O": "supported",
+      "B": "inconclusive",
+      "V": "inconclusive",
+      "O_minus_A": "inconclusive",
+      "A_minus_B": "inconclusive"
+     },
+     "A_worst_case_bounds_first_dataset": null
+    }
+   },
+   "validation": [
+    {
+     "check": "false support of A at the margin (\u0394_A = 3) \u2264 5% (+MC tolerance)",
+     "value": 0.032,
+     "bound": 0.07436698586202241,
+     "pass": true
+    },
+    {
+     "check": "false equivalence of A at the lower margin (\u0394_A = \u22123) \u2264 5% (+MC tolerance)",
+     "value": 0.05,
+     "bound": 0.07436698586202241,
+     "pass": true
+    },
+    {
+     "check": "power for A at \u0394_A = 5, SD 1.88 matches the analytic value 0.927 (\u00b1MC tolerance)",
+     "value": 0.934,
+     "bound": 0.9267465634376787,
+     "pass": true
+    },
+    {
+     "check": "missing run makes A, O\u2212A and A\u2212B inconclusive in every dataset",
+     "value": 1.0,
+     "bound": 1.0,
+     "pass": true
+    },
+    {
+     "check": "global null: familywise false 'supported' among secondaries \u2264 5% (+MC tolerance)",
+     "value": 0.0,
+     "bound": 0.07436698586202241,
+     "pass": true
+    },
+    {
+     "check": "historical 10-point effect: all four drops supported with probability \u2265 0.99",
+     "value": 1.0,
+     "bound": 0.99,
+     "pass": true
+    }
+   ],
+   "all_checks_pass": true
+  },
+  "3.0": {
+   "sd_points": 3.0,
+   "n_datasets": 500,
+   "analytic_power_A5": 0.6184863173855496,
+   "scenarios": {
+    "global_null": {
+     "truth": {
+      "O": 0,
+      "A": 0,
+      "B": 0,
+      "V": 0
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 0.0,
+       "equivalent": 0.778,
+       "inconclusive": 0.222
+      },
+      "O": {
+       "supported": 0.0,
+       "equivalent": 0.234,
+       "inconclusive": 0.766
+      },
+      "B": {
+       "supported": 0.0,
+       "equivalent": 0.222,
+       "inconclusive": 0.778
+      },
+      "V": {
+       "supported": 0.0,
+       "equivalent": 0.22,
+       "inconclusive": 0.78
+      },
+      "O_minus_A": {
+       "supported": 0.0,
+       "equivalent": 0.038,
+       "inconclusive": 0.962
+      },
+      "A_minus_B": {
+       "supported": 0.0,
+       "equivalent": 0.026,
+       "inconclusive": 0.974
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 0.0,
+      "survives_matching": 0.0,
+      "length_balancing_attenuates": 0.0,
+      "persists_after_balancing": 0.0,
+      "insufficient_evidence": 0.82,
+      "V_failures_lower": 0.0
+     },
+     "realized_paired_sd_A": {
+      "mean": 2.9221909790079756
+     },
+     "mock_first_dataset": {
+      "A": "inconclusive",
+      "O": "inconclusive",
+      "B": "inconclusive",
+      "V": "inconclusive",
+      "O_minus_A": "inconclusive",
+      "A_minus_B": "inconclusive"
+     },
+     "A_worst_case_bounds_first_dataset": null
+    },
+    "A_at_margin_3": {
+     "truth": {
+      "O": 0,
+      "A": 3,
+      "B": 0,
+      "V": 0
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 0.044,
+       "equivalent": 0.044,
+       "inconclusive": 0.912
+      },
+      "O": {
+       "supported": 0.0,
+       "equivalent": 0.222,
+       "inconclusive": 0.778
+      },
+      "B": {
+       "supported": 0.0,
+       "equivalent": 0.18,
+       "inconclusive": 0.82
+      },
+      "V": {
+       "supported": 0.0,
+       "equivalent": 0.236,
+       "inconclusive": 0.764
+      },
+      "O_minus_A": {
+       "supported": 0.0,
+       "equivalent": 0.002,
+       "inconclusive": 0.998
+      },
+      "A_minus_B": {
+       "supported": 0.004,
+       "equivalent": 0.0,
+       "inconclusive": 0.996
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 0.0,
+      "survives_matching": 0.044,
+      "length_balancing_attenuates": 0.002,
+      "persists_after_balancing": 0.0,
+      "insufficient_evidence": 0.986,
+      "V_failures_lower": 0.0
+     },
+     "realized_paired_sd_A": {
+      "mean": 2.9311581658872674
+     },
+     "mock_first_dataset": {
+      "A": "inconclusive",
+      "O": "inconclusive",
+      "B": "inconclusive",
+      "V": "inconclusive",
+      "O_minus_A": "inconclusive",
+      "A_minus_B": "inconclusive"
+     },
+     "A_worst_case_bounds_first_dataset": null
+    },
+    "A_at_minus_margin_-3": {
+     "truth": {
+      "O": 0,
+      "A": -3,
+      "B": 0,
+      "V": 0
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 0.0,
+       "equivalent": 0.042,
+       "inconclusive": 0.958
+      },
+      "O": {
+       "supported": 0.0,
+       "equivalent": 0.242,
+       "inconclusive": 0.758
+      },
+      "B": {
+       "supported": 0.0,
+       "equivalent": 0.22,
+       "inconclusive": 0.78
+      },
+      "V": {
+       "supported": 0.0,
+       "equivalent": 0.224,
+       "inconclusive": 0.776
+      },
+      "O_minus_A": {
+       "supported": 0.006,
+       "equivalent": 0.002,
+       "inconclusive": 0.992
+      },
+      "A_minus_B": {
+       "supported": 0.0,
+       "equivalent": 0.0,
+       "inconclusive": 1.0
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 0.0,
+      "survives_matching": 0.0,
+      "length_balancing_attenuates": 0.0,
+      "persists_after_balancing": 0.0,
+      "insufficient_evidence": 0.986,
+      "V_failures_lower": 0.0
+     },
+     "realized_paired_sd_A": {
+      "mean": 2.906020079420865
+     },
+     "mock_first_dataset": {
+      "A": "inconclusive",
+      "O": "inconclusive",
+      "B": "equivalent",
+      "V": "inconclusive",
+      "O_minus_A": "inconclusive",
+      "A_minus_B": "inconclusive"
+     },
+     "A_worst_case_bounds_first_dataset": null
+    },
+    "A_5_planning": {
+     "truth": {
+      "O": 10,
+      "A": 5,
+      "B": 5,
+      "V": 5
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 0.626,
+       "equivalent": 0.0,
+       "inconclusive": 0.374
+      },
+      "O": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "B": {
+       "supported": 0.22,
+       "equivalent": 0.0,
+       "inconclusive": 0.78
+      },
+      "V": {
+       "supported": 0.238,
+       "equivalent": 0.0,
+       "inconclusive": 0.762
+      },
+      "O_minus_A": {
+       "supported": 0.114,
+       "equivalent": 0.0,
+       "inconclusive": 0.886
+      },
+      "A_minus_B": {
+       "supported": 0.0,
+       "equivalent": 0.024,
+       "inconclusive": 0.976
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 0.0,
+      "survives_matching": 0.626,
+      "length_balancing_attenuates": 0.0,
+      "persists_after_balancing": 0.22,
+      "insufficient_evidence": 0.856,
+      "V_failures_lower": 0.238
+     },
+     "realized_paired_sd_A": {
+      "mean": 2.894736788885113
+     },
+     "mock_first_dataset": {
+      "A": "inconclusive",
+      "O": "supported",
+      "B": "inconclusive",
+      "V": "inconclusive",
+      "O_minus_A": "inconclusive",
+      "A_minus_B": "inconclusive"
+     },
+     "A_worst_case_bounds_first_dataset": null
+    },
+    "historical_10": {
+     "truth": {
+      "O": 10,
+      "A": 10,
+      "B": 10,
+      "V": 10
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "O": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "B": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "V": {
+       "supported": 0.998,
+       "equivalent": 0.0,
+       "inconclusive": 0.002
+      },
+      "O_minus_A": {
+       "supported": 0.0,
+       "equivalent": 0.036,
+       "inconclusive": 0.964
+      },
+      "A_minus_B": {
+       "supported": 0.0,
+       "equivalent": 0.052,
+       "inconclusive": 0.948
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 0.0,
+      "survives_matching": 1.0,
+      "length_balancing_attenuates": 0.0,
+      "persists_after_balancing": 1.0,
+      "insufficient_evidence": 0.0,
+      "V_failures_lower": 0.998
+     },
+     "realized_paired_sd_A": {
+      "mean": 2.877522665569685
+     },
+     "mock_first_dataset": {
+      "A": "supported",
+      "O": "supported",
+      "B": "supported",
+      "V": "supported",
+      "O_minus_A": "inconclusive",
+      "A_minus_B": "inconclusive"
+     },
+     "A_worst_case_bounds_first_dataset": null
+    },
+    "transition_confound": {
+     "truth": {
+      "O": 10,
+      "A": 0,
+      "B": 0,
+      "V": 0
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 0.0,
+       "equivalent": 0.79,
+       "inconclusive": 0.21
+      },
+      "O": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "B": {
+       "supported": 0.0,
+       "equivalent": 0.248,
+       "inconclusive": 0.752
+      },
+      "V": {
+       "supported": 0.0,
+       "equivalent": 0.268,
+       "inconclusive": 0.732
+      },
+      "O_minus_A": {
+       "supported": 0.954,
+       "equivalent": 0.0,
+       "inconclusive": 0.046
+      },
+      "A_minus_B": {
+       "supported": 0.0,
+       "equivalent": 0.062,
+       "inconclusive": 0.938
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 0.774,
+      "survives_matching": 0.0,
+      "length_balancing_attenuates": 0.0,
+      "persists_after_balancing": 0.0,
+      "insufficient_evidence": 0.79,
+      "V_failures_lower": 0.0
+     },
+     "realized_paired_sd_A": {
+      "mean": 2.893757660496705
+     },
+     "mock_first_dataset": {
+      "A": "equivalent",
+      "O": "supported",
+      "B": "equivalent",
+      "V": "equivalent",
+      "O_minus_A": "supported",
+      "A_minus_B": "inconclusive"
+     },
+     "A_worst_case_bounds_first_dataset": null
+    },
+    "length_shortcut": {
+     "truth": {
+      "O": 10,
+      "A": 10,
+      "B": 0,
+      "V": 10
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "O": {
+       "supported": 0.998,
+       "equivalent": 0.0,
+       "inconclusive": 0.002
+      },
+      "B": {
+       "supported": 0.0,
+       "equivalent": 0.296,
+       "inconclusive": 0.704
+      },
+      "V": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "O_minus_A": {
+       "supported": 0.0,
+       "equivalent": 0.032,
+       "inconclusive": 0.968
+      },
+      "A_minus_B": {
+       "supported": 0.968,
+       "equivalent": 0.0,
+       "inconclusive": 0.032
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 0.0,
+      "survives_matching": 1.0,
+      "length_balancing_attenuates": 0.296,
+      "persists_after_balancing": 0.0,
+      "insufficient_evidence": 0.704,
+      "V_failures_lower": 1.0
+     },
+     "realized_paired_sd_A": {
+      "mean": 2.895201185559602
+     },
+     "mock_first_dataset": {
+      "A": "supported",
+      "O": "supported",
+      "B": "inconclusive",
+      "V": "supported",
+      "O_minus_A": "inconclusive",
+      "A_minus_B": "supported"
+     },
+     "A_worst_case_bounds_first_dataset": null
+    },
+    "persists_after_balancing": {
+     "truth": {
+      "O": 8,
+      "A": 8,
+      "B": 8,
+      "V": 8
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "O": {
+       "supported": 0.972,
+       "equivalent": 0.0,
+       "inconclusive": 0.028
+      },
+      "B": {
+       "supported": 0.972,
+       "equivalent": 0.0,
+       "inconclusive": 0.028
+      },
+      "V": {
+       "supported": 0.964,
+       "equivalent": 0.0,
+       "inconclusive": 0.036
+      },
+      "O_minus_A": {
+       "supported": 0.0,
+       "equivalent": 0.044,
+       "inconclusive": 0.956
+      },
+      "A_minus_B": {
+       "supported": 0.0,
+       "equivalent": 0.058,
+       "inconclusive": 0.942
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 0.0,
+      "survives_matching": 1.0,
+      "length_balancing_attenuates": 0.0,
+      "persists_after_balancing": 0.972,
+      "insufficient_evidence": 0.028,
+      "V_failures_lower": 0.964
+     },
+     "realized_paired_sd_A": {
+      "mean": 2.872289223981159
+     },
+     "mock_first_dataset": {
+      "A": "supported",
+      "O": "supported",
+      "B": "supported",
+      "V": "supported",
+      "O_minus_A": "inconclusive",
+      "A_minus_B": "equivalent"
+     },
+     "A_worst_case_bounds_first_dataset": null
+    },
+    "reverse_-5": {
+     "truth": {
+      "O": 0,
+      "A": -5,
+      "B": 0,
+      "V": 0
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 0.0,
+       "equivalent": 0.0,
+       "inconclusive": 1.0
+      },
+      "O": {
+       "supported": 0.0,
+       "equivalent": 0.226,
+       "inconclusive": 0.774
+      },
+      "B": {
+       "supported": 0.0,
+       "equivalent": 0.206,
+       "inconclusive": 0.794
+      },
+      "V": {
+       "supported": 0.0,
+       "equivalent": 0.23,
+       "inconclusive": 0.77
+      },
+      "O_minus_A": {
+       "supported": 0.114,
+       "equivalent": 0.0,
+       "inconclusive": 0.886
+      },
+      "A_minus_B": {
+       "supported": 0.0,
+       "equivalent": 0.0,
+       "inconclusive": 1.0
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 0.0,
+      "survives_matching": 0.0,
+      "length_balancing_attenuates": 0.0,
+      "persists_after_balancing": 0.0,
+      "insufficient_evidence": 1.0,
+      "V_failures_lower": 0.0
+     },
+     "realized_paired_sd_A": {
+      "mean": 2.9157628721000175
+     },
+     "mock_first_dataset": {
+      "A": "inconclusive",
+      "O": "equivalent",
+      "B": "equivalent",
+      "V": "inconclusive",
+      "O_minus_A": "inconclusive",
+      "A_minus_B": "inconclusive"
+     },
+     "A_worst_case_bounds_first_dataset": null
+    },
+    "missing_run_historical_10": {
+     "truth": {
+      "O": 10,
+      "A": 10,
+      "B": 10,
+      "V": 10,
+      "missing": [
+       "A_phi0.65_s104"
+      ]
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 0.0,
+       "equivalent": 0.0,
+       "inconclusive": 1.0
+      },
+      "O": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "B": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "V": {
+       "supported": 1.0,
+       "equivalent": 0.0,
+       "inconclusive": 0.0
+      },
+      "O_minus_A": {
+       "supported": 0.0,
+       "equivalent": 0.0,
+       "inconclusive": 1.0
+      },
+      "A_minus_B": {
+       "supported": 0.0,
+       "equivalent": 0.0,
+       "inconclusive": 1.0
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 0.0,
+      "survives_matching": 0.0,
+      "length_balancing_attenuates": 0.0,
+      "persists_after_balancing": 1.0,
+      "insufficient_evidence": 1.0,
+      "V_failures_lower": 1.0
+     },
+     "realized_paired_sd_A": {
+      "mean": null
+     },
+     "mock_first_dataset": {
+      "A": "inconclusive",
+      "O": "supported",
+      "B": "supported",
+      "V": "supported",
+      "O_minus_A": "inconclusive",
+      "A_minus_B": "inconclusive"
+     },
+     "A_worst_case_bounds_first_dataset": [
+      2.510109517971337,
+      12.510109517971337
+     ]
+    },
+    "A_5_stress_sd5": {
+     "truth": {
+      "O": 10,
+      "A": 5,
+      "B": 5,
+      "V": 5,
+      "sd": 5.0
+     },
+     "n_datasets": 500,
+     "decision_probabilities": {
+      "A": {
+       "supported": 0.336,
+       "equivalent": 0.0,
+       "inconclusive": 0.664
+      },
+      "O": {
+       "supported": 0.842,
+       "equivalent": 0.0,
+       "inconclusive": 0.158
+      },
+      "B": {
+       "supported": 0.066,
+       "equivalent": 0.0,
+       "inconclusive": 0.934
+      },
+      "V": {
+       "supported": 0.066,
+       "equivalent": 0.0,
+       "inconclusive": 0.934
+      },
+      "O_minus_A": {
+       "supported": 0.046,
+       "equivalent": 0.0,
+       "inconclusive": 0.954
+      },
+      "A_minus_B": {
+       "supported": 0.0,
+       "equivalent": 0.0,
+       "inconclusive": 1.0
+      }
+     },
+     "interpretation_frequency": {
+      "transition_budget_sensitive": 0.0,
+      "survives_matching": 0.336,
+      "length_balancing_attenuates": 0.0,
+      "persists_after_balancing": 0.066,
+      "insufficient_evidence": 0.99,
+      "V_failures_lower": 0.066
+     },
+     "realized_paired_sd_A": {
+      "mean": 4.946703898679178
+     },
+     "mock_first_dataset": {
+      "A": "inconclusive",
+      "O": "supported",
+      "B": "inconclusive",
+      "V": "inconclusive",
+      "O_minus_A": "inconclusive",
+      "A_minus_B": "inconclusive"
+     },
+     "A_worst_case_bounds_first_dataset": null
+    }
+   },
+   "validation": [
+    {
+     "check": "false support of A at the margin (\u0394_A = 3) \u2264 5% (+MC tolerance)",
+     "value": 0.044,
+     "bound": 0.07436698586202241,
+     "pass": true
+    },
+    {
+     "check": "false equivalence of A at the lower margin (\u0394_A = \u22123) \u2264 5% (+MC tolerance)",
+     "value": 0.042,
+     "bound": 0.07436698586202241,
+     "pass": true
+    },
+    {
+     "check": "power for A at \u0394_A = 5, SD 3.0 matches the analytic value 0.618 (\u00b1MC tolerance)",
+     "value": 0.626,
+     "bound": 0.6184863173855496,
+     "pass": true
+    },
+    {
+     "check": "missing run makes A, O\u2212A and A\u2212B inconclusive in every dataset",
+     "value": 1.0,
+     "bound": 1.0,
+     "pass": true
+    },
+    {
+     "check": "global null: familywise false 'supported' among secondaries \u2264 5% (+MC tolerance)",
+     "value": 0.0,
+     "bound": 0.07436698586202241,
+     "pass": true
+    },
+    {
+     "check": "historical 10-point effect: all four drops supported with probability \u2265 0.99",
+     "value": 0.998,
+     "bound": 0.99,
+     "pass": true
+    }
+   ],
+   "all_checks_pass": true
+  }
+ },
+ "config_sha256": "9befd6754f5e7b5e339ef90da8d3918d8b3454e4abd969ffe963cde85feabdbb"
+}

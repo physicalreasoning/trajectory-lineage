@@ -222,6 +222,8 @@ results/                 committed machine-readable results
 experiments/             frozen experiment configurations
 approvals/               freeze manifests binding configuration, code, and analyzer
 tests/                   physics, lineage, and measurement invariants
+colab/                   Colab notebooks for the GPU steps (pilots, locked confirmation)
+exp2-kuka-matched/       Experiment 2 registered implementation (Kuka control), with real-data results
 docs/
   RESEARCH_PLAN.md        gates and kill criteria
   SPEC.md                 lineage and simulator contracts

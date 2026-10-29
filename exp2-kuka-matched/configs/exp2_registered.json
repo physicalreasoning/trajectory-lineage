@@ -1,0 +1,106 @@
+{
+  "name": "exp2_transition_matched_kuka",
+  "version": "2026-10-28",
+  "description": "Registered construction of Experiment 2 (transition-matched Kuka control) for Seen and Unseen. Every value here is frozen before training.",
+  "seeds": [
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109
+  ],
+  "historical_seeds_excluded": [
+    0,
+    1,
+    2
+  ],
+  "optimizer_steps": 2000,
+  "episode_eligibility": {
+    "length_min": 3,
+    "length_max": 24
+  },
+  "split": {
+    "rule": "(shard // 3) % 5 == 0 is test",
+    "divisor": 3,
+    "every": 5
+  },
+  "designs": {
+    "O": {
+      "description": "Original episode-count arms (prefixes of the seeded pools).",
+      "arms": {
+        "phi0.10": {
+          "n_success": 2700,
+          "n_failure": 300
+        },
+        "phi0.65": {
+          "n_success": 1050,
+          "n_failure": 1950
+        }
+      }
+    },
+    "A": {
+      "description": "Exactly `transitions` distinct transitions at each episode failure fraction phi; episode counts free, total episodes a multiple of `episode_multiple` so phi*N is an integer.",
+      "transitions": 31600,
+      "phis": [
+        0.0,
+        0.1,
+        0.25,
+        0.5,
+        0.65
+      ],
+      "episode_multiple": 20,
+      "max_candidate_totals": 8
+    },
+    "B": {
+      "description": "Equal normalized outcome-conditional length distributions at a fixed transition budget. Each length contributes 20*k_l episodes: 18S+2F at phi=.10 and 7S+13F at phi=.65. The common histogram is the integer solution closest to the pooled availability shape (least squares) under the per-length caps.",
+      "transitions": 31600,
+      "phis": [
+        0.1,
+        0.65
+      ],
+      "unit": 20,
+      "fallback": {
+        "rule": "If 31,600 is infeasible, budget_B = largest multiple of 1000 <= 0.9 * (maximum feasible B budget). Design A comparators at budget_B are added for both B fractions.",
+        "fraction_of_max": 0.9,
+        "round_to": 1000
+      }
+    },
+    "V": {
+      "description": "Shared seeded base of `base_successes` successes; add distinct transitions of further successes (V+S) or of failures (V+F) until the arm holds exactly `total_transitions` (Design A's budget), so V arms are transition-matched to A.",
+      "base_successes": 1500,
+      "total_transitions": 31600
+    }
+  },
+  "evaluation": {
+    "min_eval_per_outcome_per_length": 20,
+    "min_train_per_outcome_per_length": 1,
+    "threshold": 0.5,
+    "prevalence_source": "all eligible test episodes (before support exclusion)"
+  },
+  "decision": {
+    "margin_points": 3.0,
+    "alpha_support_one_sided": 0.05,
+    "equivalence_ci_level": 0.9,
+    "holm_alpha": 0.05,
+    "primary": "A",
+    "secondary": [
+      "O",
+      "B",
+      "V",
+      "O_minus_A",
+      "A_minus_B"
+    ]
+  },
+  "judge": {
+    "per_class": 2500,
+    "rng_seed": 99,
+    "C": 0.05,
+    "validity_auroc": 0.75,
+    "pca_components": 256
+  }
+}

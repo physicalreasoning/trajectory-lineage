@@ -1,0 +1,37 @@
+{
+ "sha256": "e8c0f6ce6dc3387375b02b23572d3763f0d61be3a578b10cb3468e4fd09a7674",
+ "episodes": 13689,
+ "eligible": 13689,
+ "train": {
+  "episodes": 10889,
+  "successes": 3989,
+  "failures": 6900,
+  "transitions": 150750
+ },
+ "test": {
+  "episodes": 2800,
+  "successes": 996,
+  "prevalence": 0.3557142857142857
+ },
+ "length_range": [
+  3,
+  24
+ ],
+ "header": {
+  "kind": "SYNTHETIC",
+  "warning": "metadata stand-in for dry runs only; never train or freeze on it",
+  "source": "/tmp/rwmo/results/episodes/kuka.jsonl",
+  "assumed_counts": {
+   "train_successes": 3989,
+   "train_failures": 6900,
+   "test_successes": 996,
+   "test_failures": 1804
+  },
+  "split_rule": "(shard // 3) % 5 == 0 is test",
+  "eligibility": {
+   "length_min": 3,
+   "length_max": 24
+  },
+  "seed": 20261023
+ }
+}
