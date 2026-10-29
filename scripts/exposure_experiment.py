@@ -29,7 +29,6 @@ from freeze import FreezeError, changed_since, git_state, run_identity  # noqa: 
 from freeze import validate as validate_freeze  # noqa: E402
 
 from trajectory_lineage.convlstm import ConvLSTMStatePredictor
-from trajectory_lineage.latent import LatentStatePredictor, get_encoder
 from trajectory_lineage.detectors import state_trajectory_distance
 from trajectory_lineage.exposure import (
     AppearanceRegistry,
@@ -48,6 +47,7 @@ from trajectory_lineage.exposure import (
     sample_event,
     select_reservoir_neighbors,
 )
+from trajectory_lineage.latent import LatentStatePredictor, get_encoder
 
 ARMS = ("B", "C", "D", "D2", "E")
 POPULATIONS = ("source", "exact", "independent")
@@ -226,9 +226,13 @@ def block_state_hash(block: dict) -> dict[str, str]:
     populations = dict(block["events"])
     populations["screen"] = block["screen_events"]
     for name, events in populations.items():
-        payload = json.dumps([asdict(event.state) for event in events], sort_keys=True, separators=(",", ":"))
+        payload = json.dumps(
+            [asdict(event.state) for event in events], sort_keys=True, separators=(",", ":")
+        )
         digests[name] = hashlib.sha256(payload.encode()).hexdigest()
-    digests["all"] = hashlib.sha256("".join(digests[k] for k in sorted(digests)).encode()).hexdigest()
+    digests["all"] = hashlib.sha256(
+        "".join(digests[k] for k in sorted(digests)).encode()
+    ).hexdigest()
     return digests
 
 
@@ -282,7 +286,8 @@ def train_steps(model, optimizer, batches, device) -> list[float]:
 
 def predictor_config(config: dict[str, Any]) -> dict[str, Any]:
     """The predictor block: ``{"type": "convlstm"}`` (default) or a latent world model
-    ``{"type": "latent", "encoder": "dinov2-small" | "vjepa2-vitl" | "fake-<dim>", "depth", "heads"}``.
+    ``{"type": "latent", "encoder": ..., "depth": ..., "heads": ...}`` with encoder
+    ``dinov2-small``, ``vjepa2-vitl`` or ``fake-<dim>``.
     For both types ``hidden_channels`` (and ``capacity_levels``) set the capacity: ConvLSTM hidden
     channels, or the latent transformer's width."""
 
@@ -293,7 +298,8 @@ def encode_block(block: dict, config: dict[str, Any], device) -> dict:
     """For latent predictors: replace every population's video tensor by frozen-encoder tokens.
 
     The encoder never trains, so the block's training trajectories never touch it; tokens are
-    computed once per block for all populations and arms (arm E and the exact population share one)."""
+    computed once per block for all populations and arms (arm E and the exact population share
+    one)."""
 
     pc = predictor_config(config)
     if pc["type"] != "latent":
@@ -311,7 +317,9 @@ def encode_block(block: dict, config: dict[str, Any], device) -> dict:
     for population in ("base", "source", "exact", "independent", "screen"):
         video, target = block[population]
         out[population] = (tokens_for(video), target)
-    out["arms"] = {arm: (tokens_for(video), target) for arm, (video, target) in block["arms"].items()}
+    out["arms"] = {
+        arm: (tokens_for(video), target) for arm, (video, target) in block["arms"].items()
+    }
     return out
 
 
@@ -319,13 +327,19 @@ def new_model(config: dict[str, Any], spec: EventSpec, device, hidden_channels: 
     pc = predictor_config(config)
     if pc["type"] == "latent":
         encoder = get_encoder(pc["encoder"], device)
-        steps = spec.observed_frames // 2 if pc["encoder"].startswith("vjepa2") else spec.observed_frames
+        steps = (
+            spec.observed_frames // 2
+            if pc["encoder"].startswith("vjepa2")
+            else spec.observed_frames
+        )
         return LatentStatePredictor(
             token_dim=encoder.token_dim,
             steps=steps,
             tokens_per_step=encoder.tokens_per_step,
             future_frames=spec.future_frames,
-            width=int(hidden_channels or config["hidden_channels"]),  # capacity levels = transformer width
+            width=int(
+                hidden_channels or config["hidden_channels"]
+            ),  # capacity levels = transformer width
             depth=int(pc.get("depth", 4)),
             heads=int(pc.get("heads", 8)),
         ).to(device)
@@ -337,7 +351,7 @@ def new_model(config: dict[str, Any], spec: EventSpec, device, hidden_channels: 
 
 
 def base_steps_for(config: dict[str, Any], hidden_channels: int) -> int:
-    """Base training steps for a capacity level (a registered per-level override, else the default)."""
+    """Base training steps for a capacity level: a registered per-level override, else default."""
 
     overrides = config.get("base_training_steps_by_capacity") or {}
     return int(overrides.get(str(hidden_channels), config["base_training_steps"]))
@@ -589,9 +603,7 @@ def blinded_report(config: dict[str, Any], runs: list[dict[str, Any]]) -> dict[s
                 }
                 if len(level_ok) >= 2
                 else {},
-                "seconds_per_block_mean": float(
-                    np.mean([run["total_seconds"] for run in level_ok])
-                )
+                "seconds_per_block_mean": float(np.mean([run["total_seconds"] for run in level_ok]))
                 if level_ok
                 else None,
             }
@@ -656,7 +668,9 @@ def configure_backend(device) -> None:
         torch.set_float32_matmul_precision("high")
 
 
-def _worker_run(config_path: str, block_index: int, device_name: str, sampler_workers: int) -> dict[str, Any]:
+def _worker_run(
+    config_path: str, block_index: int, device_name: str, sampler_workers: int
+) -> dict[str, Any]:
     """Process-pool entry: one block, in its own process with its own CUDA context and encoder."""
 
     import os
@@ -668,7 +682,9 @@ def _worker_run(config_path: str, block_index: int, device_name: str, sampler_wo
     return run_with_policy(config, block_index, spec_from(config), device)
 
 
-def run_blocks_parallel(config_path: Path, indices: list[int], device_name: str, workers: int, on_done) -> None:
+def run_blocks_parallel(
+    config_path: Path, indices: list[int], device_name: str, workers: int, on_done
+) -> None:
     """Run blocks concurrently in ``workers`` spawned processes sharing one device.
 
     Blocks are independent (per-block seeds), so results do not depend on which worker runs which
@@ -746,7 +762,9 @@ def blind_record(run: dict[str, Any], key: dict[str, float]) -> dict[str, Any]:
     missing = [name for name in run["contrasts"] if name not in key]
     if missing:
         raise SystemExit(f"blinding key lacks offsets for {missing}")
-    record["contrasts"] = {name: float(value) + key[name] for name, value in run["contrasts"].items()}
+    record["contrasts"] = {
+        name: float(value) + key[name] for name, value in run["contrasts"].items()
+    }
     record["E_exact_gain_positive"] = bool(run["contrasts"]["E_exact_gain"] > 0)
     record["blinded"] = True
     return record
@@ -774,7 +792,9 @@ def load_checkpoint(path: Path, expected_config_hash: str) -> list[dict[str, Any
 def append_checkpoint(path: Path, config_sha256: str, run: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a") as handle:
-        handle.write(json.dumps({"config_sha256": config_sha256, "run": run}, sort_keys=True) + "\n")
+        handle.write(
+            json.dumps({"config_sha256": config_sha256, "run": run}, sort_keys=True) + "\n"
+        )
         handle.flush()
 
 
@@ -790,7 +810,8 @@ def main() -> None:
         type=Path,
         default=None,
         help="JSONL of raw block records, appended per block and resumed on restart. Raw records "
-        "carry effects, so this is allowed only for approved confirmatory runs (--freeze-manifest).",
+        "carry effects, so this is allowed only for approved confirmatory runs "
+        "(--freeze-manifest).",
     )
     parser.add_argument(
         "--blinded-checkpoint",
@@ -803,13 +824,15 @@ def main() -> None:
         "--blinding-key",
         type=Path,
         default=None,
-        help="Where the random offsets live (default: next to the blinded checkpoint). Never open it.",
+        help="Where the random offsets live (default: next to the blinded checkpoint). "
+        "Never open it.",
     )
     parser.add_argument(
         "--workers",
         type=int,
         default=1,
-        help="Blocks trained concurrently in separate processes on the same device (GPU runs: 2-4). "
+        help="Blocks trained concurrently in separate processes on the same device "
+        "(GPU runs: 2-4). "
         "Results do not depend on this value.",
     )
     args = parser.parse_args()
@@ -821,12 +844,18 @@ def main() -> None:
     if args.checkpoint is not None and args.freeze_manifest is None:
         raise SystemExit("--checkpoint writes raw block records; it requires --freeze-manifest")
     if args.blinded_checkpoint is not None and args.unblind is not None:
-        raise SystemExit("--blinded-checkpoint keeps no raw records; it cannot be combined with --unblind")
+        raise SystemExit(
+            "--blinded-checkpoint keeps no raw records; it cannot be combined with --unblind"
+        )
     if args.blinded_checkpoint is not None and args.checkpoint is not None:
-        raise SystemExit("use either --checkpoint (confirmatory, raw) or --blinded-checkpoint (pilot)")
+        raise SystemExit(
+            "use either --checkpoint (confirmatory, raw) or --blinded-checkpoint (pilot)"
+        )
     blinding_key: dict[str, float] | None = None
     if args.blinded_checkpoint is not None:
-        key_path = args.blinding_key or args.blinded_checkpoint.with_name("DO_NOT_OPEN_blinding_key.json")
+        key_path = args.blinding_key or args.blinded_checkpoint.with_name(
+            "DO_NOT_OPEN_blinding_key.json"
+        )
         zero = {arm: dict.fromkeys(POPULATIONS, 0.0) for arm in ARMS}
         blinding_key = load_blinding_key(key_path, sorted(reuse_contrasts(zero)))
 

@@ -28,13 +28,12 @@ from exposure_experiment import (  # noqa: E402
     train_steps,
 )
 
-from trajectory_lineage.latent import get_encoder  # noqa: E402
-
 from trajectory_lineage.exposure import (  # noqa: E402
     AppearanceRegistry,
     render_event,
     sample_event,
 )
+from trajectory_lineage.latent import get_encoder  # noqa: E402
 
 
 def main() -> None:
@@ -49,7 +48,11 @@ def main() -> None:
     config = json.loads(args.config.read_text())
     spec = spec_from(config)
     device = torch.device(
-        "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+        "cuda"
+        if torch.cuda.is_available()
+        else "mps"
+        if torch.backends.mps.is_available()
+        else "cpu"
     )
     configure_backend(device)
     checkpoints = [int(x) for x in args.checkpoints.split(",")]

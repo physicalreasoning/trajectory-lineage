@@ -51,7 +51,12 @@ SCENARIOS = {
         S=0.015, H=0.0, Q=0.0, E=0.004, capacity_multipliers={"64": 1.0, "256": 1.0}
     ),
     "capacity_dependent_from_null": dict(
-        S=0.0, H=0.0, Q=0.0, E=0.004, capacity_multipliers={"64": 1.0, "256": 1.0}, capacity_add={"64": 0.004, "256": 0.010}
+        S=0.0,
+        H=0.0,
+        Q=0.0,
+        E=0.004,
+        capacity_multipliers={"64": 1.0, "256": 1.0},
+        capacity_add={"64": 0.004, "256": 0.010},
     ),
 }
 
@@ -73,7 +78,7 @@ def dispersion_from(path: Path) -> dict[str, float]:
 
 
 def level_truth(truth: dict, level: int, base_level: int) -> dict:
-    """Truth at one capacity level: base truth scaled by the level's multiplier plus an additive gap."""
+    """Truth at one capacity level: base truth times the level's multiplier, plus an added gap."""
 
     if level == base_level:
         return truth
@@ -89,7 +94,14 @@ def synthetic_runs(rng, config, truth, sds, n_blocks, competent_rate):
         runs = []
         for level in levels:
             indices = [b for b in range(n_blocks) if schedule[b] == level]
-            level_runs = _synthetic_runs(rng, config, level_truth(truth, level, min(levels)), sds, len(indices), competent_rate)
+            level_runs = _synthetic_runs(
+                rng,
+                config,
+                level_truth(truth, level, min(levels)),
+                sds,
+                len(indices),
+                competent_rate,
+            )
             for run, b in zip(level_runs, indices, strict=True):
                 run["block_index"] = b
                 run["hidden_channels"] = level
@@ -180,7 +192,9 @@ def main() -> None:
     }
     for n in block_options:
         cfg = scaled_capacity_config(config, n)
-        primary_level = int(config["decision_contract"].get("primary_capacity", capacity_levels(config)[0]))
+        primary_level = int(
+            config["decision_contract"].get("primary_capacity", capacity_levels(config)[0])
+        )
         primary_blocks = int(cfg.get("capacity_blocks", {}).get(str(primary_level), n))
         cfg["decision_contract"] = dict(
             config["decision_contract"], minimum_screened_blocks=int(0.9 * primary_blocks)
@@ -227,7 +241,10 @@ def main() -> None:
                             "label": cap["label"],
                             "trend_95": None
                             if cap["trend"] is None
-                            else [round(cap["trend"]["ci95"]["lower"], 5), round(cap["trend"]["ci95"]["upper"], 5)],
+                            else [
+                                round(cap["trend"]["ci95"]["lower"], 5),
+                                round(cap["trend"]["ci95"]["upper"], 5),
+                            ],
                         }
             per[name] = {
                 "truth": truth,

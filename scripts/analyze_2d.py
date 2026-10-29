@@ -111,15 +111,32 @@ def welch(a: np.ndarray, b: np.ndarray, alpha_one_sided: float) -> dict[str, flo
     na, nb = len(a), len(b)
     va, vb = float(a.var(ddof=1)) / na, float(b.var(ddof=1)) / nb
     se = (va + vb) ** 0.5
-    df = (va + vb) ** 2 / ((va**2 / (na - 1)) + (vb**2 / (nb - 1))) if se > 0 else float(na + nb - 2)
+    df = (
+        (va + vb) ** 2 / ((va**2 / (na - 1)) + (vb**2 / (nb - 1))) if se > 0 else float(na + nb - 2)
+    )
     diff = float(a.mean() - b.mean())
     crit = t_quantile(1 - alpha_one_sided, int(max(1, round(df))))
-    p = 1.0 if se == 0 and diff <= 0 else (0.0 if se == 0 else 1.0 - t_cdf(diff / se, int(max(1, round(df)))))
-    return {"n_a": na, "n_b": nb, "mean": diff, "se": se, "df": df, "lower": diff - crit * se, "upper": diff + crit * se, "p_one_sided": p}
+    p = (
+        1.0
+        if se == 0 and diff <= 0
+        else (0.0 if se == 0 else 1.0 - t_cdf(diff / se, int(max(1, round(df)))))
+    )
+    return {
+        "n_a": na,
+        "n_b": nb,
+        "mean": diff,
+        "se": se,
+        "df": df,
+        "lower": diff - crit * se,
+        "upper": diff + crit * se,
+        "p_one_sided": p,
+    }
 
 
 def analyze_blocks_2d(
-    runs: list[dict[str, Any]], contract: dict[str, Any], extra_p_values: dict[str, float] | None = None
+    runs: list[dict[str, Any]],
+    contract: dict[str, Any],
+    extra_p_values: dict[str, float] | None = None,
 ) -> dict[str, Any]:
     alpha_support = float(contract["alpha_one_sided"])  # 0.025 -> two-sided 95%
     alpha_absence = float(contract["alpha_absence_one_sided"])  # 0.05 -> two-sided 90%
@@ -179,26 +196,70 @@ def analyze_capacity(
     alpha_support = float(contract["alpha_one_sided"])
     alpha_absence = float(contract["alpha_absence_one_sided"])
     negligible = float(contract["negligible_bound"])
-    minimum_by_level = {int(k): int(v) for k, v in (contract.get("minimum_screened_blocks_by_capacity") or {}).items()}
-    gaps = {level: np.array([run["contrasts"][FIELDS["G"]] for run in screened if run["hidden_channels"] == level]) for level in levels}
+    minimum_by_level = {
+        int(k): int(v)
+        for k, v in (contract.get("minimum_screened_blocks_by_capacity") or {}).items()
+    }
+    gaps = {
+        level: np.array(
+            [run["contrasts"][FIELDS["G"]] for run in screened if run["hidden_channels"] == level]
+        )
+        for level in levels
+    }
     per_level: dict[str, Any] = {}
     for level in levels:
         g = gaps[level]
-        entry: dict[str, Any] = {"screened": int(len(g)), "model_parameters": next((run.get("model_parameters") for run in screened if run["hidden_channels"] == level), None)}
+        entry: dict[str, Any] = {
+            "screened": int(len(g)),
+            "model_parameters": next(
+                (
+                    run.get("model_parameters")
+                    for run in screened
+                    if run["hidden_channels"] == level
+                ),
+                None,
+            ),
+        }
         if len(g) >= 2:
             g95, g90 = interval(g, alpha_support), interval(g, alpha_absence)
-            e = np.array([run["contrasts"][FIELDS["E_exact_gain"]] for run in screened if run["hidden_channels"] == level])
-            entry.update(G_95=g95, G_90=g90, magnitude_descriptive=classify_gap_2d(g95, g90, contract), E_lower_95=interval(e, alpha_support)["lower"])
+            e = np.array(
+                [
+                    run["contrasts"][FIELDS["E_exact_gain"]]
+                    for run in screened
+                    if run["hidden_channels"] == level
+                ]
+            )
+            entry.update(
+                G_95=g95,
+                G_90=g90,
+                magnitude_descriptive=classify_gap_2d(g95, g90, contract),
+                E_lower_95=interval(e, alpha_support)["lower"],
+            )
         per_level[str(level)] = entry
     low, high = min(levels), max(levels)
-    out: dict[str, Any] = {"levels": levels, "per_level": per_level, "trend": None, "trend_p_one_sided": None, "label": "unresolved"}
-    too_few = [level for level in (low, high) if len(gaps[level]) < max(2, minimum_by_level.get(level, 2))]
+    out: dict[str, Any] = {
+        "levels": levels,
+        "per_level": per_level,
+        "trend": None,
+        "trend_p_one_sided": None,
+        "label": "unresolved",
+    }
+    too_few = [
+        level for level in (low, high) if len(gaps[level]) < max(2, minimum_by_level.get(level, 2))
+    ]
     if too_few:
         out["label"] = f"unresolved (too few screened blocks at capacity {too_few})"
         return out
     trend95 = welch(gaps[high], gaps[low], alpha_support)
     trend90 = welch(gaps[high], gaps[low], alpha_absence)
-    out.update(trend={"contrast": f"G({high}) - G({low})", "ci95": trend95, "ci90": {k: trend90[k] for k in ("lower", "upper")}}, trend_p_one_sided=trend95["p_one_sided"])
+    out.update(
+        trend={
+            "contrast": f"G({high}) - G({low})",
+            "ci95": trend95,
+            "ci90": {k: trend90[k] for k in ("lower", "upper")},
+        },
+        trend_p_one_sided=trend95["p_one_sided"],
+    )
     if trend90["lower"] > -negligible and trend90["upper"] < negligible:
         out["label"] = "capacity_independent"
     return out
@@ -245,7 +306,10 @@ def analyze_2d(
     for run in completed:  # a record's capacity must be the registered one for its block index
         recorded = run.get("hidden_channels", levels[0] if not multi else None)
         if recorded != schedule[run["block_index"]]:
-            raise RecordError(f"block {run['block_index']} records hidden_channels={recorded}; registered {schedule[run['block_index']]}")
+            raise RecordError(
+                f"block {run['block_index']} records hidden_channels={recorded}; "
+                f"registered {schedule[run['block_index']]}"
+            )
         run["hidden_channels"] = recorded
     primary_level = int(contract.get("primary_capacity", levels[0]))
     screened_all = [run for run in completed if run.get("base_competent", False)]
@@ -260,13 +324,23 @@ def analyze_2d(
         "primary_capacity": primary_level,
     }
     capacity = analyze_capacity(screened_all, contract, levels) if multi else None
-    extra = {"capacity_increase": capacity["trend_p_one_sided"]} if capacity and capacity["trend_p_one_sided"] is not None else None
+    extra = (
+        {"capacity_increase": capacity["trend_p_one_sided"]}
+        if capacity and capacity["trend_p_one_sided"] is not None
+        else None
+    )
     if len(screened) >= 2:
         result["primary"] = analyze_blocks_2d(screened, contract, extra)
     if len(completed_primary) >= 2:
-        result["all_completed_blocks_sensitivity"] = analyze_blocks_2d(completed_primary, contract, extra)
+        result["all_completed_blocks_sensitivity"] = analyze_blocks_2d(
+            completed_primary, contract, extra
+        )
     if capacity is not None:
-        if "primary" in result and extra and result["primary"]["secondary_holm_rejections"].get("capacity_increase"):
+        if (
+            "primary" in result
+            and extra
+            and result["primary"]["secondary_holm_rejections"].get("capacity_increase")
+        ):
             capacity["label"] = "capacity_dependent"
         result["capacity"] = capacity
     reason = (

@@ -516,7 +516,9 @@ def capacity_schedule(config: dict) -> list[int]:
     raw = config.get("capacity_blocks")
     if raw is None:
         if blocks % len(levels):
-            raise ValueError("blocks must divide evenly across capacity levels or capacity_blocks must be given")
+            raise ValueError(
+                "blocks must divide evenly across capacity levels or capacity_blocks must be given"
+            )
         counts = {level: blocks // len(levels) for level in levels}
     else:
         counts = {int(key): int(value) for key, value in raw.items()}
@@ -583,7 +585,9 @@ def sample_closer_neighbors(
     children = rng.bit_generator.seed_seq.spawn(len(sources))
     tasks = [
         (child, source, spec, float(low), float(high), float(box_multiplier))
-        for child, source, low, high in zip(children, sources, min_distances, max_distances, strict=True)
+        for child, source, low, high in zip(
+            children, sources, min_distances, max_distances, strict=True
+        )
     ]
     workers = int(workers or os.environ.get("TRAJECTORY_LINEAGE_WORKERS") or os.cpu_count() or 1)
     if workers <= 1 or len(tasks) <= 1:

@@ -102,9 +102,7 @@ def test_failed_blocks_count_against_positive_control() -> None:
 
 
 def test_unblinding_requires_complete_manifest(tmp_path: Path, monkeypatch) -> None:
-    config = dict(
-        TINY, role="confirmatory", required_signoff_roles=["paper_lead", "stats_check"]
-    )
+    config = dict(TINY, role="confirmatory", required_signoff_roles=["paper_lead", "stats_check"])
     config["excluded_pilot_seeds"] = [5]
     config_path = tmp_path / "exposure_confirmation.json"
     config_path.write_text(json.dumps(config))

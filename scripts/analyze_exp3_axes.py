@@ -47,18 +47,30 @@ AXES = {
 }
 
 
-def screened_gaps(result: dict[str, Any], runs: list[dict[str, Any]], config: dict[str, Any]) -> np.ndarray | None:
-    """Reuse gaps of the screened blocks, or None when the configuration's decisions are suppressed."""
+def screened_gaps(
+    result: dict[str, Any], runs: list[dict[str, Any]], config: dict[str, Any]
+) -> np.ndarray | None:
+    """Reuse gaps of the screened blocks; None when the configuration's decisions are suppressed."""
 
     if "primary" not in result or result["primary"].get("decisions_suppressed"):
         return None
     # recompute from the validated records used by analyze_2d: screened = completed and competent
-    gaps = [run["contrasts"][FIELDS["G"]] for run in runs if run["status"] == "completed" and run.get("base_competent")]
+    gaps = [
+        run["contrasts"][FIELDS["G"]]
+        for run in runs
+        if run["status"] == "completed" and run.get("base_competent")
+    ]
     return np.array(gaps) if len(gaps) >= 2 else None
 
 
-def analyze_axes(main: dict[str, Any], axes: dict[str, tuple[list[dict[str, Any]], dict[str, Any]]]) -> dict[str, Any]:
-    """``main``: {"result": analyze_2d output, "config": config}; ``axes``: name -> (validated runs, config)."""
+def analyze_axes(
+    main: dict[str, Any], axes: dict[str, tuple[list[dict[str, Any]], dict[str, Any]]]
+) -> dict[str, Any]:
+    """Joint labels and one Holm family.
+
+    ``main``: {"result": analyze_2d output, "config": config};
+    ``axes``: name -> (validated runs, config).
+    """
 
     contract = main["config"]["decision_contract"]
     alpha_support = float(contract["alpha_one_sided"])
@@ -68,7 +80,9 @@ def analyze_axes(main: dict[str, Any], axes: dict[str, tuple[list[dict[str, Any]
     p_values: dict[str, float] = {}
     gaps: dict[str, np.ndarray | None] = {}
     for name, (runs, config) in axes.items():
-        result = analyze_2d(runs, config, check_records=False)  # records were validated by the caller
+        result = analyze_2d(
+            runs, config, check_records=False
+        )  # records were validated by the caller
         g = screened_gaps(result, runs, config)
         gaps[name] = g
         entry: dict[str, Any] = {
@@ -77,12 +91,16 @@ def analyze_axes(main: dict[str, Any], axes: dict[str, tuple[list[dict[str, Any]
             "completed": result["completed"],
             "screened": result["screened"],
             "failures": result["failures"],
-            "descriptive_classification": result.get("primary", {}).get("axes", {}).get("magnitude", "unavailable"),
+            "descriptive_classification": result.get("primary", {})
+            .get("axes", {})
+            .get("magnitude", "unavailable"),
             "primary_claim_descriptive": result["primary_claim"],
         }
         if g is not None:
             g95, g90 = interval(g, alpha_support), interval(g, alpha_absence)
-            entry.update(G_95=g95, G_90=g90, magnitude_descriptive=classify_gap_2d(g95, g90, contract))
+            entry.update(
+                G_95=g95, G_90=g90, magnitude_descriptive=classify_gap_2d(g95, g90, contract)
+            )
             if AXES[name] == "architecture":
                 p_values[f"detectable_{name}"] = one_sided_p(g, 0.0)
         per_axis[name] = entry
@@ -91,10 +109,18 @@ def analyze_axes(main: dict[str, Any], axes: dict[str, tuple[list[dict[str, Any]
     if gaps.get("dose16") is not None and gaps.get("dose256") is not None:
         t95 = welch(gaps["dose16"], gaps["dose256"], alpha_support)
         t90 = welch(gaps["dose16"], gaps["dose256"], alpha_absence)
-        dose = {"contrast": "G(16 sources, ~50 presentations) - G(256 sources, ~3 presentations)", "ci95": t95, "ci90": {k: t90[k] for k in ("lower", "upper")}}
+        dose = {
+            "contrast": "G(16 sources, ~50 presentations) - G(256 sources, ~3 presentations)",
+            "ci95": t95,
+            "ci90": {k: t90[k] for k in ("lower", "upper")},
+        }
         p_values["dose_increase"] = t95["p_one_sided"]
     # one Holm family: main secondaries + axes
-    main_p = dict(main["result"]["primary"]["secondary_p_values"]) if "primary" in main["result"] and not main["result"]["primary"].get("decisions_suppressed") else {}
+    main_p = (
+        dict(main["result"]["primary"]["secondary_p_values"])
+        if "primary" in main["result"] and not main["result"]["primary"].get("decisions_suppressed")
+        else {}
+    )
     family = {**main_p, **p_values}
     decisions = holm(family, alpha_support) if family else {}
     labels: dict[str, str] = {}
@@ -119,8 +145,12 @@ def analyze_axes(main: dict[str, Any], axes: dict[str, tuple[list[dict[str, Any]
     main_labels = {}
     if main_p:
         main_labels = {
-            "event_identity": "event_specific" if decisions.get("identity_specific") else main["result"]["primary"]["axes"]["event_identity"],
-            "capacity": "capacity_dependent" if decisions.get("capacity_increase") else main["result"].get("capacity", {}).get("label", "n/a"),
+            "event_identity": "event_specific"
+            if decisions.get("identity_specific")
+            else main["result"]["primary"]["axes"]["event_identity"],
+            "capacity": "capacity_dependent"
+            if decisions.get("capacity_increase")
+            else main["result"].get("capacity", {}).get("label", "n/a"),
         }
     return {
         "main_primary_claim": main["result"]["primary_claim"],
@@ -131,24 +161,44 @@ def analyze_axes(main: dict[str, Any], axes: dict[str, tuple[list[dict[str, Any]
         "axes": per_axis,
         "dose_trend": dose,
         "labels": labels,
-        "note": "Primary claim from analyze_2d on the main confirmation, unchanged. Secondary labels use the joint Holm family (main secondaries + axes).",
+        "note": (
+            "Primary claim from analyze_2d on the main confirmation, unchanged. Secondary labels "
+            "use the joint Holm family (main secondaries + axes)."
+        ),
     }
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--main-config", type=Path, default=Path("experiments/exposure2d_confirmation.json"))
+    parser.add_argument(
+        "--main-config", type=Path, default=Path("experiments/exposure2d_confirmation.json")
+    )
     parser.add_argument("--main-records", type=Path, required=True)
-    parser.add_argument("--axis", action="append", default=[], metavar="NAME=CONFIG:RECORDS", help="e.g. latent_dinov2=experiments/exposure2d_confirm_latent_dinov2.json:results/latent_dinov2_raw.json")
+    parser.add_argument(
+        "--axis",
+        action="append",
+        default=[],
+        metavar="NAME=CONFIG:RECORDS",
+        help=(
+            "e.g. latent_dinov2=experiments/exposure2d_confirm_latent_dinov2.json:"
+            "results/latent_dinov2_raw.json"
+        ),
+    )
     parser.add_argument("--freeze-manifest", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
     try:
-        validate_freeze(json.loads(args.freeze_manifest.read_text()), args.main_config, Path(__file__).with_name("analyze_2d.py"))
+        validate_freeze(
+            json.loads(args.freeze_manifest.read_text()),
+            args.main_config,
+            Path(__file__).with_name("analyze_2d.py"),
+        )
     except FreezeError as error:
         raise SystemExit(f"refusing to analyze: {error}") from error
     main_config = json.loads(args.main_config.read_text())
-    main_runs = check_identity(json.loads(args.main_records.read_text()), args.freeze_manifest, args.main_config)
+    main_runs = check_identity(
+        json.loads(args.main_records.read_text()), args.freeze_manifest, args.main_config
+    )
     main_result = analyze_2d(main_runs, main_config)
     axes: dict[str, tuple[list[dict[str, Any]], dict[str, Any]]] = {}
     from analyze_confirmation import validate_records
@@ -165,7 +215,12 @@ def main() -> None:
     result = analyze_axes({"result": main_result, "config": main_config}, axes)
     result["main"] = main_result
     args.out.write_text(json.dumps(result, indent=2, sort_keys=True, default=str) + "\n")
-    print(json.dumps({"main_primary_claim": result["main_primary_claim"], "labels": result["labels"]}, indent=2))
+    print(
+        json.dumps(
+            {"main_primary_claim": result["main_primary_claim"], "labels": result["labels"]},
+            indent=2,
+        )
+    )
 
 
 if __name__ == "__main__":
