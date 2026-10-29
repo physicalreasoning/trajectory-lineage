@@ -1,0 +1,151 @@
+{
+  "sd_scale": 2.0,
+  "replications": 60,
+  "results": {
+    "all_null": {
+      "truth": {
+        "main": 0.0,
+        "latent_dinov2": 0.0,
+        "latent_vjepa2": 0.0,
+        "dose16": 0.0,
+        "dose256": 0.0
+      },
+      "main_primary_claim": {
+        "negligible differential gap": 1.0
+      },
+      "labels": {
+        "latent_dinov2": {
+          "negligible_under_recipe": 1.0
+        },
+        "latent_vjepa2": {
+          "negligible_under_recipe": 1.0
+        },
+        "dose": {
+          "unresolved": 0.8666666666666667,
+          "dose_independent": 0.13333333333333333
+        }
+      },
+      "capacity_label_under_joint_holm": {
+        "capacity_independent": 0.7333333333333333,
+        "unresolved": 0.25,
+        "capacity_dependent": 0.016666666666666666
+      }
+    },
+    "main_consequential_recipes_detectable_dose_rising": {
+      "truth": {
+        "main": 0.015,
+        "latent_dinov2": 0.004,
+        "latent_vjepa2": 0.004,
+        "dose16": 0.015,
+        "dose256": 0.004
+      },
+      "main_primary_claim": {
+        "consequential reuse advantage": 1.0
+      },
+      "labels": {
+        "latent_dinov2": {
+          "reuse_detectable_under_recipe": 1.0
+        },
+        "latent_vjepa2": {
+          "reuse_detectable_under_recipe": 1.0
+        },
+        "dose": {
+          "dose_dependent": 1.0
+        }
+      },
+      "capacity_label_under_joint_holm": {
+        "capacity_independent": 0.75,
+        "unresolved": 0.25
+      }
+    },
+    "main_consequential_recipes_null_dose_flat": {
+      "truth": {
+        "main": 0.015,
+        "latent_dinov2": 0.0,
+        "latent_vjepa2": 0.0,
+        "dose16": 0.015,
+        "dose256": 0.015
+      },
+      "main_primary_claim": {
+        "consequential reuse advantage": 1.0
+      },
+      "labels": {
+        "latent_dinov2": {
+          "negligible_under_recipe": 0.9833333333333333,
+          "reuse_detectable_under_recipe": 0.016666666666666666
+        },
+        "latent_vjepa2": {
+          "negligible_under_recipe": 0.9833333333333333,
+          "reuse_detectable_under_recipe": 0.016666666666666666
+        },
+        "dose": {
+          "unresolved": 0.8333333333333334,
+          "dose_independent": 0.16666666666666666
+        }
+      },
+      "capacity_label_under_joint_holm": {
+        "capacity_independent": 0.75,
+        "unresolved": 0.23333333333333334,
+        "capacity_dependent": 0.016666666666666666
+      }
+    },
+    "recipes_tiny_0.001": {
+      "truth": {
+        "main": 0.006,
+        "latent_dinov2": 0.001,
+        "latent_vjepa2": 0.001,
+        "dose16": 0.006,
+        "dose256": 0.006
+      },
+      "main_primary_claim": {
+        "prevalence_dependent reuse advantage": 1.0
+      },
+      "labels": {
+        "latent_dinov2": {
+          "reuse_detectable_under_recipe": 0.9166666666666666,
+          "negligible_under_recipe": 0.08333333333333333
+        },
+        "latent_vjepa2": {
+          "reuse_detectable_under_recipe": 0.95,
+          "negligible_under_recipe": 0.05
+        },
+        "dose": {
+          "unresolved": 0.8,
+          "dose_independent": 0.2
+        }
+      },
+      "capacity_label_under_joint_holm": {
+        "capacity_independent": 0.9166666666666666,
+        "unresolved": 0.08333333333333333
+      }
+    },
+    "dose_rising_from_null_low_dose": {
+      "truth": {
+        "main": 0.006,
+        "latent_dinov2": 0.003,
+        "latent_vjepa2": 0.003,
+        "dose16": 0.01,
+        "dose256": 0.0
+      },
+      "main_primary_claim": {
+        "prevalence_dependent reuse advantage": 1.0
+      },
+      "labels": {
+        "latent_dinov2": {
+          "reuse_detectable_under_recipe": 1.0
+        },
+        "latent_vjepa2": {
+          "reuse_detectable_under_recipe": 1.0
+        },
+        "dose": {
+          "dose_dependent": 1.0
+        }
+      },
+      "capacity_label_under_joint_holm": {
+        "capacity_independent": 0.8333333333333334,
+        "unresolved": 0.15,
+        "capacity_dependent": 0.016666666666666666
+      }
+    }
+  }
+}

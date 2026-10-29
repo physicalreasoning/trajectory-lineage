@@ -17,13 +17,17 @@ from dryrun_2d import SCENARIOS, synthetic_runs  # noqa: E402
 from exposure_experiment import analyzer_for  # noqa: E402
 from freeze import FreezeError, run_identity, sha256, validate  # noqa: E402
 
+from trajectory_lineage.exposure import scaled_capacity_config  # noqa: E402
+
 SDS = {"S": 0.005, "H": 0.001, "G": 0.0055, "Q": 0.004, "Q2": 0.005, "E": 0.0075}
 
 
 def _setup(tmp_path, mode="confirmatory"):
-    config = json.loads((ROOT / "experiments/exposure2d_confirmation.json").read_text())
-    config["blocks"] = 40
-    config["decision_contract"]["minimum_screened_blocks"] = 30
+    config = scaled_capacity_config(
+        json.loads((ROOT / "experiments/exposure2d_confirmation.json").read_text()), 40
+    )
+    config["decision_contract"]["minimum_screened_blocks"] = 15  # 20 primary-level blocks of 40
+    config["decision_contract"]["minimum_screened_blocks_by_capacity"] = {"64": 8, "256": 8}
     cpath = tmp_path / "config.json"
     cpath.write_text(json.dumps(config))
     analyzer = analyzer_for(config)
@@ -33,8 +37,8 @@ def _setup(tmp_path, mode="confirmatory"):
         "analyzer_sha256": sha256(analyzer),
         "code_commit": "abc123",
         "signoffs": {
-            "paper_lead": "Jiankai Sun",
-            "evaluation_science": "Yining Hua",
+            "paper_lead": "Paper Lead",
+            "stats_check": "Internal Statistician",
             "workstream_owner": "Lovejesh Bangar",
         },
         "signoff_date": "2026-10-29",

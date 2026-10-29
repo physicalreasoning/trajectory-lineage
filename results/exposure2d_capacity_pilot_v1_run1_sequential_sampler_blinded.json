@@ -1,0 +1,634 @@
+{
+  "algorithmic_failures": [],
+  "base_competence_failures": [
+    17
+  ],
+  "blinded": true,
+  "blocks_base_competent": 71,
+  "blocks_completed": 72,
+  "blocks_scheduled": 72,
+  "by_capacity": {
+    "16": {
+      "base_competence_failures": [],
+      "blocks_base_competent": 24,
+      "blocks_completed": 24,
+      "blocks_scheduled": 24,
+      "dispersion": {
+        "B_apparent_improvement": {
+          "blocks": 24,
+          "standard_deviation": 0.00220227019,
+          "standard_deviation_upper_limit": 0.00254695195,
+          "upper_limit_confidence": 0.8
+        },
+        "C_apparent_improvement": {
+          "blocks": 24,
+          "standard_deviation": 0.00389812976,
+          "standard_deviation_upper_limit": 0.00450823393,
+          "upper_limit_confidence": 0.8
+        },
+        "C_independent_gain": {
+          "blocks": 24,
+          "standard_deviation": 0.000960695066,
+          "standard_deviation_upper_limit": 0.00111105539,
+          "upper_limit_confidence": 0.8
+        },
+        "C_independent_harm": {
+          "blocks": 24,
+          "standard_deviation": 0.000960695066,
+          "standard_deviation_upper_limit": 0.00111105539,
+          "upper_limit_confidence": 0.8
+        },
+        "C_minus_D2_gap": {
+          "blocks": 24,
+          "standard_deviation": 0.00384115371,
+          "standard_deviation_upper_limit": 0.00444234044,
+          "upper_limit_confidence": 0.8
+        },
+        "C_minus_D_gap": {
+          "blocks": 24,
+          "standard_deviation": 0.00319542254,
+          "standard_deviation_upper_limit": 0.00369554457,
+          "upper_limit_confidence": 0.8
+        },
+        "C_minus_D_source": {
+          "blocks": 24,
+          "standard_deviation": 0.00380908063,
+          "standard_deviation_upper_limit": 0.00440524753,
+          "upper_limit_confidence": 0.8
+        },
+        "C_reuse_gap": {
+          "blocks": 24,
+          "standard_deviation": 0.00430707388,
+          "standard_deviation_upper_limit": 0.00498118272,
+          "upper_limit_confidence": 0.8
+        },
+        "C_source_gain": {
+          "blocks": 24,
+          "standard_deviation": 0.00447134383,
+          "standard_deviation_upper_limit": 0.00517116289,
+          "upper_limit_confidence": 0.8
+        },
+        "D2_independent_gain": {
+          "blocks": 24,
+          "standard_deviation": 0.00116037244,
+          "standard_deviation_upper_limit": 0.00134198468,
+          "upper_limit_confidence": 0.8
+        },
+        "D2_reuse_gap": {
+          "blocks": 24,
+          "standard_deviation": 0.00140533306,
+          "standard_deviation_upper_limit": 0.00162528458,
+          "upper_limit_confidence": 0.8
+        },
+        "D2_source_gain": {
+          "blocks": 24,
+          "standard_deviation": 0.00170797735,
+          "standard_deviation_upper_limit": 0.00197529634,
+          "upper_limit_confidence": 0.8
+        },
+        "D_independent_gain": {
+          "blocks": 24,
+          "standard_deviation": 0.00117409965,
+          "standard_deviation_upper_limit": 0.00135786036,
+          "upper_limit_confidence": 0.8
+        },
+        "D_reuse_gap": {
+          "blocks": 24,
+          "standard_deviation": 0.00198584564,
+          "standard_deviation_upper_limit": 0.00229665435,
+          "upper_limit_confidence": 0.8
+        },
+        "D_source_gain": {
+          "blocks": 24,
+          "standard_deviation": 0.00173953838,
+          "standard_deviation_upper_limit": 0.00201179704,
+          "upper_limit_confidence": 0.8
+        },
+        "E_exact_gain": {
+          "blocks": 24,
+          "standard_deviation": 0.00568688744,
+          "standard_deviation_upper_limit": 0.00657695368,
+          "upper_limit_confidence": 0.8
+        },
+        "E_independent_gain": {
+          "blocks": 24,
+          "standard_deviation": 0.00132737985,
+          "standard_deviation_upper_limit": 0.00153513076,
+          "upper_limit_confidence": 0.8
+        },
+        "E_reuse_gap": {
+          "blocks": 24,
+          "standard_deviation": 0.00418453551,
+          "standard_deviation_upper_limit": 0.00483946562,
+          "upper_limit_confidence": 0.8
+        },
+        "E_source_gain": {
+          "blocks": 24,
+          "standard_deviation": 0.0042934261,
+          "standard_deviation_upper_limit": 0.00496539889,
+          "upper_limit_confidence": 0.8
+        },
+        "E_transfer_loss": {
+          "blocks": 24,
+          "standard_deviation": 0.0030726353,
+          "standard_deviation_upper_limit": 0.00355353966,
+          "upper_limit_confidence": 0.8
+        }
+      },
+      "model_parameters": 1085552,
+      "seconds_per_block_mean": 252.01263488224996
+    },
+    "256": {
+      "base_competence_failures": [
+        17
+      ],
+      "blocks_base_competent": 23,
+      "blocks_completed": 24,
+      "blocks_scheduled": 24,
+      "dispersion": {
+        "B_apparent_improvement": {
+          "blocks": 23,
+          "standard_deviation": 0.0031368641,
+          "standard_deviation_upper_limit": 0.00364164545,
+          "upper_limit_confidence": 0.8
+        },
+        "C_apparent_improvement": {
+          "blocks": 23,
+          "standard_deviation": 0.0045423948,
+          "standard_deviation_upper_limit": 0.00527335288,
+          "upper_limit_confidence": 0.8
+        },
+        "C_independent_gain": {
+          "blocks": 23,
+          "standard_deviation": 0.025464334,
+          "standard_deviation_upper_limit": 0.0295620317,
+          "upper_limit_confidence": 0.8
+        },
+        "C_independent_harm": {
+          "blocks": 23,
+          "standard_deviation": 0.025464334,
+          "standard_deviation_upper_limit": 0.0295620317,
+          "upper_limit_confidence": 0.8
+        },
+        "C_minus_D2_gap": {
+          "blocks": 23,
+          "standard_deviation": 0.00468847751,
+          "standard_deviation_upper_limit": 0.00544294309,
+          "upper_limit_confidence": 0.8
+        },
+        "C_minus_D_gap": {
+          "blocks": 23,
+          "standard_deviation": 0.00408646599,
+          "standard_deviation_upper_limit": 0.00474405641,
+          "upper_limit_confidence": 0.8
+        },
+        "C_minus_D_source": {
+          "blocks": 23,
+          "standard_deviation": 0.0283471743,
+          "standard_deviation_upper_limit": 0.032908776,
+          "upper_limit_confidence": 0.8
+        },
+        "C_reuse_gap": {
+          "blocks": 23,
+          "standard_deviation": 0.00463189525,
+          "standard_deviation_upper_limit": 0.00537725567,
+          "upper_limit_confidence": 0.8
+        },
+        "C_source_gain": {
+          "blocks": 23,
+          "standard_deviation": 0.0292689084,
+          "standard_deviation_upper_limit": 0.0339788348,
+          "upper_limit_confidence": 0.8
+        },
+        "D2_independent_gain": {
+          "blocks": 23,
+          "standard_deviation": 0.000843146914,
+          "standard_deviation_upper_limit": 0.000978825355,
+          "upper_limit_confidence": 0.8
+        },
+        "D2_reuse_gap": {
+          "blocks": 23,
+          "standard_deviation": 0.0011891574,
+          "standard_deviation_upper_limit": 0.00138051554,
+          "upper_limit_confidence": 0.8
+        },
+        "D2_source_gain": {
+          "blocks": 23,
+          "standard_deviation": 0.00137467454,
+          "standard_deviation_upper_limit": 0.00159588593,
+          "upper_limit_confidence": 0.8
+        },
+        "D_independent_gain": {
+          "blocks": 23,
+          "standard_deviation": 0.00115298654,
+          "standard_deviation_upper_limit": 0.0013385241,
+          "upper_limit_confidence": 0.8
+        },
+        "D_reuse_gap": {
+          "blocks": 23,
+          "standard_deviation": 0.0021829556,
+          "standard_deviation_upper_limit": 0.00253423484,
+          "upper_limit_confidence": 0.8
+        },
+        "D_source_gain": {
+          "blocks": 23,
+          "standard_deviation": 0.00223344771,
+          "standard_deviation_upper_limit": 0.0025928521,
+          "upper_limit_confidence": 0.8
+        },
+        "E_exact_gain": {
+          "blocks": 23,
+          "standard_deviation": 0.0052666546,
+          "standard_deviation_upper_limit": 0.00611415992,
+          "upper_limit_confidence": 0.8
+        },
+        "E_independent_gain": {
+          "blocks": 23,
+          "standard_deviation": 0.000697000843,
+          "standard_deviation_upper_limit": 0.00080916159,
+          "upper_limit_confidence": 0.8
+        },
+        "E_reuse_gap": {
+          "blocks": 23,
+          "standard_deviation": 0.00328510469,
+          "standard_deviation_upper_limit": 0.00381374078,
+          "upper_limit_confidence": 0.8
+        },
+        "E_source_gain": {
+          "blocks": 23,
+          "standard_deviation": 0.00340560194,
+          "standard_deviation_upper_limit": 0.00395362833,
+          "upper_limit_confidence": 0.8
+        },
+        "E_transfer_loss": {
+          "blocks": 23,
+          "standard_deviation": 0.0037957384,
+          "standard_deviation_upper_limit": 0.0044065452,
+          "upper_limit_confidence": 0.8
+        }
+      },
+      "model_parameters": 21532832,
+      "seconds_per_block_mean": 349.19506763052215
+    },
+    "64": {
+      "base_competence_failures": [],
+      "blocks_base_competent": 24,
+      "blocks_completed": 24,
+      "blocks_scheduled": 24,
+      "dispersion": {
+        "B_apparent_improvement": {
+          "blocks": 24,
+          "standard_deviation": 0.00278293605,
+          "standard_deviation_upper_limit": 0.00321849899,
+          "upper_limit_confidence": 0.8
+        },
+        "C_apparent_improvement": {
+          "blocks": 24,
+          "standard_deviation": 0.00221708079,
+          "standard_deviation_upper_limit": 0.00256408058,
+          "upper_limit_confidence": 0.8
+        },
+        "C_independent_gain": {
+          "blocks": 24,
+          "standard_deviation": 0.000835910011,
+          "standard_deviation_upper_limit": 0.000966739975,
+          "upper_limit_confidence": 0.8
+        },
+        "C_independent_harm": {
+          "blocks": 24,
+          "standard_deviation": 0.000835910011,
+          "standard_deviation_upper_limit": 0.000966739975,
+          "upper_limit_confidence": 0.8
+        },
+        "C_minus_D2_gap": {
+          "blocks": 24,
+          "standard_deviation": 0.00312770088,
+          "standard_deviation_upper_limit": 0.00361722367,
+          "upper_limit_confidence": 0.8
+        },
+        "C_minus_D_gap": {
+          "blocks": 24,
+          "standard_deviation": 0.00273577142,
+          "standard_deviation_upper_limit": 0.00316395254,
+          "upper_limit_confidence": 0.8
+        },
+        "C_minus_D_source": {
+          "blocks": 24,
+          "standard_deviation": 0.00300982743,
+          "standard_deviation_upper_limit": 0.00348090161,
+          "upper_limit_confidence": 0.8
+        },
+        "C_reuse_gap": {
+          "blocks": 24,
+          "standard_deviation": 0.00320650954,
+          "standard_deviation_upper_limit": 0.00370836683,
+          "upper_limit_confidence": 0.8
+        },
+        "C_source_gain": {
+          "blocks": 24,
+          "standard_deviation": 0.00337520996,
+          "standard_deviation_upper_limit": 0.00390347089,
+          "upper_limit_confidence": 0.8
+        },
+        "D2_independent_gain": {
+          "blocks": 24,
+          "standard_deviation": 0.000672768744,
+          "standard_deviation_upper_limit": 0.00077806514,
+          "upper_limit_confidence": 0.8
+        },
+        "D2_reuse_gap": {
+          "blocks": 24,
+          "standard_deviation": 0.00149989954,
+          "standard_deviation_upper_limit": 0.00173465185,
+          "upper_limit_confidence": 0.8
+        },
+        "D2_source_gain": {
+          "blocks": 24,
+          "standard_deviation": 0.00149668997,
+          "standard_deviation_upper_limit": 0.00173093995,
+          "upper_limit_confidence": 0.8
+        },
+        "D_independent_gain": {
+          "blocks": 24,
+          "standard_deviation": 0.000650156484,
+          "standard_deviation_upper_limit": 0.000751913789,
+          "upper_limit_confidence": 0.8
+        },
+        "D_reuse_gap": {
+          "blocks": 24,
+          "standard_deviation": 0.00154892674,
+          "standard_deviation_upper_limit": 0.0017913524,
+          "upper_limit_confidence": 0.8
+        },
+        "D_source_gain": {
+          "blocks": 24,
+          "standard_deviation": 0.00158411469,
+          "standard_deviation_upper_limit": 0.00183204769,
+          "upper_limit_confidence": 0.8
+        },
+        "E_exact_gain": {
+          "blocks": 24,
+          "standard_deviation": 0.00292230462,
+          "standard_deviation_upper_limit": 0.00337968042,
+          "upper_limit_confidence": 0.8
+        },
+        "E_independent_gain": {
+          "blocks": 24,
+          "standard_deviation": 0.000645189994,
+          "standard_deviation_upper_limit": 0.000746169984,
+          "upper_limit_confidence": 0.8
+        },
+        "E_reuse_gap": {
+          "blocks": 24,
+          "standard_deviation": 0.00312497743,
+          "standard_deviation_upper_limit": 0.00361407396,
+          "upper_limit_confidence": 0.8
+        },
+        "E_source_gain": {
+          "blocks": 24,
+          "standard_deviation": 0.00319227231,
+          "standard_deviation_upper_limit": 0.0036919013,
+          "upper_limit_confidence": 0.8
+        },
+        "E_transfer_loss": {
+          "blocks": 24,
+          "standard_deviation": 0.00202823838,
+          "standard_deviation_upper_limit": 0.00234568206,
+          "upper_limit_confidence": 0.8
+        }
+      },
+      "model_parameters": 4511456,
+      "seconds_per_block_mean": 259.86668376562494
+    }
+  },
+  "config": {
+    "arm_examples_per_batch": 8,
+    "arms": {
+      "B": "64 independent replacement trajectories under fresh appearances",
+      "C": "the 64 source trajectories under appearances unique within the block",
+      "D": "one independent neighbor per source, closer than anything in base training: RMS state distance in [0.25, 0.5] x the source's nearest base-training distance",
+      "D2": "one reservoir-selected independent neighbor per source in the 0.1st-1st percentile band of pairwise independent distances (comparable to base-training nearest neighbors)",
+      "E": "the exact renders forming the exact population (diagnostic reference, not a ceiling)"
+    },
+    "base_competence_screen": "Pre-treatment screen on a separate 256-event competence population (never scored in contrasts): a block enters the primary analysis iff its base model's bounded error there is below constant velocity's. All blocks reported; an analysis over all completed blocks is a sensitivity analysis.",
+    "base_train_examples": 512,
+    "base_training_steps": 600,
+    "base_training_steps_rationale_2d": "Fixed from effect-blind base-only tuning (results/exposure2d_base_tuning.json): at 300 steps the 2D base model only marginally beats constant velocity on the screen (error ratio 0.93-0.98); at 600 steps it is clearly competent (0.68-0.72) and later checkpoints plateau.",
+    "batch_size": 32,
+    "blocks": 72,
+    "capacity_assignment": "capacity_schedule: deterministic proportional interleaving over block indices (every contiguous stretch is balanced)",
+    "capacity_blocks": {
+      "16": 24,
+      "256": 24,
+      "64": 24
+    },
+    "capacity_levels": [
+      16,
+      64,
+      256
+    ],
+    "closer_nearby": {
+      "box_multiplier": 2.5,
+      "box_multiplier_rationale_2d": "In the 9-parameter 2D state space the 1D multiplier (6) makes the proposal box nearly the full range and acceptance infeasible (no proposal accepted in 2M). With 2.5, accepted states use at most 61% of the box (12-source check), so the box does not truncate the band; the per-block closer_box_offset_max descriptor monitors this.",
+      "construction": "box-conditioned band distribution: uniform initial-state prior restricted to a sensitivity-scaled box (edge offset alone gives 6x the band maximum; capped at the full parameter range) and conditioned on RMS state distance in [0.25, 0.5] x the source's nearest base-training distance",
+      "containment_validation": "results/closer_sampler_validation.json (box enlargement 6 vs 9, reservoir agreement, capped fractions); empirical, not a proof",
+      "high_fraction": 0.5,
+      "low_fraction": 0.25
+    },
+    "continuation_steps": 100,
+    "dims": 2,
+    "error_cap": 1.0,
+    "experiment_seed": 2026102701,
+    "exposure_dose": "800 arm-slot presentations over 64 sources: 12 or 13 presentations per source",
+    "failure_policy": "Infrastructure errors (OSError, MemoryError, device/MPS runtime errors) retry once with identical seeds; other exceptions are algorithmic failures. All failures are recorded.",
+    "frame_dt": 0.04,
+    "future_frames": 16,
+    "heldout_renders_per_source": 4,
+    "hidden_channels": 16,
+    "image_size": 64,
+    "independent_eval_examples": 512,
+    "learning_rate": 0.001,
+    "name": "exposure2d_capacity_pilot_v1",
+    "nearby": {
+      "construction": "independently simulated reservoir events assigned one-to-one by maximum bipartite matching inside a state-distance quantile band",
+      "high_quantile": 0.01,
+      "low_quantile": 0.001,
+      "reservoir_size": 20000
+    },
+    "observed_frames": 8,
+    "populations": {
+      "exact": "the render E trains on; unseen by B, C, and D",
+      "independent": "512 independently sampled trajectories under fresh appearances",
+      "source": "4 held-out renders per source trajectory, unseen by every arm"
+    },
+    "primary_metric": "mean over examples of per-disk-frame Euclidean center error, capped at 1 arena width; nonfinite outputs receive the cap",
+    "purpose": "Effect-blind capacity pilot: the registered 2D design at three predictor sizes (hidden channels 16, 64, 256; same training protocol, learning rate and steps) to release per-level contrast dispersions, competence counts and runtime for planning the capacity secondary of the confirmation. No contrast location is released; the only non-dispersion output is the coarse pooled positive-control flag.",
+    "replay_examples_per_batch": 24,
+    "role": "pilot",
+    "screen_examples": 256,
+    "sd_upper_limit_confidence": 0.8,
+    "secondary_endpoints_note": "Raw records retain per-render bounded center-error losses only; contact-timing and post-contact-velocity endpoints are not part of this confirmation.",
+    "seed_derivation": "numpy SeedSequence(entropy=experiment_seed, spawn_key=(block_index,)) spawned into data, schedule, base_batches, torch roles",
+    "source_trajectories": 64,
+    "status": "effect_blinded_pilot"
+  },
+  "config_sha256": "c0c6bf25515de3c4e8b9eeef3cf465e275154134ae0d1daa77c2990316534598",
+  "design_descriptors": {
+    "base_nearest_distance_median": 0.03831689892691881,
+    "closer_box_offset_max": 0.9852645002392364,
+    "closer_state_distance_median": 0.01698675310611298,
+    "nearby_band_mean": [
+      0.03623738883617826,
+      0.05176267551884905
+    ],
+    "nearby_state_distance_median": 0.047112625562700405,
+    "presentations_per_source": [
+      [
+        12,
+        13
+      ]
+    ],
+    "replacement_state_distance_median": 0.13055497347894315
+  },
+  "dispersion": {
+    "B_apparent_improvement": {
+      "blocks": 71,
+      "standard_deviation": 0.0026932035,
+      "standard_deviation_upper_limit": 0.0029113312,
+      "upper_limit_confidence": 0.8
+    },
+    "C_apparent_improvement": {
+      "blocks": 71,
+      "standard_deviation": 0.00393738062,
+      "standard_deviation_upper_limit": 0.00425627661,
+      "upper_limit_confidence": 0.8
+    },
+    "C_independent_gain": {
+      "blocks": 71,
+      "standard_deviation": 0.0145065022,
+      "standard_deviation_upper_limit": 0.0156814116,
+      "upper_limit_confidence": 0.8
+    },
+    "C_independent_harm": {
+      "blocks": 71,
+      "standard_deviation": 0.0145065022,
+      "standard_deviation_upper_limit": 0.0156814116,
+      "upper_limit_confidence": 0.8
+    },
+    "C_minus_D2_gap": {
+      "blocks": 71,
+      "standard_deviation": 0.00421283794,
+      "standard_deviation_upper_limit": 0.00455404375,
+      "upper_limit_confidence": 0.8
+    },
+    "C_minus_D_gap": {
+      "blocks": 71,
+      "standard_deviation": 0.00350568121,
+      "standard_deviation_upper_limit": 0.00378961303,
+      "upper_limit_confidence": 0.8
+    },
+    "C_minus_D_source": {
+      "blocks": 71,
+      "standard_deviation": 0.0164992042,
+      "standard_deviation_upper_limit": 0.0178355064,
+      "upper_limit_confidence": 0.8
+    },
+    "C_reuse_gap": {
+      "blocks": 71,
+      "standard_deviation": 0.00428122797,
+      "standard_deviation_upper_limit": 0.00462797282,
+      "upper_limit_confidence": 0.8
+    },
+    "C_source_gain": {
+      "blocks": 71,
+      "standard_deviation": 0.0171741401,
+      "standard_deviation_upper_limit": 0.0185651066,
+      "upper_limit_confidence": 0.8
+    },
+    "D2_independent_gain": {
+      "blocks": 71,
+      "standard_deviation": 0.000906567453,
+      "standard_deviation_upper_limit": 0.000979992086,
+      "upper_limit_confidence": 0.8
+    },
+    "D2_reuse_gap": {
+      "blocks": 71,
+      "standard_deviation": 0.00137212862,
+      "standard_deviation_upper_limit": 0.00148325994,
+      "upper_limit_confidence": 0.8
+    },
+    "D2_source_gain": {
+      "blocks": 71,
+      "standard_deviation": 0.00153622745,
+      "standard_deviation_upper_limit": 0.00166064945,
+      "upper_limit_confidence": 0.8
+    },
+    "D_independent_gain": {
+      "blocks": 71,
+      "standard_deviation": 0.00102082413,
+      "standard_deviation_upper_limit": 0.00110350263,
+      "upper_limit_confidence": 0.8
+    },
+    "D_reuse_gap": {
+      "blocks": 71,
+      "standard_deviation": 0.00192814865,
+      "standard_deviation_upper_limit": 0.0020843131,
+      "upper_limit_confidence": 0.8
+    },
+    "D_source_gain": {
+      "blocks": 71,
+      "standard_deviation": 0.00191529521,
+      "standard_deviation_upper_limit": 0.00207041863,
+      "upper_limit_confidence": 0.8
+    },
+    "E_exact_gain": {
+      "blocks": 71,
+      "standard_deviation": 0.00509606647,
+      "standard_deviation_upper_limit": 0.00550880665,
+      "upper_limit_confidence": 0.8
+    },
+    "E_independent_gain": {
+      "blocks": 71,
+      "standard_deviation": 0.000933010895,
+      "standard_deviation_upper_limit": 0.00100857723,
+      "upper_limit_confidence": 0.8
+    },
+    "E_reuse_gap": {
+      "blocks": 71,
+      "standard_deviation": 0.00373339162,
+      "standard_deviation_upper_limit": 0.00403576615,
+      "upper_limit_confidence": 0.8
+    },
+    "E_source_gain": {
+      "blocks": 71,
+      "standard_deviation": 0.00382527696,
+      "standard_deviation_upper_limit": 0.00413509346,
+      "upper_limit_confidence": 0.8
+    },
+    "E_transfer_loss": {
+      "blocks": 71,
+      "standard_deviation": 0.00331018229,
+      "standard_deviation_upper_limit": 0.00357828029,
+      "upper_limit_confidence": 0.8
+    }
+  },
+  "infrastructure_failures": [],
+  "positive_control_passed": true,
+  "pretreatment_balance": {
+    "base_source_minus_independent_mean": -8.499123890634993e-05,
+    "base_source_minus_independent_sd": 0.0028213070884031315
+  },
+  "provenance": {
+    "device": "cuda",
+    "git_commit": "964a4a4b89946522019b9a59ed6104fffec41e07",
+    "git_dirty": true,
+    "numpy": "2.1.3",
+    "platform": "Linux-6.6.159+-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "torch": "2.11.0+cu130"
+  },
+  "runtime": {
+    "seconds_per_block_mean": 286.14915778945084,
+    "total_seconds": 20627.95520251801
+  }
+}

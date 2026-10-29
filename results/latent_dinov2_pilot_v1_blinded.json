@@ -1,0 +1,234 @@
+{
+  "algorithmic_failures": [],
+  "base_competence_failures": [],
+  "blinded": true,
+  "blocks_base_competent": 24,
+  "blocks_completed": 24,
+  "blocks_scheduled": 24,
+  "config": {
+    "architecture_note": "hidden_channels is the latent transformer width; capacity_levels would vary it. Learning rate 3e-4 (transformer default), fixed before the pilot.",
+    "arm_examples_per_batch": 8,
+    "arms": {
+      "B": "64 independent replacement trajectories under fresh appearances",
+      "C": "the 64 source trajectories under appearances unique within the block",
+      "D": "one independent neighbor per source, closer than anything in base training: RMS state distance in [0.25, 0.5] x the source's nearest base-training distance",
+      "D2": "one reservoir-selected independent neighbor per source in the 0.1st-1st percentile band of pairwise independent distances (comparable to base-training nearest neighbors)",
+      "E": "the exact renders forming the exact population (diagnostic reference, not a ceiling)"
+    },
+    "base_competence_screen": "Pre-treatment screen on a separate 256-event competence population (never scored in contrasts): a block enters the primary analysis iff its base model's bounded error there is below constant velocity's. All blocks reported; an analysis over all completed blocks is a sensitivity analysis.",
+    "base_train_examples": 512,
+    "base_training_steps": 600,
+    "base_training_steps_rationale_2d": "Fixed from effect-blind base-only tuning (results/exposure2d_base_tuning.json): at 300 steps the 2D base model only marginally beats constant velocity on the screen (error ratio 0.93-0.98); at 600 steps it is clearly competent (0.68-0.72) and later checkpoints plateau.",
+    "batch_size": 32,
+    "blocks": 24,
+    "closer_nearby": {
+      "box_multiplier": 2.5,
+      "box_multiplier_rationale_2d": "In the 9-parameter 2D state space the 1D multiplier (6) makes the proposal box nearly the full range and acceptance infeasible (no proposal accepted in 2M). With 2.5, accepted states use at most 61% of the box (12-source check), so the box does not truncate the band; the per-block closer_box_offset_max descriptor monitors this.",
+      "construction": "box-conditioned band distribution: uniform initial-state prior restricted to a sensitivity-scaled box (edge offset alone gives 6x the band maximum; capped at the full parameter range) and conditioned on RMS state distance in [0.25, 0.5] x the source's nearest base-training distance",
+      "containment_validation": "results/closer_sampler_validation.json (box enlargement 6 vs 9, reservoir agreement, capped fractions); empirical, not a proof",
+      "high_fraction": 0.5,
+      "low_fraction": 0.25
+    },
+    "continuation_steps": 100,
+    "dims": 2,
+    "error_cap": 1.0,
+    "experiment_seed": 2026102801,
+    "exposure_dose": "800 arm-slot presentations over 64 sources: 12 or 13 presentations per source",
+    "failure_policy": "Infrastructure errors (OSError, MemoryError, device/MPS runtime errors) retry once with identical seeds; other exceptions are algorithmic failures. All failures are recorded.",
+    "frame_dt": 0.04,
+    "future_frames": 16,
+    "heldout_renders_per_source": 4,
+    "hidden_channels": 256,
+    "image_size": 64,
+    "independent_eval_examples": 512,
+    "learning_rate": 0.0003,
+    "name": "exposure2d_latent_dinov2_pilot_v1",
+    "nearby": {
+      "construction": "independently simulated reservoir events assigned one-to-one by maximum bipartite matching inside a state-distance quantile band",
+      "high_quantile": 0.01,
+      "low_quantile": 0.001,
+      "reservoir_size": 20000
+    },
+    "observed_frames": 8,
+    "populations": {
+      "exact": "the render E trains on; unseen by B, C, and D",
+      "independent": "512 independently sampled trajectories under fresh appearances",
+      "source": "4 held-out renders per source trajectory, unseen by every arm"
+    },
+    "predictor": {
+      "depth": 4,
+      "encoder": "dinov2-small",
+      "heads": 8,
+      "type": "latent"
+    },
+    "primary_metric": "mean over examples of per-disk-frame Euclidean center error, capped at 1 arena width; nonfinite outputs receive the cap",
+    "purpose": "Effect-blind pilot of the architecture axis: the registered 2D reuse design with a latent world-model predictor (frozen pretrained encoder dinov2-small, trained transformer width 256 depth 4 heads 8) instead of the ConvLSTM. Same events, appearances, arms, steps and contrasts; renders stay 64x64 and are upsampled at encoding. Releases dispersions, competence counts, runtime and the pooled coarse positive-control flag only.",
+    "replay_examples_per_batch": 24,
+    "role": "pilot",
+    "screen_examples": 256,
+    "sd_upper_limit_confidence": 0.8,
+    "secondary_endpoints_note": "Raw records retain per-render bounded center-error losses only; contact-timing and post-contact-velocity endpoints are not part of this confirmation.",
+    "seed_derivation": "numpy SeedSequence(entropy=experiment_seed, spawn_key=(block_index,)) spawned into data, schedule, base_batches, torch roles",
+    "source_trajectories": 64,
+    "status": "effect_blinded_pilot"
+  },
+  "config_sha256": "112727c3b2c4baba1381c8de71b78423f8205ab49d2f2ad7d71d83d778973bfb",
+  "design_descriptors": {
+    "base_nearest_distance_median": 0.038486026665275286,
+    "closer_box_offset_max": 0.9957561035902911,
+    "closer_state_distance_median": 0.017032235003870747,
+    "nearby_band_mean": [
+      0.036044297779678665,
+      0.05169198015131258
+    ],
+    "nearby_state_distance_median": 0.04683805405483102,
+    "presentations_per_source": [
+      [
+        12,
+        13
+      ]
+    ],
+    "replacement_state_distance_median": 0.1309506906527606
+  },
+  "dispersion": {
+    "B_apparent_improvement": {
+      "blocks": 24,
+      "standard_deviation": 0.00305209198,
+      "standard_deviation_upper_limit": 0.00352978107,
+      "upper_limit_confidence": 0.8
+    },
+    "C_apparent_improvement": {
+      "blocks": 24,
+      "standard_deviation": 0.00277637733,
+      "standard_deviation_upper_limit": 0.00321091376,
+      "upper_limit_confidence": 0.8
+    },
+    "C_independent_gain": {
+      "blocks": 24,
+      "standard_deviation": 0.00313931227,
+      "standard_deviation_upper_limit": 0.00363065238,
+      "upper_limit_confidence": 0.8
+    },
+    "C_independent_harm": {
+      "blocks": 24,
+      "standard_deviation": 0.00313931227,
+      "standard_deviation_upper_limit": 0.00363065238,
+      "upper_limit_confidence": 0.8
+    },
+    "C_minus_D2_gap": {
+      "blocks": 24,
+      "standard_deviation": 0.00198479058,
+      "standard_deviation_upper_limit": 0.00229543416,
+      "upper_limit_confidence": 0.8
+    },
+    "C_minus_D_gap": {
+      "blocks": 24,
+      "standard_deviation": 0.00212253658,
+      "standard_deviation_upper_limit": 0.00245473907,
+      "upper_limit_confidence": 0.8
+    },
+    "C_minus_D_source": {
+      "blocks": 24,
+      "standard_deviation": 0.00283385385,
+      "standard_deviation_upper_limit": 0.00327738604,
+      "upper_limit_confidence": 0.8
+    },
+    "C_reuse_gap": {
+      "blocks": 24,
+      "standard_deviation": 0.00154231095,
+      "standard_deviation_upper_limit": 0.00178370116,
+      "upper_limit_confidence": 0.8
+    },
+    "C_source_gain": {
+      "blocks": 24,
+      "standard_deviation": 0.00325205654,
+      "standard_deviation_upper_limit": 0.00376104248,
+      "upper_limit_confidence": 0.8
+    },
+    "D2_independent_gain": {
+      "blocks": 24,
+      "standard_deviation": 0.0034073612,
+      "standard_deviation_upper_limit": 0.00394065419,
+      "upper_limit_confidence": 0.8
+    },
+    "D2_reuse_gap": {
+      "blocks": 24,
+      "standard_deviation": 0.00139162002,
+      "standard_deviation_upper_limit": 0.00160942528,
+      "upper_limit_confidence": 0.8
+    },
+    "D2_source_gain": {
+      "blocks": 24,
+      "standard_deviation": 0.00316584182,
+      "standard_deviation_upper_limit": 0.00366133413,
+      "upper_limit_confidence": 0.8
+    },
+    "D_independent_gain": {
+      "blocks": 24,
+      "standard_deviation": 0.00280858158,
+      "standard_deviation_upper_limit": 0.00324815836,
+      "upper_limit_confidence": 0.8
+    },
+    "D_reuse_gap": {
+      "blocks": 24,
+      "standard_deviation": 0.00145585512,
+      "standard_deviation_upper_limit": 0.00168371395,
+      "upper_limit_confidence": 0.8
+    },
+    "D_source_gain": {
+      "blocks": 24,
+      "standard_deviation": 0.00275208954,
+      "standard_deviation_upper_limit": 0.00318282463,
+      "upper_limit_confidence": 0.8
+    },
+    "E_exact_gain": {
+      "blocks": 24,
+      "standard_deviation": 0.0031384183,
+      "standard_deviation_upper_limit": 0.00362961849,
+      "upper_limit_confidence": 0.8
+    },
+    "E_independent_gain": {
+      "blocks": 24,
+      "standard_deviation": 0.0027493285,
+      "standard_deviation_upper_limit": 0.00317963146,
+      "upper_limit_confidence": 0.8
+    },
+    "E_reuse_gap": {
+      "blocks": 24,
+      "standard_deviation": 0.0013075889,
+      "standard_deviation_upper_limit": 0.00151224228,
+      "upper_limit_confidence": 0.8
+    },
+    "E_source_gain": {
+      "blocks": 24,
+      "standard_deviation": 0.00278346141,
+      "standard_deviation_upper_limit": 0.00321910658,
+      "upper_limit_confidence": 0.8
+    },
+    "E_transfer_loss": {
+      "blocks": 24,
+      "standard_deviation": 0.00153095146,
+      "standard_deviation_upper_limit": 0.00177056377,
+      "upper_limit_confidence": 0.8
+    }
+  },
+  "infrastructure_failures": [],
+  "positive_control_passed": true,
+  "pretreatment_balance": {
+    "base_source_minus_independent_mean": -0.0012331961964567502,
+    "base_source_minus_independent_sd": 0.0036998318138427915
+  },
+  "provenance": {
+    "device": "cuda",
+    "git_commit": "964a4a4b89946522019b9a59ed6104fffec41e07",
+    "git_dirty": true,
+    "numpy": "2.1.3",
+    "platform": "Linux-6.6.159+-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "torch": "2.11.0+cu130"
+  },
+  "runtime": {
+    "seconds_per_block_mean": 141.7510475185833,
+    "total_seconds": 3402.0251404459996
+  }
+}

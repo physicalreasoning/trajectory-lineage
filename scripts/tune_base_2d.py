@@ -18,9 +18,11 @@ import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from exposure_experiment import (  # noqa: E402
+    configure_backend,
     constant_velocity_error,
     evaluate,
     new_model,
+    predictor_config,
     spec_from,
     to_tensors,
     train_steps,
@@ -31,6 +33,7 @@ from trajectory_lineage.exposure import (  # noqa: E402
     render_event,
     sample_event,
 )
+from trajectory_lineage.latent import get_encoder  # noqa: E402
 
 
 def main() -> None:
@@ -44,7 +47,14 @@ def main() -> None:
     args = parser.parse_args()
     config = json.loads(args.config.read_text())
     spec = spec_from(config)
-    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+    device = torch.device(
+        "cuda"
+        if torch.cuda.is_available()
+        else "mps"
+        if torch.backends.mps.is_available()
+        else "cpu"
+    )
+    configure_backend(device)
     checkpoints = [int(x) for x in args.checkpoints.split(",")]
     rows = []
     for block in range(args.blocks):
@@ -59,6 +69,10 @@ def main() -> None:
             [render_event(e, spec, seeds.draw()) for e in screen_events], screen_events, spec
         )
         cv = constant_velocity_error(screen_events, spec, float(config["error_cap"]))
+        if predictor_config(config)["type"] == "latent":  # frozen encoder: tokens once per block
+            encoder = get_encoder(predictor_config(config)["encoder"], device)
+            base = (encoder.encode(base[0]), base[1])
+            screen = (encoder.encode(screen[0]), screen[1])
         for hidden in [int(h) for h in args.hidden.split(",")]:
             torch.manual_seed(1000 * block + hidden)
             cfg = dict(config, hidden_channels=hidden)

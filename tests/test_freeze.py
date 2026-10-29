@@ -24,7 +24,7 @@ def setup(tmp_path: Path, **config_overrides) -> tuple[Path, dict]:
         "config_sha256": freeze.sha256(config_path),
         "code_commit": "frozen",
         "analyzer_sha256": freeze.sha256(ANALYZER),
-        "signoffs": {"paper_lead": "Jiankai Sun", "evaluation_science": "Yining Hua"},
+        "signoffs": {"paper_lead": "Paper Lead", "stats_check": "Internal Statistician"},
         "signoff_date": "2026-10-20",
         "decision_statement": "A 0.001 shift decides whether a model is reported as better.",
         "excluded_pilot_seeds": [5, 7],

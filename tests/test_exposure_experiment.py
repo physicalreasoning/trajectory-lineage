@@ -102,9 +102,7 @@ def test_failed_blocks_count_against_positive_control() -> None:
 
 
 def test_unblinding_requires_complete_manifest(tmp_path: Path, monkeypatch) -> None:
-    config = dict(
-        TINY, role="confirmatory", required_signoff_roles=["paper_lead", "evaluation_science"]
-    )
+    config = dict(TINY, role="confirmatory", required_signoff_roles=["paper_lead", "stats_check"])
     config["excluded_pilot_seeds"] = [5]
     config_path = tmp_path / "exposure_confirmation.json"
     config_path.write_text(json.dumps(config))
@@ -123,7 +121,7 @@ def test_unblinding_requires_complete_manifest(tmp_path: Path, monkeypatch) -> N
         "config_sha256": experiment.config_hash(config_path),
         "code_commit": "abc123",
         "analyzer_sha256": experiment.config_hash(experiment.ANALYZER),
-        "signoffs": {"paper_lead": "Jiankai Sun", "evaluation_science": "Yining Hua"},
+        "signoffs": {"paper_lead": "Paper Lead", "stats_check": "Internal Statistician"},
         "signoff_date": "2026-10-20",
         "decision_statement": "A 0.001 shift changes whether we report one model as better.",
         "excluded_pilot_seeds": [5, 7],
@@ -135,7 +133,7 @@ def test_unblinding_requires_complete_manifest(tmp_path: Path, monkeypatch) -> N
         ("config_sha256", "wrong"),
         ("code_commit", "other"),
         ("analyzer_sha256", "wrong"),
-        ("signoffs", {"paper_lead": "full name", "evaluation_science": "Yining Hua"}),
+        ("signoffs", {"paper_lead": "full name", "stats_check": "Internal Statistician"}),
         ("signoff_date", "soon"),
         ("decision_statement", "ok"),
         ("excluded_pilot_seeds", [5]),

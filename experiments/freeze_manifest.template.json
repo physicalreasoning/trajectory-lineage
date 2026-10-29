@@ -5,7 +5,7 @@
   "analyzer_sha256": "sha256 of scripts/analyze_confirmation.py",
   "signoffs": {
     "paper_lead": "full name",
-    "evaluation_science": "full name"
+    "stats_check": "full name"
   },
   "signoff_date": "YYYY-MM-DD",
   "excluded_pilot_seeds": [

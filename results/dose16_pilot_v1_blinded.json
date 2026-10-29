@@ -1,0 +1,227 @@
+{
+  "algorithmic_failures": [],
+  "base_competence_failures": [],
+  "blinded": true,
+  "blocks_base_competent": 24,
+  "blocks_completed": 24,
+  "blocks_scheduled": 24,
+  "config": {
+    "arm_examples_per_batch": 8,
+    "arms": {
+      "B": "64 independent replacement trajectories under fresh appearances",
+      "C": "the 64 source trajectories under appearances unique within the block",
+      "D": "one independent neighbor per source, closer than anything in base training: RMS state distance in [0.25, 0.5] x the source's nearest base-training distance",
+      "D2": "one reservoir-selected independent neighbor per source in the 0.1st-1st percentile band of pairwise independent distances (comparable to base-training nearest neighbors)",
+      "E": "the exact renders forming the exact population (diagnostic reference, not a ceiling)"
+    },
+    "base_competence_screen": "Pre-treatment screen on a separate 256-event competence population (never scored in contrasts): a block enters the primary analysis iff its base model's bounded error there is below constant velocity's. All blocks reported; an analysis over all completed blocks is a sensitivity analysis.",
+    "base_train_examples": 512,
+    "base_training_steps": 600,
+    "base_training_steps_rationale_2d": "Fixed from effect-blind base-only tuning (results/exposure2d_base_tuning.json): at 300 steps the 2D base model only marginally beats constant velocity on the screen (error ratio 0.93-0.98); at 600 steps it is clearly competent (0.68-0.72) and later checkpoints plateau.",
+    "batch_size": 32,
+    "blocks": 24,
+    "closer_nearby": {
+      "box_multiplier": 2.5,
+      "box_multiplier_rationale_2d": "In the 9-parameter 2D state space the 1D multiplier (6) makes the proposal box nearly the full range and acceptance infeasible (no proposal accepted in 2M). With 2.5, accepted states use at most 61% of the box (12-source check), so the box does not truncate the band; the per-block closer_box_offset_max descriptor monitors this.",
+      "construction": "box-conditioned band distribution: uniform initial-state prior restricted to a sensitivity-scaled box (edge offset alone gives 6x the band maximum; capped at the full parameter range) and conditioned on RMS state distance in [0.25, 0.5] x the source's nearest base-training distance",
+      "containment_validation": "results/closer_sampler_validation.json (box enlargement 6 vs 9, reservoir agreement, capped fractions); empirical, not a proof",
+      "high_fraction": 0.5,
+      "low_fraction": 0.25
+    },
+    "continuation_steps": 100,
+    "dims": 2,
+    "error_cap": 1.0,
+    "experiment_seed": 2026102811,
+    "exposure_dose": "800 arm-slot presentations over 16 sources: about 50.0 presentations per source (the registered design has 64 sources, 12-13 each)",
+    "failure_policy": "Infrastructure errors (OSError, MemoryError, device/MPS runtime errors) retry once with identical seeds; other exceptions are algorithmic failures. All failures are recorded.",
+    "frame_dt": 0.04,
+    "future_frames": 16,
+    "heldout_renders_per_source": 4,
+    "hidden_channels": 16,
+    "image_size": 64,
+    "independent_eval_examples": 512,
+    "learning_rate": 0.001,
+    "name": "exposure2d_dose16_pilot_v1",
+    "nearby": {
+      "construction": "independently simulated reservoir events assigned one-to-one by maximum bipartite matching inside a state-distance quantile band",
+      "high_quantile": 0.01,
+      "low_quantile": 0.001,
+      "reservoir_size": 20000
+    },
+    "observed_frames": 8,
+    "populations": {
+      "exact": "the render E trains on; unseen by B, C, and D",
+      "independent": "512 independently sampled trajectories under fresh appearances",
+      "source": "4 held-out renders per source trajectory, unseen by every arm"
+    },
+    "primary_metric": "mean over examples of per-disk-frame Euclidean center error, capped at 1 arena width; nonfinite outputs receive the cap",
+    "purpose": "Effect-blind dose-response pilot: the registered 2D design with 16 reused source trajectories instead of 64, so each reused trajectory is presented about 50 times during the 100 continuation updates. Same arms, steps, contrasts; releases dispersions, competence counts, runtime and the pooled positive-control flag only.",
+    "replay_examples_per_batch": 24,
+    "role": "pilot",
+    "screen_examples": 256,
+    "sd_upper_limit_confidence": 0.8,
+    "secondary_endpoints_note": "Raw records retain per-render bounded center-error losses only; contact-timing and post-contact-velocity endpoints are not part of this confirmation.",
+    "seed_derivation": "numpy SeedSequence(entropy=experiment_seed, spawn_key=(block_index,)) spawned into data, schedule, base_batches, torch roles",
+    "source_trajectories": 16,
+    "status": "effect_blinded_pilot"
+  },
+  "config_sha256": "0a0137305a5e6cbd7efc5161d69b0786c7dc67d9b073ca76b11e8bb56ddf12c2",
+  "design_descriptors": {
+    "base_nearest_distance_median": 0.03849324590259477,
+    "closer_box_offset_max": 0.8831893854689357,
+    "closer_state_distance_median": 0.016942227239361826,
+    "nearby_band_mean": [
+      0.03638339802977383,
+      0.05182192430667066
+    ],
+    "nearby_state_distance_median": 0.04673425394714356,
+    "presentations_per_source": [
+      [
+        50,
+        50
+      ]
+    ],
+    "replacement_state_distance_median": 0.11830466937593227
+  },
+  "dispersion": {
+    "B_apparent_improvement": {
+      "blocks": 24,
+      "standard_deviation": 0.00544691084,
+      "standard_deviation_upper_limit": 0.00629941786,
+      "upper_limit_confidence": 0.8
+    },
+    "C_apparent_improvement": {
+      "blocks": 24,
+      "standard_deviation": 0.00262831298,
+      "standard_deviation_upper_limit": 0.00303967555,
+      "upper_limit_confidence": 0.8
+    },
+    "C_independent_gain": {
+      "blocks": 24,
+      "standard_deviation": 0.000694333242,
+      "standard_deviation_upper_limit": 0.000803004741,
+      "upper_limit_confidence": 0.8
+    },
+    "C_independent_harm": {
+      "blocks": 24,
+      "standard_deviation": 0.000694333242,
+      "standard_deviation_upper_limit": 0.000803004741,
+      "upper_limit_confidence": 0.8
+    },
+    "C_minus_D2_gap": {
+      "blocks": 24,
+      "standard_deviation": 0.00543007958,
+      "standard_deviation_upper_limit": 0.0062799523,
+      "upper_limit_confidence": 0.8
+    },
+    "C_minus_D_gap": {
+      "blocks": 24,
+      "standard_deviation": 0.00366649377,
+      "standard_deviation_upper_limit": 0.00424034412,
+      "upper_limit_confidence": 0.8
+    },
+    "C_minus_D_source": {
+      "blocks": 24,
+      "standard_deviation": 0.00349343233,
+      "standard_deviation_upper_limit": 0.00404019648,
+      "upper_limit_confidence": 0.8
+    },
+    "C_reuse_gap": {
+      "blocks": 24,
+      "standard_deviation": 0.00614307564,
+      "standard_deviation_upper_limit": 0.00710454082,
+      "upper_limit_confidence": 0.8
+    },
+    "C_source_gain": {
+      "blocks": 24,
+      "standard_deviation": 0.00587268591,
+      "standard_deviation_upper_limit": 0.00679183185,
+      "upper_limit_confidence": 0.8
+    },
+    "D2_independent_gain": {
+      "blocks": 24,
+      "standard_deviation": 0.000715373199,
+      "standard_deviation_upper_limit": 0.000827337704,
+      "upper_limit_confidence": 0.8
+    },
+    "D2_reuse_gap": {
+      "blocks": 24,
+      "standard_deviation": 0.00314193614,
+      "standard_deviation_upper_limit": 0.00363368691,
+      "upper_limit_confidence": 0.8
+    },
+    "D2_source_gain": {
+      "blocks": 24,
+      "standard_deviation": 0.00304861895,
+      "standard_deviation_upper_limit": 0.00352576447,
+      "upper_limit_confidence": 0.8
+    },
+    "D_independent_gain": {
+      "blocks": 24,
+      "standard_deviation": 0.000535965779,
+      "standard_deviation_upper_limit": 0.000619850866,
+      "upper_limit_confidence": 0.8
+    },
+    "D_reuse_gap": {
+      "blocks": 24,
+      "standard_deviation": 0.0044647303,
+      "standard_deviation_upper_limit": 0.00516351426,
+      "upper_limit_confidence": 0.8
+    },
+    "D_source_gain": {
+      "blocks": 24,
+      "standard_deviation": 0.00426397191,
+      "standard_deviation_upper_limit": 0.00493133477,
+      "upper_limit_confidence": 0.8
+    },
+    "E_exact_gain": {
+      "blocks": 24,
+      "standard_deviation": 0.00629286641,
+      "standard_deviation_upper_limit": 0.00727777565,
+      "upper_limit_confidence": 0.8
+    },
+    "E_independent_gain": {
+      "blocks": 24,
+      "standard_deviation": 0.000662476815,
+      "standard_deviation_upper_limit": 0.0007661624,
+      "upper_limit_confidence": 0.8
+    },
+    "E_reuse_gap": {
+      "blocks": 24,
+      "standard_deviation": 0.00582786574,
+      "standard_deviation_upper_limit": 0.00673999678,
+      "upper_limit_confidence": 0.8
+    },
+    "E_source_gain": {
+      "blocks": 24,
+      "standard_deviation": 0.00555330553,
+      "standard_deviation_upper_limit": 0.0064224646,
+      "upper_limit_confidence": 0.8
+    },
+    "E_transfer_loss": {
+      "blocks": 24,
+      "standard_deviation": 0.0032801431,
+      "standard_deviation_upper_limit": 0.00379352493,
+      "upper_limit_confidence": 0.8
+    }
+  },
+  "infrastructure_failures": [],
+  "positive_control_passed": true,
+  "pretreatment_balance": {
+    "base_source_minus_independent_mean": -0.00014937575906515121,
+    "base_source_minus_independent_sd": 0.005217678239100004
+  },
+  "provenance": {
+    "device": "cuda",
+    "git_commit": "964a4a4b89946522019b9a59ed6104fffec41e07",
+    "git_dirty": true,
+    "numpy": "2.1.3",
+    "platform": "Linux-6.6.159+-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "torch": "2.11.0+cu130"
+  },
+  "runtime": {
+    "seconds_per_block_mean": 63.424799334166586,
+    "total_seconds": 1522.1951840199981
+  }
+}
