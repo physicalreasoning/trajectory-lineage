@@ -209,8 +209,16 @@ def main() -> None:
         if name not in AXES:
             raise SystemExit(f"unknown axis {name}; expected one of {sorted(AXES)}")
         config = json.loads(Path(config_path).read_text())
-        runs = json.loads(Path(records_path).read_text())
-        runs = runs["runs"] if isinstance(runs, dict) and "runs" in runs else runs
+        try:  # every axis configuration must be bound by the same freeze manifest
+            validate_freeze(
+                json.loads(args.freeze_manifest.read_text()),
+                Path(config_path),
+                Path(__file__).with_name("analyze_2d.py"),
+            )
+        except FreezeError as error:
+            raise SystemExit(f"refusing to analyze axis {name}: {error}") from error
+        export = json.loads(Path(records_path).read_text())
+        runs = check_identity(export, args.freeze_manifest, Path(config_path))
         axes[name] = (validate_records(runs, int(config["blocks"]), config), config)
     result = analyze_axes({"result": main_result, "config": main_config}, axes)
     result["main"] = main_result

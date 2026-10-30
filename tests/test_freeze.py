@@ -102,3 +102,94 @@ def test_provisional_mode_requires_owner_and_label(tmp_path: Path) -> None:
         check(dict(provisional, signoffs={}), config_path, tmp_path)
     with pytest.raises(freeze.FreezeError):
         check(dict(provisional, mode="other"), config_path, tmp_path)
+
+
+# --- environment block, several configurations per manifest, axis role ---------------------------
+
+
+def env_repo(tmp_path: Path) -> Path:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "uv.lock").write_text("lock v1\n")
+    return repo
+
+
+def check_env(manifest, config_path, tmp_path, repo):
+    freeze.validate(
+        manifest,
+        config_path,
+        ANALYZER,
+        state=lambda: ("frozen", True),
+        changes=lambda commit: None,
+        experiments=tmp_path / "experiments",
+        repository=repo,
+    )
+
+
+def test_environment_block_is_required_and_checked(tmp_path: Path) -> None:
+    config_path, manifest = setup(tmp_path, require_environment=True)
+    repo = env_repo(tmp_path)
+    with pytest.raises(freeze.FreezeError, match="environment block"):
+        check_env(manifest, config_path, tmp_path, repo)
+    good = freeze.environment_block("A100", lockfile=repo / "uv.lock")
+    check_env({**manifest, "environment": good}, config_path, tmp_path, repo)
+    (repo / "uv.lock").write_text("lock v2\n")
+    with pytest.raises(freeze.FreezeError, match="lockfile"):
+        check_env({**manifest, "environment": good}, config_path, tmp_path, repo)
+    (repo / "uv.lock").write_text("lock v1\n")
+    tampered = {**good, "runtime": {**good["runtime"], "numpy": "0.0"}}
+    with pytest.raises(freeze.FreezeError, match="runtime_sha256"):
+        check_env({**manifest, "environment": tampered}, config_path, tmp_path, repo)
+    with pytest.raises(freeze.FreezeError, match="hardware class"):
+        check_env(
+            {**manifest, "environment": {**good, "hardware_class": "tbd"}},
+            config_path,
+            tmp_path,
+            repo,
+        )
+    # provisional (1D) manifests and configurations without the flag are unaffected
+    (tmp_path / "plain").mkdir()
+    plain_path, plain = setup(tmp_path / "plain")
+    check(plain, plain_path, tmp_path / "plain")
+
+
+def test_one_manifest_binds_several_configurations_including_axes(tmp_path: Path) -> None:
+    config_path, manifest = setup(tmp_path)
+    axis = config_path.parent / "exposure2d_confirm_dose16.json"
+    axis.write_text(json.dumps({"role": "confirmatory_axis", "experiment_seed": 101}))
+    multi = {k: v for k, v in manifest.items() if k != "config_sha256"}
+    multi["configs"] = {
+        config_path.stem: freeze.sha256(config_path),
+        axis.stem: freeze.sha256(axis),
+    }
+    check(multi, config_path, tmp_path)
+    check(multi, axis, tmp_path)
+    other = config_path.parent / "exposure2d_confirm_dose256.json"
+    other.write_text(json.dumps({"role": "confirmatory_axis", "experiment_seed": 102}))
+    with pytest.raises(freeze.FreezeError, match="does not bind"):
+        check(multi, other, tmp_path)
+
+
+def test_runtime_check_refuses_other_hardware_unless_a_deviation_is_logged() -> None:
+    env = freeze.environment_block("CPU")
+    record = freeze.check_runtime({"environment": env}, "cpu")
+    assert record["checked"] and record["hardware_matches"] and not record["runtime_differences"]
+    wrong = {**env, "hardware_class": "A100"}
+    with pytest.raises(freeze.FreezeError, match="frozen class"):
+        freeze.check_runtime({"environment": wrong}, "cpu")
+    logged = freeze.check_runtime(
+        {"environment": wrong}, "cpu", deviation="Colab had no A100 for a week"
+    )
+    assert logged["deviation"] and not logged["hardware_matches"]
+    drift = {**env, "runtime": {**env["runtime"], "numpy": "0.0"}}
+    with pytest.raises(freeze.FreezeError, match="runtime differs"):
+        freeze.check_runtime({"environment": drift}, "cpu")
+    assert freeze.check_runtime({}, "cpu")["checked"] is False
+
+
+def test_environment_command_writes_a_valid_block(tmp_path: Path) -> None:
+    out = tmp_path / "approvals" / "environment.json"
+    freeze.main(["environment", "--hardware-class", "A100", "--out", str(out)])
+    block = json.loads(out.read_text())
+    assert block["hardware_class"] == "A100" and block["lockfile"] == "uv.lock"
+    freeze.validate_environment(block)

@@ -15,7 +15,7 @@ pytest.importorskip("torch")  # the runner imports torch; covered by the model-u
 from analyze_2d import analyze_2d, check_identity  # noqa: E402
 from dryrun_2d import SCENARIOS, synthetic_runs  # noqa: E402
 from exposure_experiment import analyzer_for  # noqa: E402
-from freeze import FreezeError, run_identity, sha256, validate  # noqa: E402
+from freeze import FreezeError, environment_block, run_identity, sha256, validate  # noqa: E402
 
 from trajectory_lineage.exposure import scaled_capacity_config  # noqa: E402
 
@@ -45,6 +45,7 @@ def _setup(tmp_path, mode="confirmatory"):
         "decision_statement": "Thresholds approved as registered for the 2D confirmation "
         "(synthetic test)." + (" provisional" if mode == "provisional" else ""),
         "excluded_pilot_seeds": sorted(config["excluded_pilot_seeds"]),
+        "environment": environment_block("CPU"),
     }
     mpath = tmp_path / "manifest.json"
     mpath.write_text(json.dumps(manifest))

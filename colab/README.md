@@ -6,6 +6,7 @@ Notebooks for the GPU steps of the Seen and Unseen study. Open one in Google Col
 |---|---|---|
 | `run_exp3_pilots_a100.ipynb` | Experiment 3 effect-blind pilots: architecture axis (frozen DINOv2-small or V-JEPA 2-L encoder + latent transformer) and dose axis (16 or 256 reused sources), three blocks in parallel | Run on Oct 28; reports in `results/` |
 | `run_all_exp3_then_exp2.ipynb` | Part A: Experiment 3 capacity pilot. Part B: Experiment 2 Kuka feature cache on Drive, then manifest, certificate, support and dry run (`exp2-kuka-matched/`). Its training cells stay locked until a signed freeze exists | Run on Oct 28; Exp 2 results in `exp2-kuka-matched/results_real_oct28/` |
+| `prepare_exp3_freeze_environment.ipynb` | Records the environment block for the Experiment 3 freeze manifest (lockfile hash, exact package versions and their hash, hardware class) on the Colab runtime that will run the confirmation | Before the freeze |
 | `LOCKED_exp3_confirmation.ipynb` | Experiment 3 confirmation: the five registered configurations from the freeze tag, with the signed freeze manifest; raw records stay sealed on Drive | After registration, freeze and tag only |
 
 `build_notebooks.py` regenerates the notebooks. It refuses to write a notebook that fails its static checks (cell magics on the first line, Python syntax, shell placeholders defined earlier, `%%writefile` folders created earlier, embedded files compile).
