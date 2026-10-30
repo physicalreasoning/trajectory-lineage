@@ -193,3 +193,38 @@ def test_environment_command_writes_a_valid_block(tmp_path: Path) -> None:
     block = json.loads(out.read_text())
     assert block["hardware_class"] == "A100" and block["lockfile"] == "uv.lock"
     freeze.validate_environment(block)
+
+
+def test_draft_binds_all_five_configurations_and_is_refused_until_signed() -> None:
+    paths = [freeze.REPOSITORY / c for c in freeze.EXP3_CONFIGS]
+    env = freeze.environment_block("CPU")
+    draft = freeze.build_draft(paths, env, code_commit="abc123")
+    assert draft["status"] == "DRAFT - unsigned" and len(draft["configs"]) == 5
+    assert draft["analyzer"] == "scripts/analyze_2d.py"
+    every_pilot = freeze.pilot_registry(freeze.EXPERIMENTS, {})
+    assert every_pilot <= set(draft["excluded_pilot_seeds"])
+
+    def run(manifest, path):
+        freeze.validate(
+            manifest,
+            path,
+            freeze.REPOSITORY / draft["analyzer"],
+            state=lambda: ("abc123", True),
+            changes=lambda commit: [],
+        )
+
+    for path in paths:
+        with pytest.raises(freeze.FreezeError, match="sign-off"):
+            run(draft, path)
+    half = freeze.sign(draft, "paper_lead", "Paper Lead", "2026-11-02")
+    assert half["status"] == "DRAFT - unsigned"
+    with pytest.raises(freeze.FreezeError):
+        freeze.sign(half, "stats_check", "tbd", "2026-11-02")
+    signed = freeze.sign(half, "stats_check", "Stats Check", "2026-11-03")
+    assert signed["status"] == "signed" and signed["signoff_date"] == "2026-11-03"
+    for path in paths:
+        run(signed, path)
+    with pytest.raises(freeze.FreezeError, match="analyzers"):
+        freeze.build_draft(
+            [*paths, freeze.REPOSITORY / "experiments/exposure_confirmation.json"], env, "abc123"
+        )

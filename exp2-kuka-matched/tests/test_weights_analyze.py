@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import json
 
 import numpy as np
 import pytest
@@ -9,7 +10,7 @@ from scipy import stats
 from registered import sha256_json
 from registered.analyze import AnalysisError, analyze, holm, paired_t, validate_runs
 from registered.dryrun import synthetic_runs
-from registered.freeze import FreezeError, build_freeze, check_runtime, environment_block, verify_freeze
+from registered.freeze import FreezeError, build_freeze, check_runtime, environment_block, sign, verify_freeze
 
 
 # ---------------------------------------------------------------- weights
@@ -152,3 +153,36 @@ def test_freeze_binds_and_rejects(selection, support, config, tmp_path):
     tampered["selection_sha256_without_certificate"] = sha256_json({k: v for k, v in tampered.items() if k != "certificate"})
     with pytest.raises(FreezeError):
         verify_freeze(fz, config=config, selection=tampered, support=support, require_signoff=False)
+
+
+
+def test_draft_freeze_is_refused_until_both_internal_roles_sign(selection, support, config, tmp_path):
+    real_sel = copy.deepcopy(selection); real_sel["manifest_kind"] = "real"; real_sel["manifest_sha256"] = "testmanifest"
+    lock = tmp_path / "uv.lock"; lock.write_text("owner lock\n")
+    draft = build_freeze(config, tmp_path / "m.jsonl", real_sel, support, [], None, environment_block("A100", lock))
+    assert draft["status"] == "DRAFT - unsigned"
+    with pytest.raises(FreezeError, match="missing sign-off"):
+        verify_freeze(draft, config=config, selection=real_sel, support=support, require_signoff=True)
+    half = sign(draft, "paper_lead", "Paper Lead", "2026-11-02")
+    assert half["status"] == "DRAFT - unsigned"
+    with pytest.raises(FreezeError):
+        sign(half, "stats_check", "TBD", "2026-11-02")
+    full = sign(half, "stats_check", "Stats Check", "2026-11-02")
+    assert full["status"] == "signed"
+    verify_freeze(full, config=config, selection=real_sel, support=support, require_signoff=True, lockfile=lock)
+
+
+def test_freeze_cli_sign_and_verify(selection, support, config, tmp_path):
+    """The CLI path: create (draft) -> sign twice -> verify with sign-offs; sign takes no config."""
+
+    from registered.freeze import main as freeze_main
+
+    real_sel = copy.deepcopy(selection); real_sel["manifest_kind"] = "real"; real_sel["manifest_sha256"] = "testmanifest"
+    lock = tmp_path / "uv.lock"; lock.write_text("owner lock\n")
+    fz = build_freeze(config, tmp_path / "m.jsonl", real_sel, support, [], None, environment_block("CPU", lock))
+    path = tmp_path / "freeze.json"; path.write_text(json.dumps(fz))
+    freeze_main(["sign", "--freeze", str(path), "--role", "paper_lead", "--name", "Paper Lead", "--date", "2026-11-02"])
+    freeze_main(["sign", "--freeze", str(path), "--role", "stats_check", "--name", "Stats Check", "--date", "2026-11-02"])
+    signed = json.loads(path.read_text())
+    assert signed["status"] == "signed"
+    verify_freeze(signed, config=config, selection=real_sel, support=support, require_signoff=True, lockfile=lock)

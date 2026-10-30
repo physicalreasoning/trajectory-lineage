@@ -129,6 +129,7 @@ def build_freeze(config: dict, manifest_path: Path, selection: dict, support: di
         "code_sha256": code_hashes(),
         "design_B_budget": selection["design_B"]["budget_transitions"], "n_runs": selection["n_runs"],
         "approvals": approvals, "registration": registration, "environment": environment,
+        "status": "signed" if {a.get("role") for a in approvals} >= set(REQUIRED_ROLES) else "DRAFT - unsigned",
         "statement": "Training runs start only after this manifest is signed and the registration is submitted. No hypothesis, margin, weight, support, or selection changes afterwards.",
     }
 
@@ -157,6 +158,21 @@ def verify_freeze(freeze: dict, *, config: dict, selection: dict | None = None, 
                 raise FreezeError(f"placeholder or undated approval: {a}")
 
 
+def sign(freeze: dict, role: str, name: str, date: str) -> dict:
+    """Add one internal sign-off to a draft; it becomes signed once every required role has signed."""
+
+    if role not in REQUIRED_ROLES:
+        raise FreezeError(f"role must be one of {REQUIRED_ROLES}")
+    if str(name).strip().lower() in PLACEHOLDERS or len(str(name).split()) < 2:
+        raise FreezeError("sign with a full name")
+    if not DATE.match(date):
+        raise FreezeError("date must be YYYY-MM-DD")
+    approvals = [a for a in freeze.get("approvals", []) if a.get("role") != role] + [{"role": role, "name": name, "date": date}]
+    signed = {**freeze, "approvals": approvals}
+    signed["status"] = "signed" if {a["role"] for a in approvals} >= set(REQUIRED_ROLES) else "DRAFT - unsigned"
+    return signed
+
+
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description="Create or verify the Experiment 2 freeze manifest.")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -170,6 +186,11 @@ def main(argv: list[str] | None = None) -> None:
     c.add_argument("--hardware-class", required=True, help='hardware of the registered runs, for example "A100" or "Apple M"')
     c.add_argument("--lockfile", required=True, help="uv.lock of the owner's project (robot-world-model-optimism-research)")
     c.add_argument("--out", required=True)
+    g = sub.add_parser("sign", help="add one internal sign-off to a freeze manifest")
+    g.add_argument("--freeze", required=True)
+    g.add_argument("--role", required=True, choices=REQUIRED_ROLES)
+    g.add_argument("--name", required=True)
+    g.add_argument("--date", required=True, help="YYYY-MM-DD")
     v = sub.add_parser("verify")
     v.add_argument("--freeze", required=True)
     v.add_argument("--config", default=None)
@@ -178,7 +199,7 @@ def main(argv: list[str] | None = None) -> None:
     v.add_argument("--require-signoff", action="store_true")
     v.add_argument("--lockfile", default=None, help="check the owner's uv.lock against the frozen hash")
     args = ap.parse_args(argv)
-    config = load_config(args.config)
+    config = load_config(getattr(args, "config", None))
     if args.cmd == "create":
         approvals = []
         for a in args.approve:
@@ -188,6 +209,10 @@ def main(argv: list[str] | None = None) -> None:
                           environment_block(args.hardware_class, Path(args.lockfile)))
         write_json(Path(args.out), fz)
         print(json.dumps({k: v for k, v in fz.items() if k != "code_sha256"}, indent=1))
+    elif args.cmd == "sign":
+        signed = sign(json.loads(Path(args.freeze).read_text()), args.role, args.name, args.date)
+        write_json(Path(args.freeze), signed)
+        print(f"{args.freeze}: {signed['status']}; signed by {sorted(a['role'] for a in signed['approvals'])}")
     else:
         fz = json.loads(Path(args.freeze).read_text())
         verify_freeze(fz, config=config, selection=json.loads(Path(args.selection).read_text()) if args.selection else None,
