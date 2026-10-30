@@ -1,0 +1,41 @@
+{
+ "created": "2026-10-30T06:48:36+00:00",
+ "config_name": "exp2_transition_matched_kuka",
+ "config_version": "2026-10-28",
+ "config_sha256": "9befd6754f5e7b5e339ef90da8d3918d8b3454e4abd969ffe963cde85feabdbb",
+ "manifest_sha256": "1dcb390f0f095205fb4b8d68d023b5dcdc94f378564423059e8be07dd54c09d8",
+ "manifest_path": "/content/drive/MyDrive/seen-and-unseen/exp2/registered_out_freeze/manifest.jsonl",
+ "selection_sha256": "6bb9dc468e300577afb3e375ebcaa9a6b7e5c3253f898d6dce19c8d08008bb33",
+ "support_sha256": "0e637c81621c9d05990b6df330c464f592be30d22742550508385282db59d2e4",
+ "code_sha256": {
+  "registered/__init__.py": "797acfb670c07eceb8c2c6669de5c2d015da0a70a6d264778be11cd890efef28",
+  "registered/manifest.py": "e9b5325d1997045543f75375b197a8e1339b4d40f30a29bcca75e65ed16abe40",
+  "registered/design.py": "9e4308b57e73f70991b0316ee5ec1e6206204db8a47d2aeccccc04de925ef6c6",
+  "registered/weights.py": "f0c3874cf210c878568a113bae76e974d65870e41fd29b1ecffabdec8706be48",
+  "registered/analyze.py": "6ef4907647431aad9ae7a71b88894223f336fad05e14b707f9480552d0055b40",
+  "registered/freeze.py": "fde082e6e967a8745b0fb6a2c20e8d37d1524b07d75dd3251921e78203b82691",
+  "registered/run_registered.py": "11f6a6d0a37e594d01cf3b815ad36fdcc3c7fe51e0ee5d80e0b94b9a5af861f4"
+ },
+ "design_B_budget": 31600,
+ "n_runs": 110,
+ "approvals": [],
+ "registration": null,
+ "environment": {
+  "lockfile": "/content/rwmo/uv.lock",
+  "lockfile_sha256": "0ea3086b8b34cc16edcaafb9eda7c78c07389190bf2f03d981b8eb8c75d08c5c",
+  "runtime": {
+   "python": "3.13.16",
+   "torch": "2.11.0+cu130",
+   "numpy": "2.1.3",
+   "scipy": "1.16.3",
+   "scikit-learn": "1.6.1",
+   "pandas": "2.2.3",
+   "transformers": "5.20.2",
+   "cuda": "13.0"
+  },
+  "runtime_sha256": "a29af1745266fc6412dfc37d05c67424821bfa363caa7d22fb5c94ce6b550b6a",
+  "hardware_class": "A100"
+ },
+ "status": "DRAFT - unsigned",
+ "statement": "Training runs start only after this manifest is signed and the registration is submitted. No hypothesis, margin, weight, support, or selection changes afterwards."
+}

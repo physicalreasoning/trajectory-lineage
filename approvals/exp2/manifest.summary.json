@@ -1,0 +1,30 @@
+{
+ "sha256": "1dcb390f0f095205fb4b8d68d023b5dcdc94f378564423059e8be07dd54c09d8",
+ "episodes": 13678,
+ "eligible": 13678,
+ "train": {
+  "episodes": 10918,
+  "successes": 3981,
+  "failures": 6937,
+  "transitions": 148877
+ },
+ "test": {
+  "episodes": 2760,
+  "successes": 982,
+  "prevalence": 0.35579710144927534
+ },
+ "length_range": [
+  3,
+  24
+ ],
+ "header": {
+  "kind": "real",
+  "shards": 342,
+  "split_rule": "(shard // 3) % 5 == 0 is test",
+  "eligibility": {
+   "length_min": 3,
+   "length_max": 24
+  }
+ },
+ "source": "/content/drive/MyDrive/seen-and-unseen/exp2/kuka"
+}
