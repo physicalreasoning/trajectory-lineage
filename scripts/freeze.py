@@ -294,17 +294,138 @@ def run_identity(manifest_path: Path, config_path: Path) -> dict:
     }
 
 
+EXP3_CONFIGS = (
+    "experiments/exposure2d_confirmation.json",
+    "experiments/exposure2d_confirm_latent_dinov2.json",
+    "experiments/exposure2d_confirm_latent_vjepa2.json",
+    "experiments/exposure2d_confirm_dose16.json",
+    "experiments/exposure2d_confirm_dose256.json",
+)
+DEFAULT_DECISION = (
+    "Thresholds, margins and decision rules as registered in Protocol section 3: "
+    "consequential reuse gap 0.010, negligible bound 0.002, harm limit 0.001, "
+    "ranking margin 0.001; 1,600 main blocks "
+    "(800 / 400 / 400 at 16 / 64 / 256 channels) and four 200-block axis configurations; one Holm "
+    "family of seven secondaries; primary claim from the 16-channel blocks only."
+)
+
+
+def build_draft(
+    config_paths: list[Path],
+    environment: dict,
+    code_commit: str,
+    decision_statement: str = DEFAULT_DECISION,
+    experiments: Path = EXPERIMENTS,
+) -> dict:
+    """An unsigned confirmatory manifest binding every configuration, the analyzer and the code.
+
+    Sign-offs are added later with ``sign``; until both internal roles have signed, ``validate``
+    refuses the manifest, so a draft can never start or unblind a confirmatory run."""
+
+    configs, analyzers, excluded = {}, set(), set()
+    for path in config_paths:
+        config = json.loads(path.read_text())
+        if config.get("role") not in CONFIRMATORY_ROLES:
+            raise FreezeError(f"{path} is not a confirmatory configuration")
+        configs[path.stem] = sha256(path)
+        analyzers.add(config.get("analyzer_script", "scripts/analyze_confirmation.py"))
+        excluded |= pilot_registry(experiments, config)
+    if len(analyzers) != 1:
+        raise FreezeError(f"the configurations name different analyzers: {sorted(analyzers)}")
+    validate_environment(environment)
+    return {
+        "status": "DRAFT - unsigned",
+        "mode": "confirmatory",
+        "configs": configs,
+        "code_commit": code_commit,
+        "analyzer": next(iter(analyzers)),
+        "analyzer_sha256": sha256(REPOSITORY / next(iter(analyzers))),
+        "excluded_pilot_seeds": sorted(excluded),
+        "decision_statement": decision_statement,
+        "environment": environment,
+        "signoffs": {},
+        "signoff_date": "",
+        "registration": None,
+    }
+
+
+def sign(manifest: dict, role: str, name: str, date: str) -> dict:
+    """Add one internal sign-off; the manifest is signed once every required role has signed."""
+
+    if role not in REQUIRED_ROLES:
+        raise FreezeError(f"role must be one of {REQUIRED_ROLES}")
+    if not valid_name(name):
+        raise FreezeError("sign with a full name")
+    if not DATE.match(date):
+        raise FreezeError("date must be YYYY-MM-DD")
+    signed = dict(manifest)
+    signed["signoffs"] = {**manifest.get("signoffs", {}), role: name}
+    dates = {**manifest.get("signoff_dates", {}), role: date}
+    signed["signoff_dates"] = dates
+    if all(r in signed["signoffs"] for r in REQUIRED_ROLES):
+        signed["signoff_date"] = max(dates.values())
+        signed["status"] = "signed"
+    return signed
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Freeze helpers")
     sub = parser.add_subparsers(dest="command", required=True)
     env = sub.add_parser("environment", help="write the environment block for the freeze manifest")
     env.add_argument("--hardware-class", required=True, help='for example "A100"')
     env.add_argument("--out", type=Path, required=True)
+    draft = sub.add_parser("draft", help="write an unsigned manifest for the Exp 3 confirmation")
+    draft.add_argument("--environment", type=Path, required=True, help="output of `environment`")
+    draft.add_argument("--configs", nargs="*", default=list(EXP3_CONFIGS))
+    draft.add_argument("--registration", default=None, help="OSF registration link, once known")
+    draft.add_argument("--out", type=Path, required=True)
+    sig = sub.add_parser("sign", help="add one internal sign-off to a manifest")
+    sig.add_argument("--manifest", type=Path, required=True)
+    sig.add_argument("--role", required=True, choices=REQUIRED_ROLES)
+    sig.add_argument("--name", required=True)
+    sig.add_argument("--date", required=True, help="YYYY-MM-DD")
+    chk = sub.add_parser("check", help="validate a manifest against every configuration it binds")
+    chk.add_argument("--manifest", type=Path, required=True)
     args = parser.parse_args(argv)
-    block = environment_block(args.hardware_class)
-    args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(block, indent=2, sort_keys=True) + "\n")
-    print(json.dumps(block, indent=2, sort_keys=True))
+    if args.command == "environment":
+        block = environment_block(args.hardware_class)
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        args.out.write_text(json.dumps(block, indent=2, sort_keys=True) + "\n")
+        print(json.dumps(block, indent=2, sort_keys=True))
+    elif args.command == "draft":
+        head, clean = git_state()
+        if not clean:
+            raise SystemExit(
+                "commit or stash tracked changes first: the draft binds the HEAD commit"
+            )
+        manifest = build_draft(
+            [REPOSITORY / c for c in args.configs], json.loads(args.environment.read_text()), head
+        )
+        manifest["registration"] = args.registration
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        args.out.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+        print(
+            f"wrote {args.out}: {len(manifest['configs'])} configurations, "
+            f"commit {head[:7]}, unsigned"
+        )
+    elif args.command == "sign":
+        signed = sign(json.loads(args.manifest.read_text()), args.role, args.name, args.date)
+        args.manifest.write_text(json.dumps(signed, indent=2, sort_keys=True) + "\n")
+        print(f"{args.manifest}: {signed['status']}; signed by {sorted(signed['signoffs'])}")
+    else:
+        manifest = json.loads(args.manifest.read_text())
+        failures = 0
+        for stem in manifest.get("configs", {}):
+            path = EXPERIMENTS / f"{stem}.json"
+            try:
+                validate(
+                    manifest, path, REPOSITORY / manifest.get("analyzer", "scripts/analyze_2d.py")
+                )
+                print(f"ok      {stem}")
+            except FreezeError as error:
+                failures += 1
+                print(f"refused {stem}: {error}")
+        raise SystemExit(1 if failures else 0)
 
 
 if __name__ == "__main__":

@@ -536,33 +536,88 @@ The analysis is a separate, later step after the December 8 amendment: `scripts/
     return {"cells": cells, "metadata": {"accelerator": "GPU", "colab": {"provenance": []}, "kernelspec": {"display_name": "Python 3", "name": "python3"}, "language_info": {"name": "python"}}, "nbformat": 4, "nbformat_minor": 0}
 
 
-def exp3_environment_notebook() -> dict:
-    """Records the environment block for the Exp 3 freeze manifest on the Colab runtime that will run the confirmation."""
+def freeze_drafts_notebook() -> dict:
+    """Writes the unsigned freeze manifests for Exp 3 (with the Colab environment) and Exp 2 (recertified on the Drive cache)."""
 
+    GUARD = 'assert "HARDWARE_EXP3" in globals(), "Run the configuration cell at the top first (after any restart: Runtime -> Run all)"\n'
     cells = [
-        md("""# Seen and Unseen — Experiment 3: record the freeze environment (before the freeze)
+        md("""# Seen and Unseen — write the freeze drafts (Exp 3 and Exp 2)
 
-Run this once on the same kind of Colab runtime as the confirmation (A100, High-RAM). It installs the packages the confirmation uses and writes the **environment block** for the freeze manifest: the hash of the repository lockfile, the exact versions of Python, torch, CUDA, numpy, scipy, h5py, transformers and accelerate with their hash, and the hardware class. The locked confirmation notebook installs these same versions, and the runner refuses a run on other hardware or versions unless a logged deviation is given.
+Run once, on the same kind of Colab runtime as the confirmatory runs (A100, High-RAM), after the code for the freeze is on `main`. About 15–25 minutes, mostly the Exp 2 dry run.
 
-Takes about 2 minutes. Downloads `environment.json`; paste it into the freeze manifest as `"environment"`."""),
-        code(f"""#@title 0. Configuration
-HARDWARE_CLASS = "A100"   #@param {{type:"string"}}
-CODE_COMMIT = "{TL_COMMIT}"  #@param {{type:"string"}}   # the commit the freeze tag will point to
-import torch
-print("GPU:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "NONE (switch to a GPU runtime)")"""),
-        code("""#@title 1. Code and packages (as the confirmation installs them)
+| Part | What it writes | Why it needs Colab |
+|---|---|---|
+| Exp 3 | `exp3_freeze_manifest.json`: binds the five configurations, the analyzer, the code commit and every pilot seed, and carries the environment block (lockfile hash, exact package versions and their hash, hardware class) | The environment must be recorded on the runtime that runs the confirmation |
+| Exp 2 | `exp2_freeze_manifest.json`: binds the config, the episode manifest, the selection (recertified under the current V rule), the support and the code, plus the environment block (the owner's lockfile, versions, hardware class) | The Kuka cache is on Google Drive |
+
+Both drafts are **unsigned**, and the runners and analyzers refuse them until the paper lead and the statistics check have signed (commands at the end). Downloads `freeze_drafts.zip`."""),
+        code("""#@title 0. Configuration
+CODE_REF = "main"           #@param {type:"string"}   # the commit the freeze tag will point to
+HARDWARE_EXP3 = "A100"      #@param {type:"string"}
+HARDWARE_EXP2 = "A100"      #@param {type:"string"}   # where the 110 Exp 2 runs will train
+EXP2_DRIVE_DIR = "/content/drive/MyDrive/seen-and-unseen/exp2"  #@param {type:"string"}
+DRYRUN_DATASETS = 300       #@param {type:"integer"}
+import os, torch
+print("GPU:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "NONE (switch to a GPU runtime)")
+from google.colab import drive
+drive.mount("/content/drive")
+DRAFTS = "/content/freeze_drafts"
+os.makedirs(DRAFTS, exist_ok=True)
+OUT2 = f"{EXP2_DRIVE_DIR}/registered_out_freeze"
+os.makedirs(OUT2, exist_ok=True)
+CACHE = f"{EXP2_DRIVE_DIR}/kuka"
+print("Exp 2 cache shards on Drive:", len([f for f in os.listdir(CACHE) if f.endswith(".npz")]) if os.path.exists(CACHE) else "MISSING")"""),
+        md("## Exp 3"),
+        code(GUARD + """#@title 1. Code at the freeze commit and the confirmation's packages
 %cd /content
 import os
 if not os.path.exists("trajectory-lineage"):
     !git clone -q https://github.com/physicalreasoning/trajectory-lineage.git
 %cd /content/trajectory-lineage
-!git fetch -q && git checkout -q {CODE_COMMIT} && git rev-parse --short HEAD
+!git fetch -q && git checkout -q {CODE_REF} && git rev-parse HEAD
 !pip install -q numpy h5py "transformers>=5.0" accelerate"""),
-        code("""#@title 2. Write and download the environment block
+        code(GUARD + """#@title 2. Environment block and the unsigned Exp 3 manifest
 %cd /content/trajectory-lineage
-!python scripts/freeze.py environment --hardware-class "{HARDWARE_CLASS}" --out /content/environment.json
+!python scripts/freeze.py environment --hardware-class "{HARDWARE_EXP3}" --out {DRAFTS}/exp3_environment.json
+!python scripts/freeze.py draft --environment {DRAFTS}/exp3_environment.json --out {DRAFTS}/exp3_freeze_manifest.json
+!python scripts/freeze.py check --manifest {DRAFTS}/exp3_freeze_manifest.json || echo "(expected: refused until both internal roles sign)"
+print("draft written")"""),
+        md("## Exp 2"),
+        code(GUARD + """#@title 3. Owner's pipeline (for its lockfile) and the registered package from the repository
+%cd /content
+import os
+if not os.path.exists("rwmo"):
+    !git clone -q https://github.com/subhashjprasad/robot-world-model-optimism-research.git rwmo
+!git -C /content/rwmo rev-parse --short HEAD
+!pip install -q scipy scikit-learn pandas"""),
+        code(GUARD + """#@title 4. Recertify on the Drive cache with the current rules, then the unsigned Exp 2 freeze
+%cd /content/trajectory-lineage/exp2-kuka-matched
+!PYTHONPATH=. python -m registered.manifest build --npz-dir {CACHE} --out {OUT2}/manifest.jsonl | tail -n 12
+!PYTHONPATH=. python -m registered.design --manifest {OUT2}/manifest.jsonl --out {OUT2}/selection.json | tail -n 14
+!PYTHONPATH=. python -m registered.weights --manifest {OUT2}/manifest.jsonl --out {OUT2}/support.json | tail -n 3
+!PYTHONPATH=. python -m registered.dryrun --manifest {OUT2}/manifest.jsonl --selection {OUT2}/selection.json --support {OUT2}/support.json --datasets {DRYRUN_DATASETS} --workers 2 --out {OUT2}/dryrun.json | tail -n 10
+!PYTHONPATH=. python -m registered.freeze create --manifest {OUT2}/manifest.jsonl --selection {OUT2}/selection.json --support {OUT2}/support.json --hardware-class "{HARDWARE_EXP2}" --lockfile /content/rwmo/uv.lock --out {OUT2}/exp2_freeze_manifest.json | head -n 20
+!PYTHONPATH=. python -m registered.freeze verify --freeze {OUT2}/exp2_freeze_manifest.json --selection {OUT2}/selection.json --support {OUT2}/support.json --lockfile /content/rwmo/uv.lock"""),
+        md("## Download"),
+        code(GUARD + """#@title 5. Package the drafts and the recertified Exp 2 files
+!cp {OUT2}/exp2_freeze_manifest.json {OUT2}/selection.certificate.json {OUT2}/selection.md {OUT2}/support.md {OUT2}/dryrun.md {OUT2}/manifest.summary.json {DRAFTS}/
+!cd {DRAFTS} && zip -q -j /content/freeze_drafts.zip * && ls -la /content/freeze_drafts.zip
 from google.colab import files
-files.download("/content/environment.json")"""),
+files.download("/content/freeze_drafts.zip")"""),
+        md("""### Signing (later, by the two internal signers)
+
+```bash
+# Exp 3 (from a clone of trajectory-lineage at the same commit)
+python scripts/freeze.py sign --manifest exp3_freeze_manifest.json --role paper_lead --name "Full Name" --date YYYY-MM-DD
+python scripts/freeze.py sign --manifest exp3_freeze_manifest.json --role stats_check --name "Full Name" --date YYYY-MM-DD
+python scripts/freeze.py check --manifest exp3_freeze_manifest.json      # ok for all five configurations
+
+# Exp 2 (from trajectory-lineage/exp2-kuka-matched)
+PYTHONPATH=. python -m registered.freeze sign --freeze exp2_freeze_manifest.json --role paper_lead --name "Full Name" --date YYYY-MM-DD
+PYTHONPATH=. python -m registered.freeze sign --freeze exp2_freeze_manifest.json --role stats_check --name "Full Name" --date YYYY-MM-DD
+```
+
+Then commit the signed Exp 3 manifest under `approvals/` (the only path allowed to change after the code commit), tag the code commit `exp3-freeze-YYYYMMDD` / `exp2-freeze-YYYYMMDD`, and register. The confirmatory runs start after registration."""),
     ]
     return {"cells": cells, "metadata": {"accelerator": "GPU", "colab": {"provenance": []}, "kernelspec": {"display_name": "Python 3", "name": "python3"}, "language_info": {"name": "python"}}, "nbformat": 4, "nbformat_minor": 0}
 
@@ -638,7 +693,7 @@ def validate(nb: dict) -> list[str]:
 
 
 if __name__ == "__main__":
-    for name, builder in (("run_all_exp3_then_exp2.ipynb", combined_notebook), ("run_exp3_pilots_a100.ipynb", exp3_pilots_a100_notebook), ("LOCKED_exp3_confirmation.ipynb", exp3_confirmation_notebook), ("prepare_exp3_freeze_environment.ipynb", exp3_environment_notebook)):
+    for name, builder in (("run_all_exp3_then_exp2.ipynb", combined_notebook), ("run_exp3_pilots_a100.ipynb", exp3_pilots_a100_notebook), ("LOCKED_exp3_confirmation.ipynb", exp3_confirmation_notebook), ("prepare_freeze_drafts.ipynb", freeze_drafts_notebook)):
         nb = builder()
         problems = validate(nb)
         if problems:
