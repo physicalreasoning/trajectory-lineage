@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import json
 
 import numpy as np
 import pytest
@@ -169,3 +170,19 @@ def test_draft_freeze_is_refused_until_both_internal_roles_sign(selection, suppo
     full = sign(half, "stats_check", "Stats Check", "2026-11-02")
     assert full["status"] == "signed"
     verify_freeze(full, config=config, selection=real_sel, support=support, require_signoff=True, lockfile=lock)
+
+
+def test_freeze_cli_sign_and_verify(selection, support, config, tmp_path):
+    """The CLI path: create (draft) -> sign twice -> verify with sign-offs; sign takes no config."""
+
+    from registered.freeze import main as freeze_main
+
+    real_sel = copy.deepcopy(selection); real_sel["manifest_kind"] = "real"; real_sel["manifest_sha256"] = "testmanifest"
+    lock = tmp_path / "uv.lock"; lock.write_text("owner lock\n")
+    fz = build_freeze(config, tmp_path / "m.jsonl", real_sel, support, [], None, environment_block("CPU", lock))
+    path = tmp_path / "freeze.json"; path.write_text(json.dumps(fz))
+    freeze_main(["sign", "--freeze", str(path), "--role", "paper_lead", "--name", "Paper Lead", "--date", "2026-11-02"])
+    freeze_main(["sign", "--freeze", str(path), "--role", "stats_check", "--name", "Stats Check", "--date", "2026-11-02"])
+    signed = json.loads(path.read_text())
+    assert signed["status"] == "signed"
+    verify_freeze(signed, config=config, selection=real_sel, support=support, require_signoff=True, lockfile=lock)

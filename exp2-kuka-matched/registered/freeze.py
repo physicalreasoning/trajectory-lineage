@@ -199,7 +199,7 @@ def main(argv: list[str] | None = None) -> None:
     v.add_argument("--require-signoff", action="store_true")
     v.add_argument("--lockfile", default=None, help="check the owner's uv.lock against the frozen hash")
     args = ap.parse_args(argv)
-    config = load_config(args.config)
+    config = load_config(getattr(args, "config", None))
     if args.cmd == "create":
         approvals = []
         for a in args.approve:
