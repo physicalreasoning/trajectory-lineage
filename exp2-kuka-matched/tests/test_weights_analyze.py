@@ -9,7 +9,7 @@ from scipy import stats
 from registered import sha256_json
 from registered.analyze import AnalysisError, analyze, holm, paired_t, validate_runs
 from registered.dryrun import synthetic_runs
-from registered.freeze import FreezeError, build_freeze, verify_freeze
+from registered.freeze import FreezeError, build_freeze, check_runtime, environment_block, verify_freeze
 
 
 # ---------------------------------------------------------------- weights
@@ -124,9 +124,25 @@ def test_freeze_binds_and_rejects(selection, support, config, tmp_path):
     real_sel = copy.deepcopy(selection); real_sel["manifest_kind"] = "real"; real_sel["manifest_sha256"] = "testmanifest"
     with pytest.raises(FreezeError):
         build_freeze(config, tmp_path / "m.jsonl", selection, support, [], None)  # synthetic refused
+    lock = tmp_path / "uv.lock"; lock.write_text("owner lock v1\n")
+    env = environment_block("CPU", lock)
     fz = build_freeze(config, tmp_path / "m.jsonl", real_sel, support, [{"role": "paper_lead", "name": "Lead Name", "date": "2026-10-29"},
-                                                                        {"role": "stats_check", "name": "Stats Name", "date": "2026-10-29"}], "osf.io/xxxx")
-    verify_freeze(fz, config=config, selection=real_sel, support=support, require_signoff=True)
+                                                                        {"role": "stats_check", "name": "Stats Name", "date": "2026-10-29"}], "osf.io/xxxx", env)
+    verify_freeze(fz, config=config, selection=real_sel, support=support, require_signoff=True, lockfile=lock)
+    # environment: required, lockfile checked, runtime hash consistent, hardware named
+    with pytest.raises(FreezeError, match="no environment block"):
+        verify_freeze({**fz, "environment": None}, config=config, selection=real_sel, support=support, require_signoff=False)
+    lock.write_text("owner lock v2\n")
+    with pytest.raises(FreezeError, match="lockfile"):
+        verify_freeze(fz, config=config, selection=real_sel, support=support, require_signoff=False, lockfile=lock)
+    drift = copy.deepcopy(fz); drift["environment"]["runtime"]["numpy"] = "0.0"
+    with pytest.raises(FreezeError, match="runtime_sha256"):
+        verify_freeze(drift, config=config, selection=real_sel, support=support, require_signoff=False)
+    assert check_runtime(fz, "cpu")["hardware_matches"]
+    wrong = copy.deepcopy(fz); wrong["environment"]["hardware_class"] = "A100"
+    with pytest.raises(FreezeError, match="environment differs"):
+        check_runtime(wrong, "cpu")
+    assert check_runtime(wrong, "cpu", deviation="no A100 available this week")["deviation"]
     with pytest.raises(FreezeError):
         verify_freeze(fz, config={**config, "optimizer_steps": 4000}, selection=real_sel, support=support, require_signoff=False)
     bad = copy.deepcopy(fz); bad["approvals"][0]["name"] = "TBD"

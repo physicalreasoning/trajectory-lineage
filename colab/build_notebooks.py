@@ -475,6 +475,7 @@ FREEZE_TAG = "exp3-freeze-YYYYMMDD"   #@param {type:"string"}   # the dated git 
 WORKERS = 3                           #@param {type:"integer"}
 RUN_MAIN = True                       #@param {type:"boolean"}
 RUN_AXES = True                       #@param {type:"boolean"}
+DEVIATION = ""                        #@param {type:"string"}   # only if the GPU or runtime differs from the freeze; the reason is logged
 EXP3_DRIVE_DIR = "/content/drive/MyDrive/seen-and-unseen/exp3/confirmation"  #@param {type:"string"}
 import os, torch
 print("GPU:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "NONE (switch to a GPU runtime)", "| CPUs:", os.cpu_count(), "| workers:", WORKERS)
@@ -499,17 +500,23 @@ if not os.path.exists("trajectory-lineage"):
     !git clone -q https://github.com/physicalreasoning/trajectory-lineage.git
 %cd /content/trajectory-lineage
 !git fetch -q --tags && git checkout -q {FREEZE_TAG} && git rev-parse HEAD
-!pip install -q numpy h5py "transformers>=5.0" accelerate
-!PYTHONPATH=src python -c "import json,sys; sys.path.insert(0,'scripts'); import freeze; print('freeze module ok')"
+import json
+env = json.load(open(FREEZE)).get("environment") or {}
+pins = [f"{k}=={v}" for k, v in (env.get("runtime") or {}).items() if k in ("numpy", "scipy", "h5py", "transformers", "accelerate") and v != "absent"]
+PIN_ARGS = " ".join(pins) if pins else 'numpy h5py "transformers>=5.0" accelerate'
+print("installing the frozen versions:", PIN_ARGS, "| frozen hardware class:", env.get("hardware_class"))
+!pip install -q {PIN_ARGS}
+!PYTHONPATH=src python -c "import json,sys; sys.path.insert(0,'scripts'); import freeze; print(json.dumps(freeze.check_runtime(json.load(open('{FREEZE}')), 'cuda', '{DEVIATION}' or None)))"
 print("ok")"""),
         code(GUARD + """#@title 2. Confirmation runs (resumable; blinded progress only)
 %cd /content/trajectory-lineage
+DEV_ARG = f'--deviation "{DEVIATION}"' if DEVIATION else ""
 for k, cfg in CONFIGS.items():
     ck = f"{EXP3_DRIVE_DIR}/SEALED_raw_records/{k}_raw_checkpoint.jsonl"
     raw = f"{EXP3_DRIVE_DIR}/SEALED_raw_records/{k}_raw.json"
     out = f"results/{k}_confirmation_blinded.json"
     print(f"=== {k} ===")
-    !PYTHONPATH=src python scripts/exposure_experiment.py --config {cfg} --out {out} --device cuda --workers {WORKERS} --freeze-manifest {FREEZE} --checkpoint {ck} --unblind {raw} 2>&1 | grep -E "^block|^resuming|refusing|Error|error"
+    !PYTHONPATH=src python scripts/exposure_experiment.py --config {cfg} --out {out} --device cuda --workers {WORKERS} --freeze-manifest {FREEZE} --checkpoint {ck} --unblind {raw} {DEV_ARG} 2>&1 | grep -E "^block|^resuming|^environment|refusing|Error|error"
     !cp {out} {EXP3_DRIVE_DIR}/{k}_confirmation_blinded.json"""),
         code(GUARD + """#@title 3. Blinded accounting and download (no effect values)
 import json, os
@@ -525,6 +532,37 @@ from google.colab import files
 files.download("/content/exp3_confirmation_blinded.zip")"""),
         md("""### After all five report complete
 The analysis is a separate, later step after the December 8 amendment: `scripts/analyze_2d.py` on the main raw export and `scripts/analyze_exp3_axes.py` across all five, both of which refuse to run without the freeze manifest. Do not open `SEALED_raw_records/`."""),
+    ]
+    return {"cells": cells, "metadata": {"accelerator": "GPU", "colab": {"provenance": []}, "kernelspec": {"display_name": "Python 3", "name": "python3"}, "language_info": {"name": "python"}}, "nbformat": 4, "nbformat_minor": 0}
+
+
+def exp3_environment_notebook() -> dict:
+    """Records the environment block for the Exp 3 freeze manifest on the Colab runtime that will run the confirmation."""
+
+    cells = [
+        md("""# Seen and Unseen — Experiment 3: record the freeze environment (before the freeze)
+
+Run this once on the same kind of Colab runtime as the confirmation (A100, High-RAM). It installs the packages the confirmation uses and writes the **environment block** for the freeze manifest: the hash of the repository lockfile, the exact versions of Python, torch, CUDA, numpy, scipy, h5py, transformers and accelerate with their hash, and the hardware class. The locked confirmation notebook installs these same versions, and the runner refuses a run on other hardware or versions unless a logged deviation is given.
+
+Takes about 2 minutes. Downloads `environment.json`; paste it into the freeze manifest as `"environment"`."""),
+        code(f"""#@title 0. Configuration
+HARDWARE_CLASS = "A100"   #@param {{type:"string"}}
+CODE_COMMIT = "{TL_COMMIT}"  #@param {{type:"string"}}   # the commit the freeze tag will point to
+import torch
+print("GPU:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "NONE (switch to a GPU runtime)")"""),
+        code("""#@title 1. Code and packages (as the confirmation installs them)
+%cd /content
+import os
+if not os.path.exists("trajectory-lineage"):
+    !git clone -q https://github.com/physicalreasoning/trajectory-lineage.git
+%cd /content/trajectory-lineage
+!git fetch -q && git checkout -q {CODE_COMMIT} && git rev-parse --short HEAD
+!pip install -q numpy h5py "transformers>=5.0" accelerate"""),
+        code("""#@title 2. Write and download the environment block
+%cd /content/trajectory-lineage
+!python scripts/freeze.py environment --hardware-class "{HARDWARE_CLASS}" --out /content/environment.json
+from google.colab import files
+files.download("/content/environment.json")"""),
     ]
     return {"cells": cells, "metadata": {"accelerator": "GPU", "colab": {"provenance": []}, "kernelspec": {"display_name": "Python 3", "name": "python3"}, "language_info": {"name": "python"}}, "nbformat": 4, "nbformat_minor": 0}
 
@@ -600,7 +638,7 @@ def validate(nb: dict) -> list[str]:
 
 
 if __name__ == "__main__":
-    for name, builder in (("run_all_exp3_then_exp2.ipynb", combined_notebook), ("run_exp3_pilots_a100.ipynb", exp3_pilots_a100_notebook), ("LOCKED_exp3_confirmation.ipynb", exp3_confirmation_notebook)):
+    for name, builder in (("run_all_exp3_then_exp2.ipynb", combined_notebook), ("run_exp3_pilots_a100.ipynb", exp3_pilots_a100_notebook), ("LOCKED_exp3_confirmation.ipynb", exp3_confirmation_notebook), ("prepare_exp3_freeze_environment.ipynb", exp3_environment_notebook)):
         nb = builder()
         problems = validate(nb)
         if problems:

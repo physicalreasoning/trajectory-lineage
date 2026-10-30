@@ -159,6 +159,7 @@ def run_one(wm, ep, judge, run: dict, config: dict, selection: dict, test_ids: l
 
 def run_all(*, owner_repo: Path, npz_dir: Path, manifest_path: Path, selection_path: Path, support_path: Path, config_path: Path | None,
             out: Path, freeze_path: Path | None, smoke: bool, only: list[str] | None, retry_failed: bool, allow_judge_below_gate: bool,
+            deviation: str | None = None,
             log=print) -> list[dict]:
     wm = import_owner_wm(owner_repo)
     config = load_config(config_path)
@@ -172,8 +173,14 @@ def run_all(*, owner_repo: Path, npz_dir: Path, manifest_path: Path, selection_p
     if not smoke:
         if freeze_path is None:
             raise RuntimeError("a signed freeze manifest is required to start registered training (use --smoke for the synthetic smoke test)")
-        from .freeze import verify_freeze
-        verify_freeze(json.loads(Path(freeze_path).read_text()), config=config, selection=selection, support=support, require_signoff=True)
+        from .freeze import check_runtime, verify_freeze
+        frozen = json.loads(Path(freeze_path).read_text())
+        verify_freeze(frozen, config=config, selection=selection, support=support, require_signoff=True,
+                      lockfile=Path(owner_repo) / "uv.lock")
+        environment_check = check_runtime(frozen, wm.DEVICE, deviation)
+        out.mkdir(parents=True, exist_ok=True)
+        write_json(out / f"environment_check_{dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%SZ')}.json", environment_check)
+        log(f"environment check: {json.dumps(environment_check)}")
         if selection.get("manifest_kind") == "SYNTHETIC":
             raise RuntimeError("SYNTHETIC manifest; refusing to train")
     out.mkdir(parents=True, exist_ok=True)
@@ -232,10 +239,12 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--retry-failed", action="store_true", help="rerun infrastructure failures once with the same seed")
     ap.add_argument("--allow-judge-below-gate", action="store_true", help="deviation: continue although the judge gate failed (recorded)")
     ap.add_argument("--smoke", action="store_true", help="synthetic smoke test: skips the freeze requirement")
+    ap.add_argument("--deviation", default=None, help="reason to train on another hardware class or runtime than the freeze (logged)")
     args = ap.parse_args(argv)
     run_all(owner_repo=Path(args.owner_repo), npz_dir=Path(args.npz_dir), manifest_path=Path(args.manifest), selection_path=Path(args.selection),
             support_path=Path(args.support), config_path=args.config, out=Path(args.out), freeze_path=Path(args.freeze) if args.freeze else None,
-            smoke=args.smoke, only=args.only, retry_failed=args.retry_failed, allow_judge_below_gate=args.allow_judge_below_gate)
+            smoke=args.smoke, only=args.only, retry_failed=args.retry_failed, allow_judge_below_gate=args.allow_judge_below_gate,
+            deviation=args.deviation)
 
 
 if __name__ == "__main__":

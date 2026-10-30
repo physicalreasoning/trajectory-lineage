@@ -25,7 +25,7 @@ import torch
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from freeze import FreezeError, changed_since, git_state, run_identity  # noqa: E402
+from freeze import FreezeError, changed_since, check_runtime, git_state, run_identity  # noqa: E402
 from freeze import validate as validate_freeze  # noqa: E402
 
 from trajectory_lineage.convlstm import ConvLSTMStatePredictor
@@ -835,6 +835,12 @@ def main() -> None:
         "(GPU runs: 2-4). "
         "Results do not depend on this value.",
     )
+    parser.add_argument(
+        "--deviation",
+        default=None,
+        help="Reason to run on a hardware class or runtime that differs from the freeze; "
+        "logged with the outputs. Without it, such a run is refused.",
+    )
     args = parser.parse_args()
     config = json.loads(args.config.read_text())
     if args.unblind is not None or config.get("require_approval_to_run", False):
@@ -868,6 +874,15 @@ def main() -> None:
         else "cpu"
     )
     device = torch.device(device_name)
+    environment_check = {"checked": False, "reason": "no freeze manifest"}
+    if args.freeze_manifest is not None:
+        try:
+            environment_check = check_runtime(
+                json.loads(args.freeze_manifest.read_text()), device_name, args.deviation
+            )
+        except FreezeError as error:
+            raise SystemExit(f"refusing to run: {error}") from error
+        print(f"environment check: {json.dumps(environment_check)}", flush=True)
     checkpoint = args.checkpoint or args.blinded_checkpoint
     runs = load_checkpoint(checkpoint, config_hash(args.config)) if checkpoint else []
     done = {run["block_index"] for run in runs}
@@ -907,10 +922,15 @@ def main() -> None:
     report["config"] = config
     report["config_sha256"] = config_hash(args.config)
     report["provenance"] = provenance(device)
+    report["environment_check"] = environment_check
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
     if args.unblind is not None:
-        export = {"identity": run_identity(args.freeze_manifest, args.config), "runs": runs}
+        export = {
+            "identity": run_identity(args.freeze_manifest, args.config),
+            "environment_check": environment_check,
+            "runs": runs,
+        }
         args.unblind.write_text(json.dumps(export, indent=2, sort_keys=True) + "\n")
     print(json.dumps({k: v for k, v in report.items() if k != "config"}, indent=2))
 
