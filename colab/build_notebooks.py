@@ -558,6 +558,7 @@ HARDWARE_EXP2 = "A100"      #@param {type:"string"}   # where the 110 Exp 2 runs
 EXP2_DRIVE_DIR = "/content/drive/MyDrive/seen-and-unseen/exp2"  #@param {type:"string"}
 DRYRUN_DATASETS = 300       #@param {type:"integer"}
 RUN_DRYRUN = True           #@param {type:"boolean"}   # False on a redo: reuses the dry run already on Drive (same runs)
+RUN_EXP3 = True             #@param {type:"boolean"}   # False when the Exp 3 draft is already in approvals/
 import os, torch
 print("GPU:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "NONE (switch to a GPU runtime)")
 from google.colab import drive
@@ -579,9 +580,12 @@ if not os.path.exists("trajectory-lineage"):
 !pip install -q numpy h5py "transformers>=5.0" accelerate"""),
         code(GUARD + """#@title 2. Environment block and the unsigned Exp 3 manifest
 %cd /content/trajectory-lineage
-!python scripts/freeze.py environment --hardware-class "{HARDWARE_EXP3}" --out {DRAFTS}/exp3_environment.json
-!python scripts/freeze.py draft --environment {DRAFTS}/exp3_environment.json --out {DRAFTS}/exp3_freeze_manifest.json
-!python scripts/freeze.py check --manifest {DRAFTS}/exp3_freeze_manifest.json || echo "(expected: refused until both internal roles sign)"
+if RUN_EXP3:
+    !python scripts/freeze.py environment --hardware-class "{HARDWARE_EXP3}" --out {DRAFTS}/exp3_environment.json
+    !python scripts/freeze.py draft --environment {DRAFTS}/exp3_environment.json --out {DRAFTS}/exp3_freeze_manifest.json
+    !python scripts/freeze.py check --manifest {DRAFTS}/exp3_freeze_manifest.json || echo "(expected: refused until both internal roles sign)"
+else:
+    print("Exp 3 skipped (its draft is already in approvals/)")
 print("draft written")"""),
         md("## Exp 2"),
         code(GUARD + """#@title 3. Owner's pipeline (for its lockfile) and the registered package from the repository
@@ -604,7 +608,7 @@ else:
 !PYTHONPATH=. python -m registered.freeze verify --freeze {OUT2}/exp2_freeze_manifest.json --selection {OUT2}/selection.json --support {OUT2}/support.json --lockfile /content/rwmo/uv.lock"""),
         md("## Download"),
         code(GUARD + """#@title 5. Package the drafts and the recertified Exp 2 files
-!cp {OUT2}/exp2_freeze_manifest.json {OUT2}/selection.certificate.json {OUT2}/selection.md {OUT2}/support.md {OUT2}/dryrun.md {OUT2}/manifest.summary.json {DRAFTS}/
+!cp {OUT2}/exp2_freeze_manifest.json {OUT2}/selection.json {OUT2}/selection.certificate.json {OUT2}/selection.md {OUT2}/support.json {OUT2}/support.md {OUT2}/dryrun.md {OUT2}/manifest.jsonl {OUT2}/manifest.summary.json {DRAFTS}/
 !cd {DRAFTS} && zip -q -j /content/freeze_drafts.zip * && ls -la /content/freeze_drafts.zip
 from google.colab import files
 files.download("/content/freeze_drafts.zip")"""),
