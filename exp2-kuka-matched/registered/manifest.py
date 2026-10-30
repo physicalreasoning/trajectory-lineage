@@ -137,7 +137,8 @@ def build_manifest(npz_dir: Path, divisor: int = 3, every: int = 5) -> Manifest:
             prop.append(bool(ok[e]))
     shard = np.array(shards, int)
     split = np.where(is_test_shard(shard, divisor, every), "test", "train").astype(object)
-    header = {"kind": "real", "source": str(npz_dir), "shards": len(files), "split_rule": f"(shard // {divisor}) % {every} == 0 is test",
+    # no folder path in the header: the manifest bytes (and so its SHA-256) depend only on the episodes
+    header = {"kind": "real", "shards": len(files), "split_rule": f"(shard // {divisor}) % {every} == 0 is test",
               "eligibility": {"length_min": LENGTH_MIN, "length_max": LENGTH_MAX}}
     return Manifest(np.array(ids, dtype=object), shard, np.array(lengths, int), np.array(succ, int), split, np.array(prop, bool), header)
 
@@ -199,7 +200,7 @@ def synthetic_manifest(audit_jsonl: Path, *, train_successes: int = 3989, train_
         id_arr[k] = f"{s:05d}/{counters.get(s, 0)}"
         counters[s] = counters.get(s, 0) + 1
     header = {"kind": "SYNTHETIC", "warning": "metadata stand-in for dry runs only; never train or freeze on it",
-              "source": str(audit_jsonl), "assumed_counts": {"train_successes": train_successes, "train_failures": train_failures,
+              "assumed_counts": {"train_successes": train_successes, "train_failures": train_failures,
                                                                "test_successes": test_successes, "test_failures": test_failures},
               "split_rule": "(shard // 3) % 5 == 0 is test", "eligibility": {"length_min": LENGTH_MIN, "length_max": LENGTH_MAX}, "seed": seed}
     m = Manifest(id_arr, shard_arr, np.array(length, int), np.array(success, int), np.array(split, dtype=object),
@@ -225,7 +226,8 @@ def main(argv: list[str] | None = None) -> None:
     else:
         m = synthetic_manifest(Path(args.audit_jsonl), train_failures=args.train_failures)
     digest = save_manifest(m, Path(args.out))
-    write_json(Path(args.out).with_suffix(".summary.json"), {"sha256": digest, **m.summary(), "header": m.header})
+    source = args.npz_dir if args.cmd == "build" else args.audit_jsonl
+    write_json(Path(args.out).with_suffix(".summary.json"), {"sha256": digest, **m.summary(), "header": m.header, "source": str(source)})
     print(json.dumps({"sha256": digest, **m.summary()}, indent=1))
 
 

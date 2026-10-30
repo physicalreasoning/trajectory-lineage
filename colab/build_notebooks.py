@@ -557,6 +557,7 @@ HARDWARE_EXP3 = "A100"      #@param {type:"string"}
 HARDWARE_EXP2 = "A100"      #@param {type:"string"}   # where the 110 Exp 2 runs will train
 EXP2_DRIVE_DIR = "/content/drive/MyDrive/seen-and-unseen/exp2"  #@param {type:"string"}
 DRYRUN_DATASETS = 300       #@param {type:"integer"}
+RUN_DRYRUN = True           #@param {type:"boolean"}   # False on a redo: reuses the dry run already on Drive (same runs)
 import os, torch
 print("GPU:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "NONE (switch to a GPU runtime)")
 from google.colab import drive
@@ -595,7 +596,10 @@ if not os.path.exists("rwmo"):
 !PYTHONPATH=. python -m registered.manifest build --npz-dir {CACHE} --out {OUT2}/manifest.jsonl | tail -n 12
 !PYTHONPATH=. python -m registered.design --manifest {OUT2}/manifest.jsonl --out {OUT2}/selection.json | tail -n 14
 !PYTHONPATH=. python -m registered.weights --manifest {OUT2}/manifest.jsonl --out {OUT2}/support.json | tail -n 3
-!PYTHONPATH=. python -m registered.dryrun --manifest {OUT2}/manifest.jsonl --selection {OUT2}/selection.json --support {OUT2}/support.json --datasets {DRYRUN_DATASETS} --workers 2 --out {OUT2}/dryrun.json | tail -n 10
+if RUN_DRYRUN or not os.path.exists(f"{OUT2}/dryrun.md"):
+    !PYTHONPATH=. python -m registered.dryrun --manifest {OUT2}/manifest.jsonl --selection {OUT2}/selection.json --support {OUT2}/support.json --datasets {DRYRUN_DATASETS} --workers 2 --out {OUT2}/dryrun.json | tail -n 10
+else:
+    print("dry run reused from Drive (same 110 runs; only the hashes changed)")
 !PYTHONPATH=. python -m registered.freeze create --manifest {OUT2}/manifest.jsonl --selection {OUT2}/selection.json --support {OUT2}/support.json --hardware-class "{HARDWARE_EXP2}" --lockfile /content/rwmo/uv.lock --out {OUT2}/exp2_freeze_manifest.json | head -n 20
 !PYTHONPATH=. python -m registered.freeze verify --freeze {OUT2}/exp2_freeze_manifest.json --selection {OUT2}/selection.json --support {OUT2}/support.json --lockfile /content/rwmo/uv.lock"""),
         md("## Download"),

@@ -127,3 +127,25 @@ def test_design_A_phi_zero_has_no_failures(manifest):
     pS, pF = seeded_permutations(S, F, 100)
     r = design_A_arm(manifest, pS, pF, 100, 0.0, 31600, 20, 8)
     assert r.n_failure == 0 and r.transitions == 31600
+
+
+
+def test_manifest_hash_does_not_depend_on_the_cache_folder(tmp_path):
+    """The same shards in two different folders give byte-identical manifests (same SHA-256)."""
+
+    import shutil
+
+    from registered.manifest import build_manifest, save_manifest
+
+    rng = np.random.default_rng(1)
+    first = tmp_path / "a" / "kuka"
+    first.mkdir(parents=True)
+    for sid in (0, 3, 6):
+        length = rng.integers(3, 25, 12)
+        np.savez(first / f"shard_{sid:05d}.npz", length=length, success=rng.integers(0, 2, 12), proprio_ok=np.ones(12, bool))
+    second = tmp_path / "somewhere" / "else" / "kuka"
+    shutil.copytree(first, second)
+    a = save_manifest(build_manifest(first), tmp_path / "a.jsonl")
+    b = save_manifest(build_manifest(second), tmp_path / "b.jsonl")
+    assert a == b
+    assert (tmp_path / "a.jsonl").read_bytes() == (tmp_path / "b.jsonl").read_bytes()
