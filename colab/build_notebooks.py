@@ -604,7 +604,7 @@ else:
 !PYTHONPATH=. python -m registered.freeze verify --freeze {OUT2}/exp2_freeze_manifest.json --selection {OUT2}/selection.json --support {OUT2}/support.json --lockfile /content/rwmo/uv.lock"""),
         md("## Download"),
         code(GUARD + """#@title 5. Package the drafts and the recertified Exp 2 files
-!cp {OUT2}/exp2_freeze_manifest.json {OUT2}/selection.certificate.json {OUT2}/selection.md {OUT2}/support.md {OUT2}/dryrun.md {OUT2}/manifest.summary.json {DRAFTS}/
+!cp {OUT2}/exp2_freeze_manifest.json {OUT2}/selection.json {OUT2}/selection.certificate.json {OUT2}/selection.md {OUT2}/support.json {OUT2}/support.md {OUT2}/dryrun.md {OUT2}/manifest.jsonl {OUT2}/manifest.summary.json {DRAFTS}/
 !cd {DRAFTS} && zip -q -j /content/freeze_drafts.zip * && ls -la /content/freeze_drafts.zip
 from google.colab import files
 files.download("/content/freeze_drafts.zip")"""),
