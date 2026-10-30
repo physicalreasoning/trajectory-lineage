@@ -1,0 +1,48 @@
+{
+  "analyzer": "scripts/analyze_2d.py",
+  "analyzer_sha256": "09b167d50006fab4ad30852d34d82729e66ba201efcd5688eea6809609dbe261",
+  "code_commit": "ccd871ea4370417577780ce13b32a8be29b5b17a",
+  "configs": {
+    "exposure2d_confirm_dose16": "f8f8e5239b4080146e764d77bd0452c406a5221e2c598b6a981904d7153590b8",
+    "exposure2d_confirm_dose256": "8756618f6d1456201adf027de6433767a943656e3a846d02e7c860ab99d2e5e6",
+    "exposure2d_confirm_latent_dinov2": "77a28bf57ff2437d6724809460a2583848caabc719e4f3287ccf04119ee06530",
+    "exposure2d_confirm_latent_vjepa2": "6de4e2a39da24854ec1899a80bcbaef40abbfe1ec296f515fb22ff55932889bb",
+    "exposure2d_confirmation": "21f363bd8fc064bd404712afe5bc16531e5fa5c52f95f8598313152a7e71cd1c"
+  },
+  "decision_statement": "Thresholds, margins and decision rules as registered in Protocol section 3: consequential reuse gap 0.010, negligible bound 0.002, harm limit 0.001, ranking margin 0.001; 1,600 main blocks (800 / 400 / 400 at 16 / 64 / 256 channels) and four 200-block axis configurations; one Holm family of seven secondaries; primary claim from the 16-channel blocks only.",
+  "environment": {
+    "hardware_class": "A100",
+    "lockfile": "uv.lock",
+    "lockfile_sha256": "05dcb96a92715a8362e034c04bc1396191548e1ef63b548ad8832303839dc954",
+    "runtime": {
+      "accelerate": "1.15.0",
+      "cuda": "13.0",
+      "h5py": "3.14.0",
+      "numpy": "2.1.3",
+      "python": "3.13.16",
+      "scipy": "1.16.3",
+      "torch": "2.11.0+cu130",
+      "transformers": "5.20.2"
+    },
+    "runtime_sha256": "51539a21915f3a511c71b08b700c1aa013cf7b64b89f0cef320ae97e2598921e"
+  },
+  "excluded_pilot_seeds": [
+    2026101603,
+    2026101604,
+    2026101605,
+    2026101624,
+    2026102300,
+    2026102301,
+    2026102399,
+    2026102701,
+    2026102801,
+    2026102802,
+    2026102811,
+    2026102812
+  ],
+  "mode": "confirmatory",
+  "registration": null,
+  "signoff_date": "",
+  "signoffs": {},
+  "status": "DRAFT - unsigned"
+}
