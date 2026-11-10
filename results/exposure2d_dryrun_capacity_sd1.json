@@ -27,6 +27,7 @@
           "harm_bounded=True": 1.0,
           "identity=below_threshold": 1.0,
           "magnitude=negligible": 1.0,
+          "positive_control_clears_margin=True": 1.0,
           "positive_control_detected=True": 1.0
         },
         "mock_dataset_decision": {
@@ -36,6 +37,7 @@
             "source_gain_supported": false,
             "harm_bounded": true,
             "positive_control_detected": true,
+            "positive_control_clears_margin": true,
             "event_identity": "below_threshold"
           },
           "G_95": [
@@ -81,6 +83,7 @@
           "harm_bounded=True": 1.0,
           "identity=below_threshold": 1.0,
           "magnitude=negligible": 1.0,
+          "positive_control_clears_margin=True": 1.0,
           "positive_control_detected=True": 1.0
         },
         "mock_dataset_decision": {
@@ -90,6 +93,7 @@
             "source_gain_supported": true,
             "harm_bounded": true,
             "positive_control_detected": true,
+            "positive_control_clears_margin": true,
             "event_identity": "below_threshold"
           },
           "G_95": [
@@ -139,6 +143,7 @@
           "harm_bounded=True": 1.0,
           "identity=below_threshold": 1.0,
           "magnitude=prevalence_dependent": 1.0,
+          "positive_control_clears_margin=True": 1.0,
           "positive_control_detected=True": 1.0
         },
         "mock_dataset_decision": {
@@ -148,6 +153,7 @@
             "source_gain_supported": true,
             "harm_bounded": true,
             "positive_control_detected": true,
+            "positive_control_clears_margin": true,
             "event_identity": "below_threshold"
           },
           "G_95": [
@@ -194,12 +200,14 @@
           "consequential reuse advantage": 0.025
         },
         "axis_probabilities": {
-          "capacity=capacity_independent": 1.0,
+          "capacity=capacity_independent": 0.9916666666666667,
+          "capacity=unresolved": 0.008333333333333333,
           "harm_bounded=True": 1.0,
           "identity=below_threshold": 1.0,
           "magnitude=consequential": 0.025,
           "magnitude=detectable_magnitude_unresolved": 0.9416666666666667,
           "magnitude=prevalence_dependent": 0.03333333333333333,
+          "positive_control_clears_margin=True": 1.0,
           "positive_control_detected=True": 1.0
         },
         "mock_dataset_decision": {
@@ -209,6 +217,7 @@
             "source_gain_supported": true,
             "harm_bounded": true,
             "positive_control_detected": true,
+            "positive_control_clears_margin": true,
             "event_identity": "below_threshold"
           },
           "G_95": [
@@ -258,6 +267,7 @@
           "harm_bounded=True": 1.0,
           "identity=below_threshold": 1.0,
           "magnitude=consequential": 1.0,
+          "positive_control_clears_margin=True": 1.0,
           "positive_control_detected=True": 1.0
         },
         "mock_dataset_decision": {
@@ -267,6 +277,7 @@
             "source_gain_supported": true,
             "harm_bounded": true,
             "positive_control_detected": true,
+            "positive_control_clears_margin": true,
             "event_identity": "below_threshold"
           },
           "G_95": [
@@ -316,6 +327,7 @@
           "harm_bounded=True": 1.0,
           "identity=below_threshold": 1.0,
           "magnitude=consequential": 1.0,
+          "positive_control_clears_margin=True": 1.0,
           "positive_control_detected=True": 1.0
         },
         "mock_dataset_decision": {
@@ -325,6 +337,7 @@
             "source_gain_supported": true,
             "harm_bounded": true,
             "positive_control_detected": true,
+            "positive_control_clears_margin": true,
             "event_identity": "below_threshold"
           },
           "G_95": [
@@ -374,6 +387,7 @@
           "harm_bounded=False": 1.0,
           "identity=below_threshold": 1.0,
           "magnitude=consequential": 1.0,
+          "positive_control_clears_margin=True": 1.0,
           "positive_control_detected=True": 1.0
         },
         "mock_dataset_decision": {
@@ -383,6 +397,7 @@
             "source_gain_supported": true,
             "harm_bounded": false,
             "positive_control_detected": true,
+            "positive_control_clears_margin": true,
             "event_identity": "below_threshold"
           },
           "G_95": [
@@ -432,6 +447,7 @@
           "harm_bounded=True": 1.0,
           "identity=event_specific": 1.0,
           "magnitude=consequential": 1.0,
+          "positive_control_clears_margin=True": 1.0,
           "positive_control_detected=True": 1.0
         },
         "mock_dataset_decision": {
@@ -441,6 +457,7 @@
             "source_gain_supported": true,
             "harm_bounded": true,
             "positive_control_detected": true,
+            "positive_control_clears_margin": true,
             "event_identity": "event_specific"
           },
           "G_95": [
@@ -483,14 +500,15 @@
         },
         "claim_probabilities": {
           "positive control not detected": 0.9916666666666667,
-          "negligible differential gap": 0.008333333333333333
+          "negligible gap, control below the margin": 0.008333333333333333
         },
         "axis_probabilities": {
           "capacity=capacity_dependent": 0.008333333333333333,
-          "capacity=capacity_independent": 0.9916666666666667,
+          "capacity=unresolved": 0.9916666666666667,
           "harm_bounded=True": 1.0,
           "identity=below_threshold": 1.0,
           "magnitude=negligible": 1.0,
+          "positive_control_clears_margin=False": 1.0,
           "positive_control_detected=False": 0.9916666666666667,
           "positive_control_detected=True": 0.008333333333333333
         },
@@ -501,6 +519,7 @@
             "source_gain_supported": false,
             "harm_bounded": true,
             "positive_control_detected": false,
+            "positive_control_clears_margin": false,
             "event_identity": "below_threshold"
           },
           "G_95": [
@@ -523,7 +542,7 @@
             "point": 7.342897840918711
           },
           "capacity": {
-            "label": "capacity_independent",
+            "label": "unresolved",
             "trend_95": [
               -0.00078,
               0.00056
@@ -539,25 +558,27 @@
           "E": 0.001
         },
         "claim_probabilities": {
-          "negligible differential gap": 0.9583333333333334,
+          "negligible gap, control below the margin": 0.9583333333333334,
           "positive control not detected": 0.041666666666666664
         },
         "axis_probabilities": {
           "capacity=capacity_dependent": 0.016666666666666666,
-          "capacity=capacity_independent": 0.9833333333333333,
+          "capacity=unresolved": 0.9833333333333333,
           "harm_bounded=True": 1.0,
           "identity=below_threshold": 1.0,
           "magnitude=negligible": 1.0,
+          "positive_control_clears_margin=False": 1.0,
           "positive_control_detected=False": 0.041666666666666664,
           "positive_control_detected=True": 0.9583333333333334
         },
         "mock_dataset_decision": {
-          "primary_claim": "negligible differential gap",
+          "primary_claim": "negligible gap, control below the margin",
           "axes": {
             "magnitude": "negligible",
             "source_gain_supported": false,
             "harm_bounded": true,
             "positive_control_detected": true,
+            "positive_control_clears_margin": false,
             "event_identity": "below_threshold"
           },
           "G_95": [
@@ -580,7 +601,7 @@
             "point": 3.710008284251308
           },
           "capacity": {
-            "label": "capacity_independent",
+            "label": "unresolved",
             "trend_95": [
               -0.00106,
               0.0003
@@ -604,6 +625,7 @@
           "harm_bounded=True": 1.0,
           "identity=below_threshold": 1.0,
           "magnitude=reverse": 1.0,
+          "positive_control_clears_margin=True": 1.0,
           "positive_control_detected=True": 1.0
         },
         "mock_dataset_decision": {
@@ -613,6 +635,7 @@
             "source_gain_supported": false,
             "harm_bounded": true,
             "positive_control_detected": true,
+            "positive_control_clears_margin": true,
             "event_identity": "below_threshold"
           },
           "G_95": [
@@ -656,6 +679,7 @@
           "harm_bounded=True": 1.0,
           "identity=below_threshold": 1.0,
           "magnitude=prevalence_dependent": 1.0,
+          "positive_control_clears_margin=True": 1.0,
           "positive_control_detected=True": 1.0
         },
         "mock_dataset_decision": {
@@ -665,6 +689,7 @@
             "source_gain_supported": true,
             "harm_bounded": true,
             "positive_control_detected": true,
+            "positive_control_clears_margin": true,
             "event_identity": "below_threshold"
           },
           "G_95": [
@@ -714,10 +739,12 @@
         },
         "axis_probabilities": {
           "capacity=capacity_dependent": 0.008333333333333333,
-          "capacity=capacity_independent": 0.9916666666666667,
+          "capacity=capacity_independent": 0.9833333333333333,
+          "capacity=unresolved": 0.008333333333333333,
           "harm_bounded=True": 1.0,
           "identity=below_threshold": 1.0,
           "magnitude=consequential": 1.0,
+          "positive_control_clears_margin=True": 1.0,
           "positive_control_detected=True": 1.0
         },
         "mock_dataset_decision": {
@@ -727,6 +754,7 @@
             "source_gain_supported": true,
             "harm_bounded": true,
             "positive_control_detected": true,
+            "positive_control_clears_margin": true,
             "event_identity": "below_threshold"
           },
           "G_95": [
@@ -783,6 +811,7 @@
           "harm_bounded=True": 1.0,
           "identity=below_threshold": 1.0,
           "magnitude=negligible": 1.0,
+          "positive_control_clears_margin=True": 1.0,
           "positive_control_detected=True": 1.0
         },
         "mock_dataset_decision": {
@@ -792,6 +821,7 @@
             "source_gain_supported": false,
             "harm_bounded": true,
             "positive_control_detected": true,
+            "positive_control_clears_margin": true,
             "event_identity": "below_threshold"
           },
           "G_95": [
