@@ -388,8 +388,10 @@ def test_joint_axes_analysis_labels_and_family(tmp_path):
         == main_result["primary_claim"]
         == "consequential reuse advantage"
     )
-    # an axis with a failed block drops out of the family and is unresolved;
-    # the primary is untouched
+    assert joint["encoder_difference_exploratory"]["contrast"] == "G(V-JEPA 2) - G(DINOv2)"
+    assert "encoder_difference_exploratory" not in joint["joint_family_p_values"]
+    # an axis with a failed block enters the family with p = 1 and is unresolved;
+    # the family keeps seven members and the primary is untouched
     broken = dict(axes)
     runs, cfg = broken["dose16"]
     runs = list(runs)
@@ -401,8 +403,63 @@ def test_joint_axes_analysis_labels_and_family(tmp_path):
     }
     broken["dose16"] = (runs, cfg)
     joint2 = analyze_axes({"result": main_result, "config": main_cfg}, broken)
+    assert len(joint2["joint_family_p_values"]) == 7
     assert (
-        "dose_increase" not in joint2["joint_family_p_values"]
+        joint2["joint_family_p_values"]["dose_increase"] == 1.0
         and joint2["labels"]["dose"] == "unresolved"
     )
     assert joint2["main_primary_claim"] == main_result["primary_claim"]
+    # suppressed main decisions: the four main secondaries enter with p = 1
+    suppressed = json.loads(json.dumps(main_result))
+    suppressed["primary"]["decisions_suppressed"] = "unresolved block failures"
+    joint3 = analyze_axes({"result": suppressed, "config": main_cfg}, axes)
+    family3 = joint3["joint_family_p_values"]
+    assert len(family3) == 7
+    assert all(
+        family3[name] == 1.0
+        for name in ("identity_specific", "detectable", "consequential_harm", "capacity_increase")
+    )
+    assert joint3["main_labels_under_joint_holm"] == {}
+
+
+@pytest.mark.skipif(not PILOT_REPORT.exists(), reason="pilot report not available")
+def test_absence_labels_need_the_control_above_the_negligible_bound():
+    """v3.4 section F: negligible-with-encoder and dose-independent need lower95(E) > 0.002."""
+
+    from analyze_confirmation import validate_records
+    from analyze_exp3_axes import AXES, analyze_axes
+
+    from trajectory_lineage.exposure import scaled_capacity_config
+
+    main_cfg = scaled_capacity_config(CONFIG, 80)
+    main_cfg["decision_contract"] = dict(
+        CONFIG["decision_contract"],
+        minimum_screened_blocks=30,
+        minimum_screened_blocks_by_capacity={"64": 15, "256": 15},
+    )
+    sds = dispersion_from(PILOT_REPORT)
+    rng = np.random.default_rng(11)
+    main_runs = validate_records(
+        synthetic_runs(rng, main_cfg, dict(S=0.015, H=0.0, Q=0.0, E=0.004), sds, 80, 1.0),
+        80,
+        main_cfg,
+    )
+    main_result = analyze_2d(main_runs, main_cfg, check_records=False)
+    labels = {}
+    for control in (0.004, 0.0):  # a working control, then a dead control
+        axes = {}
+        for name in AXES:
+            cfg = json.loads((ROOT / "experiments" / f"exposure2d_confirm_{name}.json").read_text())
+            cfg = dict(cfg, blocks=40)
+            cfg["decision_contract"] = dict(cfg["decision_contract"], minimum_screened_blocks=30)
+            axis_sds = dict(
+                dispersion_from(ROOT / "results" / f"{name}_pilot_v1_blinded.json"), E=0.0005
+            )
+            runs = synthetic_runs(rng, cfg, dict(S=0.0, H=0.0, Q=0.0, E=control), axis_sds, 40, 1.0)
+            axes[name] = (validate_records(runs, 40, cfg), cfg)
+        joint = analyze_axes({"result": main_result, "config": main_cfg}, axes)
+        labels[control] = joint["labels"]
+    assert labels[0.004]["latent_vjepa2"] == "negligible_under_recipe"
+    assert labels[0.0]["latent_vjepa2"] == "unresolved"
+    assert labels[0.0]["latent_dinov2"] == "unresolved"
+    assert labels[0.0]["dose"] == "unresolved"

@@ -28,9 +28,24 @@ def test_consequential_negligible_reverse_inconclusive():
 
 
 def test_claims_combine_axes():
-    assert primary_claim("consequential", True, True, True) == "consequential reuse advantage"
+    assert primary_claim("consequential", True, True, True, True) == "consequential reuse advantage"
     assert (
-        primary_claim("consequential", True, False, True) == "differential gap without safeguards"
+        primary_claim("consequential", True, False, True, True)
+        == "differential gap without safeguards"
     )
-    assert primary_claim("negligible", True, True, False) == "positive control not detected"
-    assert primary_claim("negligible", False, False, True) == "negligible differential gap"
+    assert primary_claim("negligible", True, True, False, False) == "positive control not detected"
+    assert primary_claim("negligible", False, False, True, True) == "negligible differential gap"
+
+
+def test_negligible_needs_the_control_above_the_negligible_bound():
+    # preregistration v3.4, section F: lower95(E) > 0.002 for "negligible differential gap"
+    assert (
+        primary_claim("negligible", True, True, True, False)
+        == "negligible gap, control below the margin"
+    )
+    assert primary_claim("negligible", True, True, False, False) == "positive control not detected"
+    # the control rule never changes a non-negligible claim
+    assert (
+        primary_claim("prevalence_dependent", True, True, False, False)
+        == "prevalence_dependent reuse advantage"
+    )

@@ -219,6 +219,9 @@ def main() -> None:
                     axes[f"identity={ax['event_identity']}"] += 1
                     axes[f"harm_bounded={ax['harm_bounded']}"] += 1
                     axes[f"positive_control_detected={ax['positive_control_detected']}"] += 1
+                    axes[
+                        f"positive_control_clears_margin={ax['positive_control_clears_margin']}"
+                    ] += 1
                 if "capacity" in result:
                     axes[f"capacity={result['capacity']['label']}"] += 1
                 if mock is None:
