@@ -10,7 +10,15 @@ from scipy import stats
 from registered import sha256_json
 from registered.analyze import AnalysisError, analyze, holm, paired_t, validate_runs
 from registered.dryrun import synthetic_runs
-from registered.freeze import FreezeError, build_freeze, check_runtime, environment_block, sign, verify_freeze
+from registered.freeze import (
+    FreezeError,
+    build_freeze,
+    check_runtime,
+    environment_block,
+    owner_pipeline_block,
+    sign,
+    verify_freeze,
+)
 
 
 # ---------------------------------------------------------------- weights
@@ -55,6 +63,16 @@ def test_holm_step_down():
     assert adj["b"]["p_holm"] == pytest.approx(0.06) and not adj["b"]["reject"]
     assert adj["c"]["p_holm"] == pytest.approx(0.06)  # monotone
     assert adj["d"]["p_holm"] == 0.5
+    assert adj["a"]["step_alpha"] == pytest.approx(0.05 / 4) and adj["d"]["step_alpha"] == pytest.approx(0.05)
+
+
+def test_holm_keeps_every_member_and_declares_at_the_level():
+    # v3.4 section C: an untestable member enters with p = 1, so the family keeps its size
+    adj = holm({"a": 0.01, "b": None, "c": 0.5}, 0.05)
+    assert adj["b"]["p"] is None and adj["b"]["p_entered"] == 1.0 and not adj["b"]["reject"]
+    assert adj["a"]["p_holm"] == pytest.approx(0.03)  # m = 3, not 2
+    # "declared when its Holm-adjusted p is at most the familywise level"
+    assert holm({"a": 0.025, "b": 0.9}, 0.05)["a"]["reject"]
 
 
 # ---------------------------------------------------------------- analyzer end to end on synthetic scores
@@ -112,6 +130,30 @@ def test_validation_rejects_stale_and_foreign_runs(selection, support, config, m
         analyze([stale], selection, support, config, truth=_truth_map(manifest), with_auroc=False)
 
 
+def test_primary_can_be_refuted_and_secondary_intervals_use_holm_levels(selection, support, config, manifest):
+    runs = _runs(selection, support, config, manifest, dict(O=0, A=-10, B=0, V=0))
+    res = analyze(runs, selection, support, config, truth=_truth_map(manifest), with_auroc=False)
+    assert res["decisions"]["A"] == "refuted"  # one-sided 95% upper bound below -3
+    assert res["quantities"]["A"]["t"]["upper95_one_sided"] < -3
+    assert len(res["holm"]) == 10
+    for q in config["decision"]["secondary"]:
+        hi = res["quantities"][q]["holm_intervals"]
+        for kind in ("support", "equivalence"):
+            level = 1 - 2 * res["holm"][f"{q}:{kind}"]["step_alpha"]
+            assert hi[kind]["level"] == pytest.approx(level)
+            assert 0.89 <= level <= 0.99 + 1e-12  # from 1 - 2(0.05/10) to 1 - 2(0.05)
+            lo, up = hi[kind]["ci"]
+            t = res["quantities"][q]["t"]
+            assert lo <= t["mean"] <= up
+
+
+def test_missing_run_keeps_ten_members_in_the_holm_family(selection, support, config, manifest):
+    runs = _runs(selection, support, config, manifest, dict(O=10, A=10, B=10, V=10, missing=["B_phi0.10_s101"]))
+    res = analyze(runs, selection, support, config, truth=_truth_map(manifest), with_auroc=False)
+    assert len(res["holm"]) == 10
+    assert res["holm"]["B:support"]["p_entered"] == 1.0 and not res["holm"]["B:support"]["reject"]
+
+
 def test_mean_probability_sensitivity_is_reported(selection, support, config, manifest):
     runs = _runs(selection, support, config, manifest, dict(O=10, A=10, B=10, V=10))
     res = analyze(runs, selection, support, config, truth=_truth_map(manifest), with_auroc=False)
@@ -121,14 +163,15 @@ def test_mean_probability_sensitivity_is_reported(selection, support, config, ma
 
 # ---------------------------------------------------------------- freeze
 
-def test_freeze_binds_and_rejects(selection, support, config, tmp_path):
+def test_freeze_binds_and_rejects(selection, support, config, tmp_path, owner_repo):
     real_sel = copy.deepcopy(selection); real_sel["manifest_kind"] = "real"; real_sel["manifest_sha256"] = "testmanifest"
     with pytest.raises(FreezeError):
         build_freeze(config, tmp_path / "m.jsonl", selection, support, [], None)  # synthetic refused
     lock = tmp_path / "uv.lock"; lock.write_text("owner lock v1\n")
     env = environment_block("CPU", lock)
     fz = build_freeze(config, tmp_path / "m.jsonl", real_sel, support, [{"role": "paper_lead", "name": "Lead Name", "date": "2026-10-29"},
-                                                                        {"role": "stats_check", "name": "Stats Name", "date": "2026-10-29"}], "osf.io/xxxx", env)
+                                                                        {"role": "stats_check", "name": "Stats Name", "date": "2026-10-29"}], "osf.io/xxxx", env,
+                      owner_pipeline_block(owner_repo))
     verify_freeze(fz, config=config, selection=real_sel, support=support, require_signoff=True, lockfile=lock)
     # environment: required, lockfile checked, runtime hash consistent, hardware named
     with pytest.raises(FreezeError, match="no environment block"):
@@ -156,10 +199,11 @@ def test_freeze_binds_and_rejects(selection, support, config, tmp_path):
 
 
 
-def test_draft_freeze_is_refused_until_both_internal_roles_sign(selection, support, config, tmp_path):
+def test_draft_freeze_is_refused_until_both_internal_roles_sign(selection, support, config, tmp_path, owner_repo):
     real_sel = copy.deepcopy(selection); real_sel["manifest_kind"] = "real"; real_sel["manifest_sha256"] = "testmanifest"
     lock = tmp_path / "uv.lock"; lock.write_text("owner lock\n")
-    draft = build_freeze(config, tmp_path / "m.jsonl", real_sel, support, [], None, environment_block("A100", lock))
+    draft = build_freeze(config, tmp_path / "m.jsonl", real_sel, support, [], None, environment_block("A100", lock),
+                         owner_pipeline_block(owner_repo))
     assert draft["status"] == "DRAFT - unsigned"
     with pytest.raises(FreezeError, match="missing sign-off"):
         verify_freeze(draft, config=config, selection=real_sel, support=support, require_signoff=True)
@@ -172,17 +216,67 @@ def test_draft_freeze_is_refused_until_both_internal_roles_sign(selection, suppo
     verify_freeze(full, config=config, selection=real_sel, support=support, require_signoff=True, lockfile=lock)
 
 
-def test_freeze_cli_sign_and_verify(selection, support, config, tmp_path):
+def test_freeze_cli_sign_and_verify(selection, support, config, tmp_path, owner_repo):
     """The CLI path: create (draft) -> sign twice -> verify with sign-offs; sign takes no config."""
 
     from registered.freeze import main as freeze_main
 
     real_sel = copy.deepcopy(selection); real_sel["manifest_kind"] = "real"; real_sel["manifest_sha256"] = "testmanifest"
     lock = tmp_path / "uv.lock"; lock.write_text("owner lock\n")
-    fz = build_freeze(config, tmp_path / "m.jsonl", real_sel, support, [], None, environment_block("CPU", lock))
+    fz = build_freeze(config, tmp_path / "m.jsonl", real_sel, support, [], None, environment_block("CPU", lock),
+                      owner_pipeline_block(owner_repo))
     path = tmp_path / "freeze.json"; path.write_text(json.dumps(fz))
     freeze_main(["sign", "--freeze", str(path), "--role", "paper_lead", "--name", "Paper Lead", "--date", "2026-11-02"])
     freeze_main(["sign", "--freeze", str(path), "--role", "stats_check", "--name", "Stats Check", "--date", "2026-11-02"])
     signed = json.loads(path.read_text())
     assert signed["status"] == "signed"
     verify_freeze(signed, config=config, selection=real_sel, support=support, require_signoff=True, lockfile=lock)
+
+
+def test_freeze_binds_the_owner_pipeline(selection, support, config, tmp_path, owner_repo):
+    """v3.4 section A names the owner's pipeline commit; the freeze records it and the wm.py hash."""
+
+    import subprocess
+
+    real_sel = copy.deepcopy(selection); real_sel["manifest_kind"] = "real"; real_sel["manifest_sha256"] = "testmanifest"
+    lock = owner_repo / "uv.lock"
+    fz = build_freeze(config, tmp_path / "m.jsonl", real_sel, support, [], None, environment_block("CPU", lock),
+                      owner_pipeline_block(owner_repo))
+    assert len(fz["owner_pipeline"]["commit"]) == 40
+    verify_freeze(fz, config=config, require_signoff=False, owner_repo=owner_repo)
+    with pytest.raises(FreezeError, match="owner's pipeline"):
+        verify_freeze({**fz, "owner_pipeline": None}, config=config, require_signoff=False)
+    wm = owner_repo / "experiment" / "wm.py"
+    original = wm.read_text()
+    wm.write_text(original.replace('"cpu"', '"cuda"'))  # an edited model file is refused
+    with pytest.raises(FreezeError, match="differs from the frozen file"):
+        verify_freeze(fz, config=config, require_signoff=False, owner_repo=owner_repo)
+    wm.write_text(original)
+    (owner_repo / "README.md").write_text("later change\n")  # same wm.py, another commit
+    git = ["git", "-C", str(owner_repo), "-c", "user.name=Test", "-c", "user.email=test@example.com"]
+    subprocess.run([*git, "add", "."], check=True)
+    subprocess.run([*git, "commit", "-q", "-m", "later"], check=True)
+    with pytest.raises(FreezeError, match="not at the frozen commit"):
+        verify_freeze(fz, config=config, require_signoff=False, owner_repo=owner_repo)
+
+
+def test_freeze_cli_create_reuses_a_recorded_environment(selection, support, config, tmp_path, owner_repo):
+    """``create --environment`` reuses the block recorded on the registered hardware."""
+
+    from registered.freeze import main as freeze_main
+
+    real_sel = copy.deepcopy(selection); real_sel["manifest_kind"] = "real"; real_sel["manifest_sha256"] = "testmanifest"
+    recorded = build_freeze(config, tmp_path / "m.jsonl", real_sel, support, [], None,
+                            environment_block("A100", owner_repo / "uv.lock"), owner_pipeline_block(owner_repo))
+    (tmp_path / "old.json").write_text(json.dumps(recorded))
+    (tmp_path / "selection.json").write_text(json.dumps(real_sel)); (tmp_path / "support.json").write_text(json.dumps(support))
+    out = tmp_path / "new.json"
+    freeze_main(["create", "--manifest", str(tmp_path / "m.jsonl"), "--selection", str(tmp_path / "selection.json"),
+                 "--support", str(tmp_path / "support.json"), "--owner-repo", str(owner_repo),
+                 "--environment", str(tmp_path / "old.json"), "--out", str(out)])
+    new = json.loads(out.read_text())
+    assert new["environment"] == recorded["environment"] and new["environment"]["hardware_class"] == "A100"
+    assert new["owner_pipeline"] == recorded["owner_pipeline"]
+    with pytest.raises(SystemExit):  # exactly one source of the environment block
+        freeze_main(["create", "--manifest", str(tmp_path / "m.jsonl"), "--selection", str(tmp_path / "selection.json"),
+                     "--support", str(tmp_path / "support.json"), "--owner-repo", str(owner_repo), "--out", str(out)])

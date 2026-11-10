@@ -32,7 +32,8 @@ REQUIRED_ROLES = ("paper_lead", "stats_check")
 PROVISIONAL_ROLES = ("workstream_owner",)
 REPOSITORY = Path(__file__).resolve().parents[1]
 EXPERIMENTS = REPOSITORY / "experiments"
-APPROVAL_PATHS = ("approvals/",)
+# approval records and the registration documents (no code) may change after a freeze commit
+APPROVAL_PATHS = ("approvals/", "docs/registration/")
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 CONFIRMATORY_ROLES = ("confirmatory", "confirmatory_axis")
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
@@ -77,7 +78,7 @@ def changed_since(commit: str) -> list[str] | None:
 
 
 def code_matches(frozen: str, state: Callable[[], tuple[str, bool]], changes) -> bool:
-    """HEAD equals the frozen commit, or differs from it only by approval records."""
+    """HEAD equals the frozen commit, or differs from it only under ``APPROVAL_PATHS``."""
 
     head, clean = state()
     if not clean:

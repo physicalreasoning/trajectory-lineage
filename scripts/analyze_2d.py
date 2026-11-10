@@ -9,8 +9,11 @@ decision logic, which the 2D registration revises in four ways:
 2. "Prevalence-dependent" requires the WHOLE 95% interval of the gap G to lie in
    (0.002, 0.010]. An interval that starts above 0.002 but reaches past 0.010 is reported as
    "detectable, magnitude unresolved" instead of being called prevalence-dependent.
-3. The positive control is reachable: assay sensitivity requires the 95% lower bound of arm E's
-   exact-render gain to exceed zero (the 1D rule's "E can detect 0.010" is not required).
+3. The positive control must clear the negligible bound (preregistration v3.4, section F): a
+   negligible gap is called "negligible differential gap" only if the 95% lower bound of arm E's
+   exact-render gain exceeds 0.002. If that bound lies in (0, 0.002], the claim is "negligible
+   gap, control below the margin" (inconclusive about negligibility); at or below 0 it is
+   "positive control not detected".
 4. Magnitude, safeguards (source gain, harm) and event identity (Q) are separate axes; the
    primary claim combines them by a fixed table. The confirmatory event-identity label comes from
    the Holm-adjusted secondary test, never from a nominal interval.
@@ -20,7 +23,10 @@ decision logic, which the 2D registration revises in four ways:
    reuse gap G grows with capacity: a Welch comparison of G between the largest and the smallest
    level, with its one-sided p-value in the Holm family of secondaries ("capacity_increase").
    Per-level estimates are descriptive; "capacity_independent" needs the 90% interval of the
-   difference inside the negligible bound.
+   difference inside the negligible bound and, at both compared levels, the 95% lower bound of
+   the exact-render gain above the negligible bound.
+7. Every registered secondary keeps its place in the Holm family: a secondary without a p-value
+   (for example the capacity trend when a level has too few screened blocks) enters with p = 1.
 """
 
 from __future__ import annotations
@@ -85,7 +91,13 @@ def classify_gap_2d(
     return "inconclusive"
 
 
-def primary_claim(magnitude: str, source_ok: bool, harm_ok: bool, assay_ok: bool) -> str:
+def primary_claim(
+    magnitude: str,
+    source_ok: bool,
+    harm_ok: bool,
+    control_detected: bool,
+    control_clears_margin: bool,
+) -> str:
     if magnitude in ("consequential", "prevalence_dependent"):
         return (
             f"{magnitude} reuse advantage"
@@ -99,7 +111,11 @@ def primary_claim(magnitude: str, source_ok: bool, harm_ok: bool, assay_ok: bool
             else "differential gap without safeguards"
         )
     if magnitude == "negligible":
-        return "negligible differential gap" if assay_ok else "positive control not detected"
+        if control_clears_margin:
+            return "negligible differential gap"
+        if control_detected:
+            return "negligible gap, control below the margin"
+        return "positive control not detected"
     if magnitude == "reverse":
         return "reverse gap"
     return "inconclusive"
@@ -149,9 +165,11 @@ def analyze_blocks_2d(
     s90 = {name: interval(array, alpha_absence) for name, array in values.items()}
     magnitude = classify_gap_2d(s95["G"], s90["G"], contract)
     harm_margin = float(contract["harm_margin_h"])
+    negligible = float(contract["negligible_bound"])
     source_ok = s95["S"]["lower"] > 0
     harm_ok = s95["H"]["upper"] < harm_margin
-    assay_ok = s95["E_exact_gain"]["lower"] > 0
+    control_detected = s95["E_exact_gain"]["lower"] > 0
+    control_clears_margin = s95["E_exact_gain"]["lower"] > negligible
     threshold = float(contract["consequential_threshold"])
     p_values = {
         "identity_specific": one_sided_p(values["Q"], threshold),
@@ -176,11 +194,14 @@ def analyze_blocks_2d(
             "magnitude": magnitude,
             "source_gain_supported": bool(source_ok),
             "harm_bounded": bool(harm_ok),
-            "positive_control_detected": bool(assay_ok),
+            "positive_control_detected": bool(control_detected),
+            "positive_control_clears_margin": bool(control_clears_margin),
             "event_identity": identity,
         },
         "E_exact_gain_positive_fraction": float(np.mean(values["E_exact_gain"] > 0)),
-        "primary_claim": primary_claim(magnitude, source_ok, harm_ok, assay_ok),
+        "primary_claim": primary_claim(
+            magnitude, source_ok, harm_ok, control_detected, control_clears_margin
+        ),
         "secondary_p_values": p_values,
         "secondary_holm_rejections": holm_decisions,
         "break_even_prevalence": break_even(s95["G"], float(contract["ranking_margin_m"])),
@@ -252,6 +273,9 @@ def analyze_capacity(
         return out
     trend95 = welch(gaps[high], gaps[low], alpha_support)
     trend90 = welch(gaps[high], gaps[low], alpha_absence)
+    control_clears = all(
+        per_level[str(level)].get("E_lower_95", float("-inf")) > negligible for level in (low, high)
+    )
     out.update(
         trend={
             "contrast": f"G({high}) - G({low})",
@@ -260,7 +284,7 @@ def analyze_capacity(
         },
         trend_p_one_sided=trend95["p_one_sided"],
     )
-    if trend90["lower"] > -negligible and trend90["upper"] < negligible:
+    if trend90["lower"] > -negligible and trend90["upper"] < negligible and control_clears:
         out["label"] = "capacity_independent"
     return out
 
@@ -324,9 +348,14 @@ def analyze_2d(
         "primary_capacity": primary_level,
     }
     capacity = analyze_capacity(screened_all, contract, levels) if multi else None
+    # the capacity secondary keeps its place in the Holm family: p = 1 when it cannot be tested
     extra = (
-        {"capacity_increase": capacity["trend_p_one_sided"]}
-        if capacity and capacity["trend_p_one_sided"] is not None
+        {
+            "capacity_increase": 1.0
+            if capacity["trend_p_one_sided"] is None
+            else capacity["trend_p_one_sided"]
+        }
+        if capacity
         else None
     )
     if len(screened) >= 2:

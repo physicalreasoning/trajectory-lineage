@@ -59,3 +59,23 @@ def support(manifest, config):
     s = evaluation_support(manifest, config)
     s["manifest_sha256"] = "testmanifest"
     return s
+
+
+def make_owner_repo(path: Path) -> Path:
+    """A tiny git repository shaped like the owner's: experiment/wm.py and uv.lock, one commit."""
+
+    import subprocess
+
+    (path / "experiment").mkdir(parents=True)
+    (path / "experiment" / "wm.py").write_text('DEVICE = "cpu"\n')
+    (path / "uv.lock").write_text("owner lock\n")
+    git = ["git", "-C", str(path), "-c", "user.name=Test", "-c", "user.email=test@example.com"]
+    subprocess.run(["git", "init", "-q", str(path)], check=True)
+    subprocess.run([*git, "add", "."], check=True)
+    subprocess.run([*git, "commit", "-q", "-m", "owner pipeline"], check=True)
+    return path
+
+
+@pytest.fixture()
+def owner_repo(tmp_path):
+    return make_owner_repo(tmp_path / "owner")

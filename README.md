@@ -158,7 +158,7 @@ Outcome under the contract: **negligible differential gap**, while still detecta
 
 ## Registered 2D study
 
-Two disks with one exact elastic collision in 2D. Each block trains a base model, then five matched continuations (arms B, C, D, D2, E, as in 1D). The contrasts and margins are the same as in 1D, with two revised rules (whole-interval prevalence rule, reachable positive control).
+Two disks with one exact elastic collision in 2D. Each block trains a base model, then five matched continuations (arms B, C, D, D2, E, as in 1D). The contrasts and margins are the same as in 1D, with two revised rules (whole-interval prevalence rule; a negligible gap also needs the positive control's 95% lower bound above the negligible bound 0.002, as preregistration v3.4 section F requires).
 
 | Configuration | Predictor | Reused sources | Blocks | Role |
 |---|---|---|---:|---|

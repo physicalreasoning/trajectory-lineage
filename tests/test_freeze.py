@@ -47,8 +47,18 @@ def test_manifest_may_be_committed_under_approvals(tmp_path: Path) -> None:
     config_path, manifest = setup(tmp_path)
     check(manifest, config_path, tmp_path)
     check(manifest, config_path, tmp_path, head="later", changed=["approvals/freeze.json"])
+    # the registration commit adds documents only; it must not break the binding
+    check(
+        manifest,
+        config_path,
+        tmp_path,
+        head="later",
+        changed=["docs/registration/preregistration_v3.5.pdf", "approvals/freeze.json"],
+    )
     with pytest.raises(freeze.FreezeError):
         check(manifest, config_path, tmp_path, head="later", changed=["scripts/analyze.py"])
+    with pytest.raises(freeze.FreezeError):
+        check(manifest, config_path, tmp_path, head="later", changed=["docs/EFFECT_SIZE.md"])
     with pytest.raises(freeze.FreezeError):
         check(manifest, config_path, tmp_path, head="later", changed=None)
 

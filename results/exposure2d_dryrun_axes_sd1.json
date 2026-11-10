@@ -21,8 +21,8 @@
           "negligible_under_recipe": 1.0
         },
         "dose": {
-          "dose_independent": 0.9833333333333333,
-          "unresolved": 0.016666666666666666
+          "dose_independent": 0.8333333333333334,
+          "unresolved": 0.16666666666666666
         }
       },
       "capacity_label_under_joint_holm": {
@@ -77,8 +77,8 @@
           "reuse_detectable_under_recipe": 0.016666666666666666
         },
         "dose": {
-          "dose_independent": 0.95,
-          "unresolved": 0.05
+          "dose_independent": 0.8,
+          "unresolved": 0.2
         }
       },
       "capacity_label_under_joint_holm": {
@@ -105,8 +105,8 @@
           "reuse_detectable_under_recipe": 1.0
         },
         "dose": {
-          "dose_independent": 0.9333333333333333,
-          "unresolved": 0.06666666666666667
+          "dose_independent": 0.7833333333333333,
+          "unresolved": 0.21666666666666667
         }
       },
       "capacity_label_under_joint_holm": {

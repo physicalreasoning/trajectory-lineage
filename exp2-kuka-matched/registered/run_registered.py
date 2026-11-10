@@ -39,6 +39,15 @@ def import_owner_wm(owner_repo: Path):
     sys.path.insert(0, str(Path(owner_repo) / "experiment"))
     import wm  # type: ignore
 
+    # The owner's file picks MPS or CPU at import. Prefer CUDA by setting the module attribute,
+    # which wm.py reads at call time, so the file stays byte-identical to the frozen commit.
+    try:
+        import torch  # noqa: PLC0415
+
+        if torch.cuda.is_available():
+            wm.DEVICE = "cuda"
+    except ImportError:
+        pass
     return wm
 
 
@@ -176,7 +185,7 @@ def run_all(*, owner_repo: Path, npz_dir: Path, manifest_path: Path, selection_p
         from .freeze import check_runtime, verify_freeze
         frozen = json.loads(Path(freeze_path).read_text())
         verify_freeze(frozen, config=config, selection=selection, support=support, require_signoff=True,
-                      lockfile=Path(owner_repo) / "uv.lock")
+                      lockfile=Path(owner_repo) / "uv.lock", owner_repo=Path(owner_repo))
         environment_check = check_runtime(frozen, wm.DEVICE, deviation)
         out.mkdir(parents=True, exist_ok=True)
         write_json(out / f"environment_check_{dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%SZ')}.json", environment_check)
@@ -218,8 +227,8 @@ def run_all(*, owner_repo: Path, npz_dir: Path, manifest_path: Path, selection_p
         write_json(path, rec)
         results.append(rec)
         if rec["status"] == "completed":
-            w = np.array([support["weights"].get(i, 0.0) for i in test_ids])
-            log(f"{run['run_id']}: weighted thresholded rate {(w * (np.array(rec['p']) > 0.5)).sum():.4f}  [{rec['train_minutes']:.1f} min, peak RSS {wm.rss_gb():.2f} GB]")
+            # blinded log (preregistration v3.4, section A): no estimated success; scores stay in the run file
+            log(f"{run['run_id']}: completed [{rec['train_minutes']:.1f} min, peak RSS {wm.rss_gb():.2f} GB]")
         else:
             log(f"{run['run_id']}: INFRASTRUCTURE FAILURE (attempt {attempt}); see run file")
     return results

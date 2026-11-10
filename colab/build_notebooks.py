@@ -11,6 +11,13 @@ FILES = ["configs/exp2_registered.json", "registered/__init__.py", "registered/m
          "registered/weights.py", "registered/analyze.py", "registered/dryrun.py", "registered/freeze.py", "registered/run_registered.py"]
 
 
+# the owner's pipeline commit that the preregistration (v3.4, section A) names; every notebook checks it out
+OWNER_COMMIT = "ed416e15ab9e4fd7c7b9ba4c51bdb343b4a28ce5"
+TRAINING_MOVED = """---
+## Registered training is not in this notebook
+Use `LOCKED_exp2_training.ipynb` after registration, the signed freeze and the `exp2-freeze-...` tag. It trains from the frozen tag with the owner's pipeline at its registered commit, and its log shows no estimated success. Nobody runs the analyzer in a notebook: the statistics reviewer runs it after the December 8 amendment (preregistration v3.4, section A)."""
+
+
 def md(s): return {"cell_type": "markdown", "metadata": {}, "source": s}
 def code(s): return {"cell_type": "code", "metadata": {}, "execution_count": None, "outputs": [], "source": s}
 
@@ -26,7 +33,7 @@ manifest → selection + feasibility certificate (110 or 130 runs) → evaluatio
 
 **Send back:** `exp2_prep_results.zip` (downloaded by cell 7). It holds the manifest summary, `selection.certificate.json`, `selection.md`, `support.md`, `support.json`, `dryrun.md`, `dryrun.json`, and the full `selection.json`.
 
-**Do not run cell 8** (training) before the registration is submitted and the freeze manifest is signed. The driver refuses to start without the signed freeze."""),
+This notebook does not train. Registered training is in `LOCKED_exp2_training.ipynb`."""),
         code("""#@title 1. Configuration
 USE_DRIVE = True        #@param {type:"boolean"}   # keep the cache and outputs on Google Drive (recommended)
 DRIVE_DIR = "/content/drive/MyDrive/seen-and-unseen/exp2"  #@param {type:"string"}
@@ -42,12 +49,11 @@ import os
 if not os.path.exists("rwmo"):
     !git clone -q https://github.com/subhashjprasad/robot-world-model-optimism-research.git rwmo
 %cd /content/rwmo
-!git rev-parse --short HEAD
+!git checkout -q -f @OWNER_COMMIT@ && git rev-parse HEAD
 !pip install -q tfrecord crc32c protobuf requests "transformers>=5.0" accelerate pillow scikit-learn scipy pandas matplotlib
-# the owner's scripts pick MPS or CPU; prefer CUDA on Colab (no other change)
+# the owner's extractor picks MPS or CPU; prefer CUDA on Colab (extraction only; wm.py is never edited)
 !sed -i 's/device = "mps" if torch.backends.mps.is_available() else "cpu"/device = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")/' experiment/extract_kuka.py
-!sed -i 's/DEVICE = "mps" if torch.backends.mps.is_available() else "cpu"/DEVICE = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")/' experiment/wm.py
-!grep -n "cuda" experiment/extract_kuka.py experiment/wm.py | head -3"""),
+!grep -n "cuda" experiment/extract_kuka.py | head -3""".replace("@OWNER_COMMIT@", OWNER_COMMIT)),
         code("""#@title 3. Storage (Drive) for the cache and outputs
 import os
 if USE_DRIVE:
@@ -87,20 +93,7 @@ print(open(f"{OUT}/selection.md").read())"""),
 !ls -la /content/exp2_prep_results.zip
 from google.colab import files
 files.download("/content/exp2_prep_results.zip")"""),
-        md("""---
-## 8. Registered training — LOCKED until the freeze is signed and the registration is submitted
-Upload the signed `freeze.json` to `OUT` first. The driver verifies config, selection, support and code hashes and the sign-offs, then trains the 110 (or 130) runs with the owner's `wm.py` (about 1–2 min per run on an A100 at 2,000 steps; the pipeline resumes if the runtime restarts). Then run the analyzer."""),
-        code("""#@title 8a. Train (requires {OUT}/freeze.json)
-import os
-assert os.path.exists(f"{OUT}/freeze.json"), "no signed freeze manifest in OUT; do not train before registration"
-%cd /content/exp2-kuka-matched
-!PYTHONPATH=. python -m registered.run_registered --owner-repo /content/rwmo --npz-dir /content/rwmo/data/kuka --manifest {OUT}/manifest.jsonl --selection {OUT}/selection.json --support {OUT}/support.json --freeze {OUT}/freeze.json --out {OUT}/runs 2>&1 | grep -v -i "warn" | tail -n 150"""),
-        code("""#@title 8b. Analyze (after all runs)
-%cd /content/exp2-kuka-matched
-!PYTHONPATH=. python -m registered.analyze --runs {OUT}/runs --selection {OUT}/selection.json --support {OUT}/support.json --manifest {OUT}/manifest.jsonl --judge {OUT}/runs/judge.json --freeze {OUT}/freeze.json --out {OUT}/decision.json
-!cd {OUT} && zip -q -j /content/exp2_decision.zip decision.json decision.md runs/judge.json && ls -la /content/exp2_decision.zip
-from google.colab import files
-files.download("/content/exp2_decision.zip")"""),
+        md(TRAINING_MOVED),
     ]
     return {"cells": cells, "metadata": {"accelerator": "GPU", "colab": {"provenance": []}, "kernelspec": {"display_name": "Python 3", "name": "python3"}, "language_info": {"name": "python"}}, "nbformat": 4, "nbformat_minor": 0}
 
@@ -199,7 +192,7 @@ def combined_notebook() -> dict:
 | A | Exp 3 effect-blind capacity pilot: ConvLSTM 16/64/256 channels, 72 blinded blocks, resumable from a blinded checkpoint on Drive | background process, started in cell A3 | `exp3_capacity_pilot_results.zip` (cell A5) |
 | B | Exp 2: Kuka feature cache on Drive, then manifest → certificate → support → dry run | foreground, while A runs | `exp2_prep_results.zip` (cell B5) |
 
-GPU runtime (A100 or L4), High-RAM on. Expected: Part B about 1–1.5 h; Part A about 2–3 h in the background; both zips download when ready. The Part B training cells at the end stay locked until a signed freeze exists."""),
+GPU runtime (A100 or L4), High-RAM on. Expected: Part B about 1–1.5 h; Part A about 2–3 h in the background; both zips download when ready. This notebook does not train: registered Exp 2 training is in `LOCKED_exp2_training.ipynb`."""),
         code("""#@title 0. Configuration (run first; the only cell that defines settings)
 # --- Part A: Exp 3 capacity pilot
 TUNE_BLOCKS = 4                     #@param {type:"integer"}
@@ -267,10 +260,9 @@ import os
 if not os.path.exists("rwmo"):
     !git clone -q https://github.com/subhashjprasad/robot-world-model-optimism-research.git rwmo
 %cd /content/rwmo
-!git rev-parse --short HEAD
+!git checkout -q -f @OWNER_COMMIT@ && git rev-parse HEAD
 !pip install -q tfrecord crc32c protobuf requests "transformers>=5.0" accelerate pillow scikit-learn scipy pandas matplotlib
 !sed -i 's/device = "mps" if torch.backends.mps.is_available() else "cpu"/device = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")/' experiment/extract_kuka.py
-!sed -i 's/DEVICE = "mps" if torch.backends.mps.is_available() else "cpu"/DEVICE = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")/' experiment/wm.py
 !rm -rf /content/rwmo/data/kuka && ln -s {EXP2_DRIVE_DIR}/kuka /content/rwmo/data/kuka
 print("cache:", os.path.realpath("/content/rwmo/data/kuka"), "| shards present:", len(os.listdir("/content/rwmo/data/kuka")))"""),
         code(GUARD + """#@title B2. Feature extraction (resumable; skips shards already in the cache)
@@ -327,20 +319,7 @@ print("infrastructure failures:", len(r["infrastructure_failures"]), "| algorith
 !ls -la /content/exp3_capacity_pilot_results.zip
 from google.colab import files
 files.download("/content/exp3_capacity_pilot_results.zip")"""),
-        md("""---
-## Locked — Exp 2 registered training (do not run before the freeze is signed and the registration is submitted)
-Upload the signed `freeze.json` to `OUT` first. The driver verifies config, selection, support, code hashes and sign-offs, then trains the runs with the owner's `wm.py` and resumes if the runtime restarts."""),
-        code(GUARD + """#@title L1. Train (requires {OUT}/freeze.json)
-import os
-assert os.path.exists(f"{OUT}/freeze.json"), "no signed freeze manifest in OUT; do not train before registration"
-%cd /content/exp2-kuka-matched
-!PYTHONPATH=. python -m registered.run_registered --owner-repo /content/rwmo --npz-dir /content/rwmo/data/kuka --manifest {OUT}/manifest.jsonl --selection {OUT}/selection.json --support {OUT}/support.json --freeze {OUT}/freeze.json --out {OUT}/runs 2>&1 | grep -v -i "warn" | tail -n 150"""),
-        code(GUARD + """#@title L2. Analyze (after all runs)
-%cd /content/exp2-kuka-matched
-!PYTHONPATH=. python -m registered.analyze --runs {OUT}/runs --selection {OUT}/selection.json --support {OUT}/support.json --manifest {OUT}/manifest.jsonl --judge {OUT}/runs/judge.json --freeze {OUT}/freeze.json --out {OUT}/decision.json
-!cd {OUT} && zip -q -j /content/exp2_decision.zip decision.json decision.md runs/judge.json && ls -la /content/exp2_decision.zip
-from google.colab import files
-files.download("/content/exp2_decision.zip")"""),
+        md(TRAINING_MOVED),
         md("""### Notes
 - Blinding: the pilot's Drive checkpoint holds blinded records only (contrasts shifted by the key in `DO_NOT_OPEN/`); the report contains dispersions and the pooled positive-control flag, no effect locations. Never open the key folder. Do not add `--unblind` or `--checkpoint` to the pilot command.
 - Resume: after any disconnect, Runtime → Run all. Part A skips finished blocks, Part B skips finished shards and existing outputs."""),
@@ -593,8 +572,8 @@ print("draft written")"""),
 import os
 if not os.path.exists("rwmo"):
     !git clone -q https://github.com/subhashjprasad/robot-world-model-optimism-research.git rwmo
-!git -C /content/rwmo rev-parse --short HEAD
-!pip install -q scipy scikit-learn pandas"""),
+!git -C /content/rwmo checkout -q -f @OWNER_COMMIT@ && git -C /content/rwmo rev-parse HEAD
+!pip install -q scipy scikit-learn pandas""".replace("@OWNER_COMMIT@", OWNER_COMMIT)),
         code(GUARD + """#@title 4. Recertify on the Drive cache with the current rules, then the unsigned Exp 2 freeze
 %cd /content/trajectory-lineage/exp2-kuka-matched
 !PYTHONPATH=. python -m registered.manifest build --npz-dir {CACHE} --out {OUT2}/manifest.jsonl | tail -n 12
@@ -604,8 +583,8 @@ if RUN_DRYRUN or not os.path.exists(f"{OUT2}/dryrun.md"):
     !PYTHONPATH=. python -m registered.dryrun --manifest {OUT2}/manifest.jsonl --selection {OUT2}/selection.json --support {OUT2}/support.json --datasets {DRYRUN_DATASETS} --workers 2 --out {OUT2}/dryrun.json | tail -n 10
 else:
     print("dry run reused from Drive (same 110 runs; only the hashes changed)")
-!PYTHONPATH=. python -m registered.freeze create --manifest {OUT2}/manifest.jsonl --selection {OUT2}/selection.json --support {OUT2}/support.json --hardware-class "{HARDWARE_EXP2}" --lockfile /content/rwmo/uv.lock --out {OUT2}/exp2_freeze_manifest.json | head -n 20
-!PYTHONPATH=. python -m registered.freeze verify --freeze {OUT2}/exp2_freeze_manifest.json --selection {OUT2}/selection.json --support {OUT2}/support.json --lockfile /content/rwmo/uv.lock"""),
+!PYTHONPATH=. python -m registered.freeze create --manifest {OUT2}/manifest.jsonl --selection {OUT2}/selection.json --support {OUT2}/support.json --owner-repo /content/rwmo --hardware-class "{HARDWARE_EXP2}" --lockfile /content/rwmo/uv.lock --out {OUT2}/exp2_freeze_manifest.json | head -n 20
+!PYTHONPATH=. python -m registered.freeze verify --freeze {OUT2}/exp2_freeze_manifest.json --selection {OUT2}/selection.json --support {OUT2}/support.json --lockfile /content/rwmo/uv.lock --owner-repo /content/rwmo"""),
         md("## Download"),
         code(GUARD + """#@title 5. Package the drafts and the recertified Exp 2 files
 !cp {OUT2}/exp2_freeze_manifest.json {OUT2}/selection.json {OUT2}/selection.certificate.json {OUT2}/selection.md {OUT2}/support.json {OUT2}/support.md {OUT2}/dryrun.md {OUT2}/manifest.jsonl {OUT2}/manifest.summary.json {DRAFTS}/
@@ -626,6 +605,80 @@ PYTHONPATH=. python -m registered.freeze sign --freeze exp2_freeze_manifest.json
 ```
 
 Then commit the signed Exp 3 manifest under `approvals/` (the only path allowed to change after the code commit), tag the code commit `exp3-freeze-YYYYMMDD` / `exp2-freeze-YYYYMMDD`, and register. The confirmatory runs start after registration."""),
+    ]
+    return {"cells": cells, "metadata": {"accelerator": "GPU", "colab": {"provenance": []}, "kernelspec": {"display_name": "Python 3", "name": "python3"}, "language_info": {"name": "python"}}, "nbformat": 4, "nbformat_minor": 0}
+
+
+def exp2_training_notebook() -> dict:
+    """LOCKED Exp 2 training: the 110 registered runs from the frozen tag; blinded log; no analysis."""
+
+    GUARD = 'assert "FREEZE_TAG" in globals(), "Run the configuration cell at the top first (after any restart: Runtime -> Run all)"\n'
+    cells = [
+        md("""# Seen and Unseen — Experiment 2 TRAINING (locked; run only after registration, the freeze and the tag)
+
+Trains the 110 registered Experiment 2 runs (130 under the B fallback) from the frozen git tag, with the owner's pipeline at its registered commit and the signed freeze manifest in `approvals/exp2/`. Run files go to Google Drive, so a restarted session resumes.
+
+**Sealed outputs.** Each run file holds per-episode judge scores, which are outcome data. They stay on Drive in `SEALED_registered_runs/`. Nobody opens or downloads them, and nobody runs the analyzer here: the statistics reviewer analyzes them after the December 8 amendment (preregistration v3.4, section A). The log shows run status and time only.
+
+**Refusals built in:** the runner will not start without a signed freeze manifest that matches the config, selection, support and code; without the owner's repository at the frozen commit with an unedited `experiment/wm.py`; on another hardware class or runtime unless `DEVIATION` gives a reason (logged); or if the judge fails its validity gate.
+
+**Runtime:** about 2–3 h on one A100. After a disconnect: Runtime → Run all; finished runs are skipped."""),
+        code("""#@title 0. Configuration
+FREEZE_TAG = "exp2-freeze-YYYYMMDD"   #@param {type:"string"}   # the dated git tag the paper lead created at the freeze
+EXP2_DRIVE_DIR = "/content/drive/MyDrive/seen-and-unseen/exp2"  #@param {type:"string"}
+DEVIATION = ""                        #@param {type:"string"}   # only if the GPU or runtime differs from the freeze; the reason is logged
+RETRY_FAILED = False                  #@param {type:"boolean"}  # True once, to rerun infrastructure failures with the same seed
+OWNER_COMMIT = "@OWNER_COMMIT@"
+import os, torch
+print("GPU:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "NONE (switch to a GPU runtime)")
+from google.colab import drive
+drive.mount("/content/drive")
+CACHE = f"{EXP2_DRIVE_DIR}/kuka"
+assert os.path.isdir(CACHE), f"the Kuka cache is missing at {CACHE}"
+print("cache shards:", len([f for f in os.listdir(CACHE) if f.endswith(".npz")]))
+RUNS = f"{EXP2_DRIVE_DIR}/SEALED_registered_runs"
+os.makedirs(RUNS, exist_ok=True)
+print("run files already written:", len([f for f in os.listdir(RUNS) if f.endswith(".json") and "_s" in f]))""".replace("@OWNER_COMMIT@", OWNER_COMMIT)),
+        code(GUARD + """#@title 1. Code and the signed freeze at the frozen tag
+%cd /content
+import os, json
+if not os.path.exists("trajectory-lineage"):
+    !git clone -q https://github.com/physicalreasoning/trajectory-lineage.git
+%cd /content/trajectory-lineage
+!git fetch -q --tags && git checkout -q {FREEZE_TAG} && git rev-parse HEAD
+FROZEN = "/content/trajectory-lineage/approvals/exp2"
+FREEZE = f"{FROZEN}/exp2_freeze_manifest.json"
+frozen = json.load(open(FREEZE))
+print("freeze status:", frozen["status"], "| hardware class:", frozen["environment"]["hardware_class"], "| owner commit:", frozen["owner_pipeline"]["commit"][:12])
+assert frozen["status"] == "signed", "the freeze manifest at this tag is not signed; do not train"
+assert frozen["owner_pipeline"]["commit"] == OWNER_COMMIT, "the freeze names another owner commit than this notebook"
+pins = [f"{k}=={v}" for k, v in frozen["environment"]["runtime"].items() if k in ("numpy", "scipy", "scikit-learn", "pandas", "transformers") and v != "absent"]
+PIN_ARGS = " ".join(pins)
+print("installing the frozen versions:", PIN_ARGS)
+!pip install -q {PIN_ARGS}"""),
+        code(GUARD + """#@title 2. The owner's pipeline at the registered commit (wm.py unedited) and the cache
+%cd /content
+import os
+if not os.path.exists("rwmo"):
+    !git clone -q https://github.com/subhashjprasad/robot-world-model-optimism-research.git rwmo
+!git -C /content/rwmo fetch -q && git -C /content/rwmo checkout -q -f {OWNER_COMMIT} && git -C /content/rwmo rev-parse HEAD
+!mkdir -p /content/rwmo/data && rm -rf /content/rwmo/data/kuka && ln -s {CACHE} /content/rwmo/data/kuka
+!ls /content/rwmo/data/kuka | wc -l"""),
+        code(GUARD + """#@title 3. Train the registered runs (resumable; blinded log)
+%cd /content/trajectory-lineage/exp2-kuka-matched
+EXTRA = (f'--deviation "{DEVIATION}"' if DEVIATION else "") + (" --retry-failed" if RETRY_FAILED else "")
+!PYTHONPATH=. python -m registered.run_registered --owner-repo /content/rwmo --npz-dir /content/rwmo/data/kuka --manifest {FROZEN}/manifest.jsonl --selection {FROZEN}/selection.json --support {FROZEN}/support.json --freeze {FREEZE} --out {RUNS} {EXTRA} 2>&1 | grep -v -i "warn" | tail -n 150"""),
+        code(GUARD + """#@title 4. Blinded accounting (status counts only; no scores)
+import json, glob
+expected = json.load(open(f"{FROZEN}/selection.json"))["n_runs"]
+status = {}
+for path in glob.glob(f"{RUNS}/*_s*.json"):
+    s = json.load(open(path)).get("status")
+    status[s] = status.get(s, 0) + 1
+print(f"run files: {sum(status.values())} of {expected}; by status: {status}")
+print("If any run shows infrastructure_failure: set RETRY_FAILED = True and run cells 0-3 once more.")"""),
+        md("""### After all runs complete
+Do not open, copy or download `SEALED_registered_runs/`. Tell the paper lead that training finished, with the counts from cell 4. The statistics reviewer runs `registered.analyze` on these files after the December 8 amendment."""),
     ]
     return {"cells": cells, "metadata": {"accelerator": "GPU", "colab": {"provenance": []}, "kernelspec": {"display_name": "Python 3", "name": "python3"}, "language_info": {"name": "python"}}, "nbformat": 4, "nbformat_minor": 0}
 
@@ -701,7 +754,7 @@ def validate(nb: dict) -> list[str]:
 
 
 if __name__ == "__main__":
-    for name, builder in (("run_all_exp3_then_exp2.ipynb", combined_notebook), ("run_exp3_pilots_a100.ipynb", exp3_pilots_a100_notebook), ("LOCKED_exp3_confirmation.ipynb", exp3_confirmation_notebook), ("prepare_freeze_drafts.ipynb", freeze_drafts_notebook)):
+    for name, builder in (("run_all_exp3_then_exp2.ipynb", combined_notebook), ("run_exp3_pilots_a100.ipynb", exp3_pilots_a100_notebook), ("LOCKED_exp3_confirmation.ipynb", exp3_confirmation_notebook), ("prepare_freeze_drafts.ipynb", freeze_drafts_notebook), ("LOCKED_exp2_training.ipynb", exp2_training_notebook)):
         nb = builder()
         problems = validate(nb)
         if problems:

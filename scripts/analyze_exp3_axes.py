@@ -16,9 +16,15 @@ ONE secondary family and applies Holm at the registered one-sided alpha:
                                detectable_latent_vjepa2:  G > 0 under the V-JEPA 2 recipe
   dose                         dose_increase:  G(16 sources) - G(256 sources) > 0 (Welch)
 
-Labels follow the Holm decisions; absence labels use two-sided 90% intervals inside the negligible
-bound. An axis whose record set has an unresolved failure, or too few screened blocks, contributes
-no p-value and is labelled unresolved; the main primary claim is never affected by an axis. The per
+The family always has these seven members (preregistration v3.4, sections C and F). A member
+without a p-value enters with p = 1: an axis whose record set has an unresolved failure or too few
+screened blocks, a capacity trend that cannot be tested, or main secondaries whose decisions are
+suppressed. Such an axis is labelled unresolved; an axis never affects the main primary claim.
+
+Labels follow the Holm decisions. Absence labels ("negligible_under_recipe", "dose_independent")
+need the two-sided 90% interval inside the negligible bound AND, in each configuration involved, the
+95% lower bound of the exact-render gain E above the negligible bound. The encoder difference
+G(V-JEPA 2) - G(DINOv2) is reported as an exploratory Welch interval outside the family. The per
 configuration four-axis classifications are reported as descriptive.
 """
 
@@ -45,6 +51,32 @@ AXES = {
     "dose16": "dose",
     "dose256": "dose",
 }
+# the registered secondary family, always seven members (preregistration v3.4, section F)
+FAMILY = (
+    "identity_specific",
+    "detectable",
+    "consequential_harm",
+    "capacity_increase",
+    "detectable_latent_dinov2",
+    "detectable_latent_vjepa2",
+    "dose_increase",
+)
+
+
+def screened_values(
+    result: dict[str, Any], runs: list[dict[str, Any]], name: str = "G"
+) -> np.ndarray | None:
+    """One contrast over the screened blocks; None when the decisions are suppressed."""
+
+    if "primary" not in result or result["primary"].get("decisions_suppressed"):
+        return None
+    # recompute from the validated records used by analyze_2d: screened = completed and competent
+    values = [
+        run["contrasts"][FIELDS[name]]
+        for run in runs
+        if run["status"] == "completed" and run.get("base_competent")
+    ]
+    return np.array(values) if len(values) >= 2 else None
 
 
 def screened_gaps(
@@ -52,15 +84,7 @@ def screened_gaps(
 ) -> np.ndarray | None:
     """Reuse gaps of the screened blocks; None when the configuration's decisions are suppressed."""
 
-    if "primary" not in result or result["primary"].get("decisions_suppressed"):
-        return None
-    # recompute from the validated records used by analyze_2d: screened = completed and competent
-    gaps = [
-        run["contrasts"][FIELDS["G"]]
-        for run in runs
-        if run["status"] == "completed" and run.get("base_competent")
-    ]
-    return np.array(gaps) if len(gaps) >= 2 else None
+    return screened_values(result, runs, "G")
 
 
 def analyze_axes(
@@ -84,6 +108,7 @@ def analyze_axes(
             runs, config, check_records=False
         )  # records were validated by the caller
         g = screened_gaps(result, runs, config)
+        e = screened_values(result, runs, "E_exact_gain")
         gaps[name] = g
         entry: dict[str, Any] = {
             "kind": AXES[name],
@@ -99,7 +124,10 @@ def analyze_axes(
         if g is not None:
             g95, g90 = interval(g, alpha_support), interval(g, alpha_absence)
             entry.update(
-                G_95=g95, G_90=g90, magnitude_descriptive=classify_gap_2d(g95, g90, contract)
+                G_95=g95,
+                G_90=g90,
+                magnitude_descriptive=classify_gap_2d(g95, g90, contract),
+                E_lower_95=interval(e, alpha_support)["lower"] if e is not None else None,
             )
             if AXES[name] == "architecture":
                 p_values[f"detectable_{name}"] = one_sided_p(g, 0.0)
@@ -115,14 +143,31 @@ def analyze_axes(
             "ci90": {k: t90[k] for k in ("lower", "upper")},
         }
         p_values["dose_increase"] = t95["p_one_sided"]
-    # one Holm family: main secondaries + axes
+    # one Holm family of seven: main secondaries + axes; a member without a p-value enters as 1
     main_p = (
         dict(main["result"]["primary"]["secondary_p_values"])
         if "primary" in main["result"] and not main["result"]["primary"].get("decisions_suppressed")
         else {}
     )
-    family = {**main_p, **p_values}
-    decisions = holm(family, alpha_support) if family else {}
+    available = {**main_p, **p_values}
+    family = {
+        name: 1.0 if available.get(name) is None else float(available[name]) for name in FAMILY
+    }
+    decisions = holm(family, alpha_support)
+
+    def control_clears(name: str) -> bool:
+        lower = per_axis.get(name, {}).get("E_lower_95")
+        return lower is not None and lower > negligible
+
+    # exploratory encoder comparison, outside the family (not attributed to pretraining alone)
+    encoder = None
+    if gaps.get("latent_dinov2") is not None and gaps.get("latent_vjepa2") is not None:
+        w95 = welch(gaps["latent_vjepa2"], gaps["latent_dinov2"], alpha_support)
+        encoder = {
+            "contrast": "G(V-JEPA 2) - G(DINOv2)",
+            "role": "exploratory; outside the Holm family",
+            "ci95": {k: w95[k] for k in ("n_a", "n_b", "mean", "se", "df", "lower", "upper")},
+        }
     labels: dict[str, str] = {}
     for name in ("latent_dinov2", "latent_vjepa2"):
         entry = per_axis.get(name)
@@ -130,7 +175,11 @@ def analyze_axes(
             labels[name] = "unresolved"
         elif decisions.get(f"detectable_{name}"):
             labels[name] = "reuse_detectable_under_recipe"
-        elif entry["G_90"]["lower"] > -negligible and entry["G_90"]["upper"] < negligible:
+        elif (
+            entry["G_90"]["lower"] > -negligible
+            and entry["G_90"]["upper"] < negligible
+            and control_clears(name)
+        ):
             labels[name] = "negligible_under_recipe"
         else:
             labels[name] = "unresolved"
@@ -138,19 +187,28 @@ def analyze_axes(
         labels["dose"] = "unresolved"
     elif decisions.get("dose_increase"):
         labels["dose"] = "dose_dependent"
-    elif dose["ci90"]["lower"] > -negligible and dose["ci90"]["upper"] < negligible:
+    elif (
+        dose["ci90"]["lower"] > -negligible
+        and dose["ci90"]["upper"] < negligible
+        and control_clears("dose16")
+        and control_clears("dose256")
+    ):
         labels["dose"] = "dose_independent"
     else:
         labels["dose"] = "unresolved"
     main_labels = {}
     if main_p:
+        # a label that analyze_2d declared in its own smaller family stands only if the joint
+        # family of seven also declares it
+        identity = main["result"]["primary"]["axes"]["event_identity"]
+        capacity_label = main["result"].get("capacity", {}).get("label", "n/a")
         main_labels = {
             "event_identity": "event_specific"
             if decisions.get("identity_specific")
-            else main["result"]["primary"]["axes"]["event_identity"],
+            else ("unresolved" if identity == "event_specific" else identity),
             "capacity": "capacity_dependent"
             if decisions.get("capacity_increase")
-            else main["result"].get("capacity", {}).get("label", "n/a"),
+            else ("unresolved" if capacity_label == "capacity_dependent" else capacity_label),
         }
     return {
         "main_primary_claim": main["result"]["primary_claim"],
@@ -160,10 +218,12 @@ def analyze_axes(
         "main_labels_under_joint_holm": main_labels,
         "axes": per_axis,
         "dose_trend": dose,
+        "encoder_difference_exploratory": encoder,
         "labels": labels,
         "note": (
             "Primary claim from analyze_2d on the main confirmation, unchanged. Secondary labels "
-            "use the joint Holm family (main secondaries + axes)."
+            "use the joint Holm family of seven (main secondaries + axes; p = 1 for a member "
+            "without a p-value)."
         ),
     }
 

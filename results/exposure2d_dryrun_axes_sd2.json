@@ -11,23 +11,26 @@
         "dose256": 0.0
       },
       "main_primary_claim": {
-        "negligible differential gap": 1.0
+        "negligible differential gap": 0.9833333333333333,
+        "negligible gap, control below the margin": 0.016666666666666666
       },
       "labels": {
         "latent_dinov2": {
-          "negligible_under_recipe": 1.0
+          "negligible_under_recipe": 0.95,
+          "unresolved": 0.05
         },
         "latent_vjepa2": {
-          "negligible_under_recipe": 1.0
+          "negligible_under_recipe": 0.9,
+          "unresolved": 0.1
         },
         "dose": {
-          "unresolved": 0.8666666666666667,
-          "dose_independent": 0.13333333333333333
+          "unresolved": 0.9833333333333333,
+          "dose_independent": 0.016666666666666666
         }
       },
       "capacity_label_under_joint_holm": {
-        "capacity_independent": 0.7333333333333333,
-        "unresolved": 0.25,
+        "capacity_independent": 0.5333333333333333,
+        "unresolved": 0.45,
         "capacity_dependent": 0.016666666666666666
       }
     },
@@ -54,8 +57,8 @@
         }
       },
       "capacity_label_under_joint_holm": {
-        "capacity_independent": 0.75,
-        "unresolved": 0.25
+        "unresolved": 0.48333333333333334,
+        "capacity_independent": 0.5166666666666667
       }
     },
     "main_consequential_recipes_null_dose_flat": {
@@ -75,17 +78,18 @@
           "reuse_detectable_under_recipe": 0.016666666666666666
         },
         "latent_vjepa2": {
-          "negligible_under_recipe": 0.9833333333333333,
+          "negligible_under_recipe": 0.9,
+          "unresolved": 0.08333333333333333,
           "reuse_detectable_under_recipe": 0.016666666666666666
         },
         "dose": {
-          "unresolved": 0.8333333333333334,
-          "dose_independent": 0.16666666666666666
+          "unresolved": 0.95,
+          "dose_independent": 0.05
         }
       },
       "capacity_label_under_joint_holm": {
-        "capacity_independent": 0.75,
-        "unresolved": 0.23333333333333334,
+        "capacity_independent": 0.55,
+        "unresolved": 0.43333333333333335,
         "capacity_dependent": 0.016666666666666666
       }
     },
@@ -110,13 +114,13 @@
           "negligible_under_recipe": 0.05
         },
         "dose": {
-          "unresolved": 0.8,
-          "dose_independent": 0.2
+          "unresolved": 0.9333333333333333,
+          "dose_independent": 0.06666666666666667
         }
       },
       "capacity_label_under_joint_holm": {
-        "capacity_independent": 0.9166666666666666,
-        "unresolved": 0.08333333333333333
+        "capacity_independent": 0.4666666666666667,
+        "unresolved": 0.5333333333333333
       }
     },
     "dose_rising_from_null_low_dose": {
@@ -142,8 +146,8 @@
         }
       },
       "capacity_label_under_joint_holm": {
-        "capacity_independent": 0.8333333333333334,
-        "unresolved": 0.15,
+        "capacity_independent": 0.5833333333333334,
+        "unresolved": 0.4,
         "capacity_dependent": 0.016666666666666666
       }
     }
