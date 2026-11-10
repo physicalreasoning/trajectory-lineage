@@ -2,8 +2,9 @@
 
 The manifest binds, by SHA-256: the registered config, the episode manifest, the certified selection
 (all 110 run id lists), the evaluation support and weights, and the analyzer code. It records dated,
-named sign-offs, and the environment: the lockfile hash of the owner's project, the pinned runtime
-versions with their hash, and the hardware class of the registered runs. ``verify_freeze`` is called
+named sign-offs, the owner's pipeline (git commit and the SHA-256 of ``experiment/wm.py``; the
+preregistration names commit ed416e15), and the environment: the lockfile hash of the owner's
+project, the pinned runtime versions with their hash, and the hardware class of the registered runs. ``verify_freeze`` is called
 by the driver before training (code, selection and environment block must match) and by the analyzer
 before any decision (sign-offs must also be present); ``check_runtime`` compares the live runtime and
 device with the frozen ones when training starts. Hashes bind bytes;
@@ -20,6 +21,7 @@ import importlib.metadata
 import json
 import platform
 import re
+import subprocess
 from pathlib import Path
 
 from . import PACKAGE_ROOT, load_config, sha256_file, sha256_json, write_json
@@ -30,6 +32,9 @@ REQUIRED_ROLES = ("paper_lead", "stats_check")  # internal signers; the experime
 PLACEHOLDERS = {"", "name", "full name", "tbd", "todo", "x", "owner", "lead"}
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
+HEX40 = re.compile(r"^[0-9a-f]{40}$")
+OWNER_REPOSITORY = "https://github.com/subhashjprasad/robot-world-model-optimism-research"
+OWNER_MODEL_FILE = "experiment/wm.py"
 RUNTIME_PACKAGES = ("torch", "numpy", "scipy", "scikit-learn", "pandas", "transformers")
 
 
@@ -79,6 +84,42 @@ def environment_block(hardware_class: str, lockfile: Path) -> dict:
             "runtime_sha256": runtime_sha256(versions), "hardware_class": hardware_class}
 
 
+def owner_commit(owner_repo: Path) -> str:
+    try:
+        return subprocess.check_output(["git", "-C", str(owner_repo), "rev-parse", "HEAD"], text=True).strip()
+    except (OSError, subprocess.CalledProcessError) as error:
+        raise FreezeError(f"cannot read the git commit of the owner's repository at {owner_repo}") from error
+
+
+def owner_pipeline_block(owner_repo: Path) -> dict:
+    """The owner's pipeline as it is run: git commit and the SHA-256 of the model file."""
+
+    return {"repository": OWNER_REPOSITORY, "commit": owner_commit(owner_repo),
+            "wm_py_sha256": sha256_file(Path(owner_repo) / OWNER_MODEL_FILE)}
+
+
+def validate_owner_pipeline(pipeline: object, owner_repo: Path | None = None) -> None:
+    """The block must name a full commit and a file hash; with ``owner_repo``, both must match it."""
+
+    if not isinstance(pipeline, dict) or not HEX40.match(str(pipeline.get("commit", ""))) \
+            or not HEX64.match(str(pipeline.get("wm_py_sha256", ""))):
+        raise FreezeError("the freeze manifest must record the owner's pipeline commit and the wm.py hash")
+    if owner_repo is None:
+        return
+    if sha256_file(Path(owner_repo) / OWNER_MODEL_FILE) != pipeline["wm_py_sha256"]:
+        raise FreezeError(f"the owner's {OWNER_MODEL_FILE} differs from the frozen file (edited or another commit)")
+    head = owner_commit(owner_repo)
+    if head != pipeline["commit"]:
+        raise FreezeError(f"the owner's repository is at {head[:12]}, not at the frozen commit {pipeline['commit'][:12]}")
+
+
+def load_environment(path: Path) -> dict:
+    """An environment block from a file: a bare block, or a freeze manifest that holds one."""
+
+    data = json.loads(Path(path).read_text())
+    return data["environment"] if isinstance(data, dict) and "environment" in data else data
+
+
 def validate_environment(environment: object, lockfile: Path | None = None) -> None:
     if not isinstance(environment, dict):
         raise FreezeError("the freeze manifest has no environment block")
@@ -113,7 +154,7 @@ def check_runtime(freeze: dict, device: str, deviation: str | None = None) -> di
 
 
 def build_freeze(config: dict, manifest_path: Path, selection: dict, support: dict, approvals: list[dict], registration: str | None,
-                 environment: dict | None = None) -> dict:
+                 environment: dict | None = None, owner_pipeline: dict | None = None) -> dict:
     if selection.get("manifest_kind") == "SYNTHETIC":
         raise FreezeError("refusing to freeze a selection built on a SYNTHETIC manifest")
     if not selection["certificate"]["feasible"]:
@@ -128,14 +169,15 @@ def build_freeze(config: dict, manifest_path: Path, selection: dict, support: di
         "support_sha256": support["sha256"],
         "code_sha256": code_hashes(),
         "design_B_budget": selection["design_B"]["budget_transitions"], "n_runs": selection["n_runs"],
-        "approvals": approvals, "registration": registration, "environment": environment,
+        "approvals": approvals, "registration": registration, "environment": environment, "owner_pipeline": owner_pipeline,
         "status": "signed" if {a.get("role") for a in approvals} >= set(REQUIRED_ROLES) else "DRAFT - unsigned",
         "statement": "Training runs start only after this manifest is signed and the registration is submitted. No hypothesis, margin, weight, support, or selection changes afterwards.",
     }
 
 
 def verify_freeze(freeze: dict, *, config: dict, selection: dict | None = None, support: dict | None = None,
-                  require_signoff: bool, check_code: bool = True, lockfile: Path | None = None) -> None:
+                  require_signoff: bool, check_code: bool = True, lockfile: Path | None = None,
+                  owner_repo: Path | None = None) -> None:
     if sha256_json(config) != freeze["config_sha256"]:
         raise FreezeError("config differs from the frozen config")
     if selection is not None and selection["selection_sha256_without_certificate"] != freeze["selection_sha256"]:
@@ -148,6 +190,7 @@ def verify_freeze(freeze: dict, *, config: dict, selection: dict | None = None, 
         if changed:
             raise FreezeError(f"code changed since freeze: {changed}")
     validate_environment(freeze.get("environment"), lockfile)
+    validate_owner_pipeline(freeze.get("owner_pipeline"), owner_repo)
     if require_signoff:
         roles = {a.get("role") for a in freeze.get("approvals", [])}
         missing = [r for r in REQUIRED_ROLES if r not in roles]
@@ -183,8 +226,11 @@ def main(argv: list[str] | None = None) -> None:
     c.add_argument("--support", required=True)
     c.add_argument("--approve", action="append", default=[], help='"role:Full Name:YYYY-MM-DD" (repeat)')
     c.add_argument("--registration", default=None, help="OSF registration URL or DOI")
-    c.add_argument("--hardware-class", required=True, help='hardware of the registered runs, for example "A100" or "Apple M"')
-    c.add_argument("--lockfile", required=True, help="uv.lock of the owner's project (robot-world-model-optimism-research)")
+    c.add_argument("--owner-repo", required=True, help="robot-world-model-optimism-research checked out at the registered commit")
+    c.add_argument("--hardware-class", default=None, help='hardware of the registered runs, for example "A100" (not with --environment)')
+    c.add_argument("--environment", default=None,
+                   help="reuse an environment block recorded on the registered hardware (a block, or a freeze manifest that has one)")
+    c.add_argument("--lockfile", default=None, help="uv.lock of the owner's project (default: <owner-repo>/uv.lock)")
     c.add_argument("--out", required=True)
     g = sub.add_parser("sign", help="add one internal sign-off to a freeze manifest")
     g.add_argument("--freeze", required=True)
@@ -198,6 +244,7 @@ def main(argv: list[str] | None = None) -> None:
     v.add_argument("--support", default=None)
     v.add_argument("--require-signoff", action="store_true")
     v.add_argument("--lockfile", default=None, help="check the owner's uv.lock against the frozen hash")
+    v.add_argument("--owner-repo", default=None, help="check the owner's commit and wm.py against the frozen ones")
     args = ap.parse_args(argv)
     config = load_config(getattr(args, "config", None))
     if args.cmd == "create":
@@ -205,8 +252,16 @@ def main(argv: list[str] | None = None) -> None:
         for a in args.approve:
             role, name, date = a.split(":", 2)
             approvals.append({"role": role, "name": name, "date": date})
+        lockfile = Path(args.lockfile) if args.lockfile else Path(args.owner_repo) / "uv.lock"
+        if (args.environment is None) == (args.hardware_class is None):
+            raise SystemExit("give exactly one of --hardware-class (record this machine) or --environment (reuse a recorded block)")
+        if args.environment:
+            environment = load_environment(Path(args.environment))
+            validate_environment(environment, lockfile)
+        else:
+            environment = environment_block(args.hardware_class, lockfile)
         fz = build_freeze(config, Path(args.manifest), json.loads(Path(args.selection).read_text()), json.loads(Path(args.support).read_text()), approvals, args.registration,
-                          environment_block(args.hardware_class, Path(args.lockfile)))
+                          environment, owner_pipeline_block(Path(args.owner_repo)))
         write_json(Path(args.out), fz)
         print(json.dumps({k: v for k, v in fz.items() if k != "code_sha256"}, indent=1))
     elif args.cmd == "sign":
@@ -217,7 +272,7 @@ def main(argv: list[str] | None = None) -> None:
         fz = json.loads(Path(args.freeze).read_text())
         verify_freeze(fz, config=config, selection=json.loads(Path(args.selection).read_text()) if args.selection else None,
                       support=json.loads(Path(args.support).read_text()) if args.support else None, require_signoff=args.require_signoff,
-                      lockfile=Path(args.lockfile) if args.lockfile else None)
+                      lockfile=Path(args.lockfile) if args.lockfile else None, owner_repo=Path(args.owner_repo) if args.owner_repo else None)
         print("freeze manifest verified")
 
 

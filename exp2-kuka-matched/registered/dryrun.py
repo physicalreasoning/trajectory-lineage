@@ -143,7 +143,7 @@ def summarize(results: list[dict], n_datasets: int, sd_points: float, config: di
         q_probs = {}
         for q in ["A", "O", "B", "V", "O_minus_A", "A_minus_B"]:
             labels = [r["decisions"][q] for r in rows]
-            q_probs[q] = {lab: labels.count(lab) / len(rows) for lab in ("supported", "equivalent", "inconclusive")}
+            q_probs[q] = {lab: labels.count(lab) / len(rows) for lab in ("supported", "refuted", "equivalent", "inconclusive")}
         interp = {k: np.mean([any(v in s for s in r["interpretation"]) for r in rows]) for k, v in INTERPRETATION_KEYS.items()}
         a_sd = [r["A_sd"] for r in rows if r["A_sd"] is not None]
         out[name] = {"truth": truth, "n_datasets": len(rows), "decision_probabilities": q_probs, "interpretation_frequency": interp,
@@ -167,6 +167,8 @@ def summarize(results: list[dict], n_datasets: int, sd_points: float, config: di
         {"check": "global null: familywise false 'supported' among secondaries ≤ 5% (+MC tolerance)", "value": None, "bound": 0.05 + tol(0.05), "pass": None},
         {"check": "historical 10-point effect: all four drops supported with probability ≥ 0.99", "value": min(out["historical_10"]["decision_probabilities"][q]["supported"] for q in ("A", "O", "B", "V")), "bound": 0.99,
          "pass": all(out["historical_10"]["decision_probabilities"][q]["supported"] >= 0.99 for q in ("A", "O", "B", "V"))},
+        {"check": "false refutation of A at the lower margin (Δ_A = −3) ≤ 5% (+MC tolerance)", "value": out["A_at_minus_margin_-3"]["decision_probabilities"]["A"]["refuted"], "bound": 0.05 + tol(0.05),
+         "pass": out["A_at_minus_margin_-3"]["decision_probabilities"]["A"]["refuted"] <= 0.05 + tol(0.05)},
     ]
     rows = [r for r in results if r["scenario"] == "global_null"]
     fw = np.mean([any(r["decisions"][q] == "supported" for q in config["decision"]["secondary"]) for r in rows])
@@ -178,7 +180,7 @@ def summarize(results: list[dict], n_datasets: int, sd_points: float, config: di
 
 def table_markdown(summary: dict) -> str:
     L = [f"**Paired SD {summary['sd_points']} points, {summary['n_datasets']} synthetic datasets per truth.** Analytic power at Δ_A = 5: {summary['analytic_power_A5']:.3f}.", "",
-         "| Truth (Δ_O, Δ_A, Δ_B, Δ_V in points) | A supported | A equivalent | A inconclusive | O | B | V | O−A | A−B | Interpretation rows (freq.) |", "|---|---|---|---|---|---|---|---|---|---|"]
+         "| Truth (Δ_O, Δ_A, Δ_B, Δ_V in points) | A supported | A refuted | A equivalent | A inconclusive | O | B | V | O−A | A−B | Interpretation rows (freq.) |", "|---|---|---|---|---|---|---|---|---|---|---|"]
 
     def top(d: dict) -> str:
         k = max(d, key=d.get)
@@ -190,7 +192,7 @@ def table_markdown(summary: dict) -> str:
         extra += f"; SD {t['sd']}" if t.get("sd") else ""
         dp = s["decision_probabilities"]
         interp = "; ".join(f"{k} {v:.2f}" for k, v in s["interpretation_frequency"].items() if v > 0) or "—"
-        L.append(f"| {name}: ({t['O']}, {t['A']}, {t['B']}, {t['V']}){extra} | {dp['A']['supported']:.2f} | {dp['A']['equivalent']:.2f} | {dp['A']['inconclusive']:.2f} | "
+        L.append(f"| {name}: ({t['O']}, {t['A']}, {t['B']}, {t['V']}){extra} | {dp['A']['supported']:.2f} | {dp['A']['refuted']:.2f} | {dp['A']['equivalent']:.2f} | {dp['A']['inconclusive']:.2f} | "
                  f"{top(dp['O'])} | {top(dp['B'])} | {top(dp['V'])} | {top(dp['O_minus_A'])} | {top(dp['A_minus_B'])} | {interp} |")
     L += ["", "| Validation | Value | Bound | Pass |", "|---|---|---|---|"]
     for c in summary["validation"]:

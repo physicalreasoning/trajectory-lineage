@@ -9,8 +9,12 @@ training run written by ``run_registered``. The analyzer:
 3. forms paired seed contrasts D_ds = 100 (R_d,.10,s - R_d,.65,s) for designs O, A, B, the V contrast
    100 (R_V+S,s - R_V+F,s), and the differences O - A and A - B (A at B's budget when comparators exist);
 4. applies paired t inference: support if the one-sided 95% lower bound exceeds the margin (3 points),
-   absence if the 90% CI lies inside (-3, 3) (two one-sided tests at 5%); the ten secondary p-values
-   (support and equivalence for O, B, V, O - A, A - B) are Holm-adjusted at familywise 0.05;
+   refuted if the one-sided 95% upper bound is below -3 (primary), absence if the 90% CI lies inside
+   (-3, 3) (two one-sided tests at 5%); the ten secondary p-values (support and equivalence for O, B,
+   V, O - A, A - B) are Holm-adjusted at familywise 0.05. The family always has ten members: a
+   p-value that cannot be computed (missing or failed run) enters as 1. A member is declared when its
+   Holm-adjusted p is at most 0.05, and each secondary interval is reported at level 1 - 2 alpha_j,
+   where alpha_j is that hypothesis's Holm step level (preregistration v3.4, sections C and E);
 5. makes every decision that depends on a missing or failed run inconclusive and reports worst-case
    bounds with rates in [0, 1] instead of analysing only the completed runs;
 6. maps the decision pattern to the registered interpretation table.
@@ -117,7 +121,7 @@ def paired_t(d: np.ndarray, margin: float, alpha: float, eq_level: float) -> dic
     n = int(len(d))
     if n < 2:
         return {"n": n, "mean": float(d.mean()) if n else None, "sd": None, "se": None, "lower95_one_sided": None,
-                "ci90": None, "p_support": None, "p_equivalence": None}
+                "upper95_one_sided": None, "ci90": None, "p_support": None, "p_equivalence": None}
     mean, sd = float(d.mean()), float(d.std(ddof=1))
     se = sd / np.sqrt(n)
     df = n - 1
@@ -132,22 +136,35 @@ def paired_t(d: np.ndarray, margin: float, alpha: float, eq_level: float) -> dic
         p2 = float(stats.t.cdf((mean - margin) / se, df))                       # H0: delta >= margin
         p_eq = max(p1, p2)
     return {"n": n, "mean": mean, "sd": sd, "se": float(se), "lower95_one_sided": float(mean - t_a * se),
+            "upper95_one_sided": float(mean + t_a * se),
             "ci90": [float(mean - t_eq * se), float(mean + t_eq * se)], "p_support": p_sup, "p_equivalence": p_eq}
 
 
-def holm(pvals: dict[str, float], alpha: float) -> dict[str, dict]:
-    items = [(k, v) for k, v in pvals.items() if v is not None]
-    m = len(items)
-    order = sorted(items, key=lambda kv: kv[1])
+def interval_at(t: dict, level: float) -> list[float]:
+    """Two-sided t interval at ``level`` around a paired_t result (n >= 2)."""
+
+    if t["se"] == 0:
+        return [t["mean"], t["mean"]]
+    q = stats.t.ppf(1 - (1 - level) / 2, t["n"] - 1)
+    return [float(t["mean"] - q * t["se"]), float(t["mean"] + q * t["se"])]
+
+
+def holm(pvals: dict[str, float | None], alpha: float) -> dict[str, dict]:
+    """Holm step-down over every registered member; a missing p-value enters as 1.
+
+    ``step_alpha`` is the member's Holm step level alpha / (m - rank); ``reject`` is p_holm <= alpha.
+    """
+
+    entered = {k: 1.0 if v is None else float(v) for k, v in pvals.items()}
+    m = len(entered)
+    order = sorted(entered.items(), key=lambda kv: kv[1])
     adjusted: dict[str, dict] = {}
     running = 0.0
     for i, (k, p) in enumerate(order):
         adj = min(1.0, (m - i) * p)
         running = max(running, adj)
-        adjusted[k] = {"p": p, "p_holm": running, "reject": running < alpha}
-    for k, v in pvals.items():
-        if v is None:
-            adjusted[k] = {"p": None, "p_holm": None, "reject": False}
+        adjusted[k] = {"p": pvals[k], "p_entered": p, "p_holm": running, "reject": running <= alpha,
+                       "step_alpha": alpha / (m - i)}
     return adjusted
 
 
@@ -272,6 +289,8 @@ def analyze(runs: list[dict], selection: dict, support: dict, config: dict, judg
         t = prim["t"]
         if t["lower95_one_sided"] > margin:
             decisions[dc["primary"]] = "supported"
+        elif t["upper95_one_sided"] < -margin:
+            decisions[dc["primary"]] = "refuted"
         elif t["ci90"][0] > -margin and t["ci90"][1] < margin:
             decisions[dc["primary"]] = "equivalent"
         else:
@@ -283,6 +302,14 @@ def analyze(runs: list[dict], selection: dict, support: dict, config: dict, judg
         pvals[f"{q}:support"] = None if t is None else t["p_support"]
         pvals[f"{q}:equivalence"] = None if t is None else t["p_equivalence"]
     adj = holm(pvals, dc["holm_alpha"])
+    for q in dc["secondary"]:  # intervals at level 1 - 2 alpha_j (v3.4 section E)
+        t = quantities[q]["t"]
+        if t is not None:
+            quantities[q]["holm_intervals"] = {
+                kind: {"level": 1 - 2 * adj[f"{q}:{kind}"]["step_alpha"],
+                       "ci": interval_at(t, 1 - 2 * adj[f"{q}:{kind}"]["step_alpha"])}
+                for kind in ("support", "equivalence")
+            }
     for q in dc["secondary"]:
         if quantities[q]["t"] is None:
             decisions[q] = "inconclusive"
@@ -335,6 +362,9 @@ def report_markdown(res: dict) -> str:
         hs = res["holm"].get(f"{q}:support", {}).get("p_holm")
         he = res["holm"].get(f"{q}:equivalence", {}).get("p_holm")
         holm_txt = "n/a" if hs is None else f"{hs:.4f} / {he:.4f}"
+        hi = e.get("holm_intervals")
+        if hi:
+            holm_txt += " (" + "; ".join(f"{k} {v['level']:.4f} CI [{v['ci'][0]:.2f}, {v['ci'][1]:.2f}]" for k, v in hi.items()) + ")"
         L.append(f"| {q} | {role} | {t['mean']:.2f} | {t['sd']:.2f} | {t['lower95_one_sided']:.2f} | [{t['ci90'][0]:.2f}, {t['ci90'][1]:.2f}] | {t['p_support']:.4f} | {t['p_equivalence']:.4f} | {holm_txt} | **{dec}** |")
     L += ["", "## Interpretation (registered table)", ""] + [f"- {s}" for s in res["interpretation"]]
     L += ["", "## Arm summary (weighted thresholded success, mean over seeds)", "", "| Arm | R_thr | R_meanp | unweighted R_thr | Brier (w) | signed error vs truth | AUROC |", "|---|---|---|---|---|---|---|"]

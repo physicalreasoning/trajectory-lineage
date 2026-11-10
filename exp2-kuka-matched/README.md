@@ -11,12 +11,12 @@ Code that turns Protocol §2 of *Seen and Unseen* into frozen, hash-bound artefa
 | 1 | `registered/manifest.py` | Episode manifest (id, shard, length, outcome, split) from `data/kuka/shard_*.npz`, hashed. Reads only the small arrays; seconds, no features in memory. |
 | 2 | `registered/design.py` | Seeded samplers for designs O, A, B, V and the **feasibility certificate**: exact 31,600 transitions and exact φ for A; equal normalized outcome-conditional length distributions and identical total histograms for B; shared base and arm totals matched to A's 31,600 for V. 110 runs (130 if B falls back). |
 | 3 | `registered/weights.py` | Evaluation support (exact-length bins with ≥ 20 evaluation episodes per outcome) and overlap weights a_i; Σa = 1, weighted truth = π, ESS reported. |
-| 4 | `registered/analyze.py` | The decision contract: paired t over seeds 100–109, one-sided 95% lower bound > 3 for support, 90% CI inside (−3, 3) for absence, Holm over the ten secondary p-values, worst-case bounds and inconclusive decisions when a run is missing, outcome-to-interpretation table. |
+| 4 | `registered/analyze.py` | The decision contract (preregistration v3.4, sections C and E): paired t over seeds 100–109, one-sided 95% lower bound > 3 for support, upper bound < −3 for refutation of ∆A, 90% CI inside (−3, 3) for absence, Holm over always ten secondary p-values (a missing one enters as 1; declared at Holm p ≤ 0.05; intervals at level 1 − 2αj), worst-case bounds and inconclusive decisions when a run is missing, outcome-to-interpretation table. |
 | 5 | `registered/dryrun.py` | Synthetic per-episode scores for every run under declared truths → the real validator and analyzer → operating characteristics with automated checks. |
-| 6 | `registered/freeze.py` | Freeze manifest binding config, manifest, selection, support and code by SHA-256, with named dated sign-offs. Driver and analyzer refuse to run if anything differs. |
+| 6 | `registered/freeze.py` | Freeze manifest binding config, manifest, selection, support and code by SHA-256, the owner's pipeline (commit and `experiment/wm.py` hash) and the environment, with named dated sign-offs. Driver and analyzer refuse to run if anything differs. |
 | 7 | `registered/run_registered.py` | Training driver: frozen selection in, per-episode scores out; frozen normalization and judge (hard AUROC ≥ 0.75 gate); refuses stale artefacts; records infrastructure failures and retries once with the same seed. |
 
-Tests: `tests/` (22 tests, including an end-to-end driver smoke test on a tiny synthetic feature cache). Run from this folder: `python -m pytest -q tests`. The large synthetic stand-in files are not committed; `python -m registered.manifest synthetic --audit-jsonl <owner repo>/results/episodes/kuka.jsonl --out results/synthetic_manifest.jsonl` regenerates them.
+Tests: `tests/` (30 tests, including an end-to-end driver smoke test on a tiny synthetic feature cache). Run from this folder: `python -m pytest -q tests`. The large synthetic stand-in files are not committed; `python -m registered.manifest synthetic --audit-jsonl <owner repo>/results/episodes/kuka.jsonl --out results/synthetic_manifest.jsonl` regenerates them.
 
 ## What the owner runs (about 10 minutes of wall time before training)
 
@@ -41,18 +41,20 @@ python -m registered.weights --manifest registered_out/manifest.jsonl --out regi
 python -m registered.dryrun --manifest registered_out/manifest.jsonl --selection registered_out/selection.json \
     --support registered_out/support.json --datasets 500 --out registered_out/dryrun.json
 
-# 5. freeze (internal signers: paper lead + stats check; the owner may add a line). Then tag the commit in git.
+# 5. freeze draft (owner repository checked out at the registered commit ed416e15, wm.py unedited);
+#    the internal signers (paper lead + stats check) then run `registered.freeze sign`. Then tag the commit in git.
 python -m registered.freeze create --manifest registered_out/manifest.jsonl --selection registered_out/selection.json \
-    --support registered_out/support.json --approve "paper_lead:Full Name:YYYY-MM-DD" \
-    --approve "stats_check:Full Name:YYYY-MM-DD" --registration "osf.io/<id>" --out registered_out/freeze.json
+    --support registered_out/support.json --owner-repo . --hardware-class A100 --registration "osf.io/<id>" \
+    --out registered_out/freeze.json
 
 # 6. registered training (after Oct 30), about 110 x 4 minutes on an M-series laptop at 2,000 steps
 python -m registered.run_registered --owner-repo . --npz-dir data/kuka --manifest registered_out/manifest.jsonl \
     --selection registered_out/selection.json --support registered_out/support.json --freeze registered_out/freeze.json \
     --out registered_out/runs
 #    rerun with --retry-failed once if a run file says infrastructure_failure
+#    the log shows run status and time only; per-episode scores stay in the run files (blinded)
 
-# 7. analysis (Nov 9 target)
+# 7. analysis: the statistics reviewer only, after the December 8 amendment (preregistration v3.4, section A)
 python -m registered.analyze --runs registered_out/runs --selection registered_out/selection.json --support registered_out/support.json \
     --manifest registered_out/manifest.jsonl --judge registered_out/runs/judge.json --freeze registered_out/freeze.json --out registered_out/decision.json
 ```
