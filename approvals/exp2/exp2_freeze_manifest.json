@@ -1,10 +1,10 @@
 {
- "created": "2026-10-30T06:48:36+00:00",
+ "created": "2026-11-10T04:27:36+00:00",
  "config_name": "exp2_transition_matched_kuka",
  "config_version": "2026-10-28",
  "config_sha256": "9befd6754f5e7b5e339ef90da8d3918d8b3454e4abd969ffe963cde85feabdbb",
  "manifest_sha256": "1dcb390f0f095205fb4b8d68d023b5dcdc94f378564423059e8be07dd54c09d8",
- "manifest_path": "/content/drive/MyDrive/seen-and-unseen/exp2/registered_out_freeze/manifest.jsonl",
+ "manifest_path": "../approvals/exp2/manifest.jsonl",
  "selection_sha256": "6bb9dc468e300577afb3e375ebcaa9a6b7e5c3253f898d6dce19c8d08008bb33",
  "support_sha256": "0e637c81621c9d05990b6df330c464f592be30d22742550508385282db59d2e4",
  "code_sha256": {
@@ -12,9 +12,9 @@
   "registered/manifest.py": "e9b5325d1997045543f75375b197a8e1339b4d40f30a29bcca75e65ed16abe40",
   "registered/design.py": "9e4308b57e73f70991b0316ee5ec1e6206204db8a47d2aeccccc04de925ef6c6",
   "registered/weights.py": "f0c3874cf210c878568a113bae76e974d65870e41fd29b1ecffabdec8706be48",
-  "registered/analyze.py": "6ef4907647431aad9ae7a71b88894223f336fad05e14b707f9480552d0055b40",
-  "registered/freeze.py": "fde082e6e967a8745b0fb6a2c20e8d37d1524b07d75dd3251921e78203b82691",
-  "registered/run_registered.py": "11f6a6d0a37e594d01cf3b815ad36fdcc3c7fe51e0ee5d80e0b94b9a5af861f4"
+  "registered/analyze.py": "b7d9eae4233ed9eeab84eddf7b8749fa2caa5aaeb63cf61673fc08c0947e93dc",
+  "registered/freeze.py": "d82536b10a64ae44c58e299c0bd004a459fbe5d5398d55deafc8254c333d1765",
+  "registered/run_registered.py": "6cf007a5d8e8da33777b1cca50f5e220e4a76baa54762547cc93dccb1f87ae9a"
  },
  "design_B_budget": 31600,
  "n_runs": 110,
@@ -35,6 +35,11 @@
   },
   "runtime_sha256": "a29af1745266fc6412dfc37d05c67424821bfa363caa7d22fb5c94ce6b550b6a",
   "hardware_class": "A100"
+ },
+ "owner_pipeline": {
+  "repository": "https://github.com/subhashjprasad/robot-world-model-optimism-research",
+  "commit": "ed416e15ab9e4fd7c7b9ba4c51bdb343b4a28ce5",
+  "wm_py_sha256": "fa3e10110caebf503d6bb29a2499053e57048efa6ae13639279476306e479cb8"
  },
  "status": "DRAFT - unsigned",
  "statement": "Training runs start only after this manifest is signed and the registration is submitted. No hypothesis, margin, weight, support, or selection changes afterwards."
