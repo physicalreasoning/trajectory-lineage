@@ -1,0 +1,1326 @@
+\documentclass[10pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{amsmath,amssymb}
+\usepackage[expansion=false]{microtype}
+\usepackage{booktabs,longtable,array,calc}
+\usepackage[small,compact]{titlesec}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{seqsplit}
+\usepackage{needspace}
+\usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=blue!45!black]{hyperref}
+\usepackage{fancyhdr}
+\DeclareUnicodeCharacter{03C6}{\ensuremath{\varphi}}
+\DeclareUnicodeCharacter{2212}{\ensuremath{-}}
+\DeclareUnicodeCharacter{0394}{\ensuremath{\Delta}}
+\DeclareUnicodeCharacter{2265}{\ensuremath{\geq}}
+\DeclareUnicodeCharacter{2264}{\ensuremath{\leq}}
+\DeclareUnicodeCharacter{00D7}{\ensuremath{\times}}
+\DeclareUnicodeCharacter{00B1}{\ensuremath{\pm}}
+\DeclareUnicodeCharacter{2208}{\ensuremath{\in}}
+\DeclareUnicodeCharacter{03B1}{\ensuremath{\alpha}}
+\DeclareUnicodeCharacter{2192}{\ensuremath{\rightarrow}}
+\DeclareUnicodeCharacter{00A7}{\ensuremath{\mathsection}}
+\DeclareUnicodeCharacter{2026}{\ldots}
+\DeclareUnicodeCharacter{00B7}{\ensuremath{\cdot}}
+\DeclareUnicodeCharacter{03C1}{\ensuremath{\rho}}
+\newcommand{\usd}{{\usefont{OT1}{cmr}{m}{n}\char36}}
+\renewcommand{\labelitemi}{$\bullet$}
+\renewcommand{\labelitemii}{$\circ$}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setlist{nosep,leftmargin=1.4em,topsep=2pt}
+\setlength{\parskip}{0.38em}
+\setlength{\parindent}{0pt}
+\setcounter{secnumdepth}{0}
+\setlength{\emergencystretch}{1.5em}
+\titlespacing*{\section}{0pt}{1.1em}{0.35em}
+\titleformat{\section}{\large\bfseries}{}{0pt}{}
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{4pt}
+\renewcommand{\arraystretch}{1.14}
+\setlength{\tabcolsep}{4.5pt}
+\pagestyle{fancy}\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\footnotesize\color{black!60}Seen and Unseen: Preregistration, v3.4}
+\fancyfoot[R]{\footnotesize\color{black!60}\thepage}
+\begin{document}
+\begin{center}
+{\Large\bfseries Seen and Unseen: Training Failure Share and\\[2pt] Trajectory Reuse in World-Model Evaluation}\\[6pt]
+{\normalsize Preregistration \quad$\cdot$\quad v3.4 \quad$\cdot$\quad revised November 14, 2026}
+\end{center}
+\vspace{2pt}
+This document preregisters three computational experiments.
+It contains every confirmatory commitment: claims,
+estimators, thresholds, exclusions and permitted fallbacks.
+
+\needspace{4\baselineskip}
+\hypertarget{summary}{%
+\section{Summary}\label{summary}}
+
+\textbf{Motivation.} Learned world models are increasingly
+used to evaluate robot policies on episodes the model
+generates (``in imagination'') instead of on real robots. If
+such evaluations get the order of policies right but their
+success rates wrong, teams can pick the right policy while
+reporting the wrong number, and published comparisons can
+mislead. Two properties of the data could cause such errors:
+how many failures the world model saw in training, and
+evaluation items that reuse training trajectories. On logged
+Kuka data, a world model trained without failures estimated
+about 51\% success against 36\% recorded (§G).
+
+\textbf{Terms.} A world model is a learned simulator that
+predicts the next observation from recent observations and
+an action. In closed-loop evaluation, a policy acts on these
+predictions for a whole episode (an imagined rollout), and a
+judge (a learned classifier in the primary analysis) labels
+the episode a success or failure. A real rollout runs the
+same policy in the simulator from the same start. True
+success is the simulator's own outcome for an episode. A
+policy's true success is its rate over 10,000 simulator
+episodes, and far pairs are pairs of policies at least 15
+points apart in it. The headline is P1 and P3 together
+(Experiment 1's row in the table below). A seed is one
+training run. In Experiment 3, a block is one independently
+trained forecaster with its matched continuations; it is
+screened in if its base model beats constant-velocity
+extrapolation. Errors are in arena widths, and the positive
+control trains on the exact evaluation renders.
+
+\textbf{Claims under test.} First, estimated success from
+world-model policy evaluation depends on the share of
+failures in the world model's training data, while policies
+far apart in true success are misordered little more often
+in imagined rollouts than by the same judge on real
+rollouts. Second, in controlled 2D forecasting, reusing
+training trajectories in evaluation lowers forecast error on
+those trajectories relative to independent events.
+Experiment 1 tests the first claim in closed loop.
+Experiment 2 checks its failure-share part on logged robot
+data. Experiment 3 tests the second claim.
+
+\begingroup\small
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Experiment
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Primary hypothesis
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Test and margin
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Supported means
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Absent means
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1. Closed-loop evaluation in simulation (primary) & Raising
+the training failure share from 10\% to 65\% lowers
+estimated success, relative to the same judge on real
+rollouts, by more than 3 points (P1); at a 10\% failure
+share, the excess misordering of pairs at least 15 points
+apart in true success (imagined minus real-rollout
+misordering rate) is below 5 points (P3) & One-sided 95\%
+bounds over 12 seeds; shift \ensuremath{>} 3 points; excess
+misordering \ensuremath{<} 5 points & For these 12 policies,
+estimates depend on the training failure share, and far
+pairs are misordered less than 5 points more often than on
+real rollouts & Failure share does not move closed-loop
+estimates beyond ±3 points in this setting \\
+2. Transition-matched control on logged Kuka data
+(robustness check of a known drop; §G) & With every arm
+trained on exactly 31,600 distinct transitions, raising the
+failure share from 10\% to 65\% still lowers estimated
+success (\(\Delta_A\)) & One-sided 95\% bound over 10 seeds;
+drop \ensuremath{>} 3 points & The previously observed
+open-loop drop (logged actions replayed in the world model)
+survives when the number of training transitions is held
+fixed & The drop is within ±3 points once the number of
+transitions is held fixed \\
+3. Trajectory reuse in controlled 2D forecasting & Reusing
+training trajectories in evaluation lowers forecast error on
+them relative to independent events (reuse gap G) &
+Two-sided 95\% interval over the screened 16-channel blocks
+(800 scheduled, at least 720 required); consequential if the
+lower bound exceeds 0.010 arena widths; negligible if the
+90\% interval lies inside ±0.002 and the positive control's
+lower bound exceeds 0.002 & The reuse gap exceeds 0.010
+arena widths, with lower error on the reused trajectories
+themselves (source gain S \ensuremath{>} 0) and error on
+independent events raised by less than 0.001 (harm H) & The
+reuse gap is negligible, and training on the exact
+evaluation renders (the positive control) lowers error on
+them by more than 0.002 \\
+\end{longtable}
+\endgroup
+
+P2 tests whether, at a 10\% failure share, imagined
+estimates differ from the same judge's real-rollout
+estimates by more than 5 points on average over policies
+(mean absolute world-model shift). It is decided separately
+from the headline, and a supported headline does not by
+itself establish that this shift is large. P3 measures
+misordering in excess of the same judge's on real rollouts:
+if that judge itself misorders far pairs, a supported P3
+shows limited additional ordering error in imagined
+rollouts, not correct ranking (§D). Sections D--F give every
+secondary hypothesis, fallback and failure rule.
+
+\textbf{Margins and rationale.}
+
+\begingroup\small
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2692}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2308}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Margin
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Rationale
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Consequential shift (Exps 1--2) & 3 percentage points &
+Smallest change in a reported success rate treated as
+consequential; the same margin in both experiments keeps one
+scale \\
+Large shift (P2, S6) & 5 points (support); 2 points
+(absence) & 5 points is the smallest gap within a close pair
+(5--10 points), so a shift of that size can reverse a close
+pair when the two policies' shifts differ by at least their
+gap, which S4 tests. Absence requires the shift to be below
+2 points; the absence statistic is biased upward (§D), so
+the call is conservative \\
+Misordering (P3, S4) & 5 points of excess misordering &
+About one flipped far pair in twenty (P3); S4 uses the same
+5 points for close pairs \\
+Recalibration (S3a, S3b) & ratio \ensuremath{<} 0.5 &
+Recalibration must at least halve the level error to count
+as a fix \\
+Reuse gap (Exp 3) & 0.010 consequential; ±0.002 negligible &
+On a test set with reuse fraction p, the error advantage of
+the model continued on reused trajectories (arm C, §F) over
+the one continued on independent events (arm B) is pG − H,
+where H is the harm below. Reused test items raise this
+advantage by pG, relative to an evaluation on independent
+events only. At 10\% reuse, a 0.010 gap raises it by 0.001
+arena widths, the ranking margin we set for closely matched
+models (a stipulated value, not an estimate). At 50\% reuse,
+a 0.002 gap does the same \\
+Harm (Exp 3) & 0.001 & On independent events only, C's error
+advantage over B is −H. Reuse must raise error on
+independent events by less than 0.001 arena widths, the same
+ranking margin \\
+\end{longtable}
+\endgroup
+
+\needspace{6\baselineskip}
+\hypertarget{a.-registered-code-freezes-and-amendments}{%
+\section{A. Registered code, freezes and
+amendments}\label{a.-registered-code-freezes-and-amendments}}
+
+\begingroup\small
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2143}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7857}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Item
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Commitment
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Documents & The full protocol is
+\texttt{docs/\allowbreak{}registration/\allowbreak{}protocol\_\allowbreak{}v3.4.md} at the
+registered commit, cited below as ``Protocol''. It adds
+operational detail, the evidence for each choice and the
+outcome tables. It adds no confirmatory commitment. Where
+the two differ, this document takes precedence and the
+difference is logged as a deviation. The OSF Preregistration
+(this document and the registration form) is embargoed until
+peer review ends \\
+Code at registration &
+\texttt{physicalreasoning/\allowbreak{}trajectory-lineage} at tag
+\texttt{osf-registration-v3.4}, the commit that adds this
+document and the Protocol under \texttt{docs/\allowbreak{}registration/\allowbreak{}}
+on top of \texttt{28e4ada}. The registration form records
+the full hash of the tagged commit. Experiment 2 pipeline:
+\texttt{subhashjprasad/\allowbreak{}robot-world-model-optimism-research}
+at \texttt{\seqsplit{ed416e15ab9e4fd7c7b9ba4c51bdb343b4a28ce5}}. The
+Experiment 2 and Experiment 3 analyzers are at the
+registered commit (below). Experiment 1's analysis code is
+recorded by the November 20 amendment, before any Experiment
+1 outcome is computed. For every experiment, where code and
+this document differ, this document governs \\
+Code freezes & Each experiment receives a dated tag before
+its confirmatory runs. Experiments 2 and 3 also have freeze
+manifests that pin configuration, data selection, analyzer,
+code and environment by hash. The paper lead and a
+designated statistics reviewer (an author who runs no
+confirmatory jobs) sign each manifest. The runners refuse an
+unsigned manifest \\
+November 20 amendment & Contains only these items.
+\textbf{Experiment 1:} the pilot's operational values (token
+grid, training steps, judge weights, which §D fallbacks
+fired, gate results, ACT chunk size, the confirmatory
+hardware class; the exploratory released world model, if
+any; if the encoder arm runs, its readout and how its
+2-frame tubelet steps align with per-step actions), the 12
+policy hashes, the bootstrap percentiles from fallback 7
+with the hash of the calibration script, and the repository,
+commit and analysis code. \textbf{Experiment 3:} the
+detector-audit details listed in §F. Filed before any
+Experiment 1 outcome or 2D detector test outcome is
+computed. The Experiment 1 analysis code checks the
+amendment's hash before reading outcomes. The amendment
+cannot change hypotheses, endpoints, thresholds, exclusions
+or analysis families. If it is not filed before any
+Experiment 1 outcome is computed, Experiment 1 becomes
+exploratory; if it is not filed before any 2D detector test
+outcome is scored, H3.3--H3.5 become exploratory \\
+Analyzers at registration (Experiments 2 and 3) & The
+registered commit contains the analyzers that implement §C's
+Holm rule (Experiment 2) and §F (Experiment 3), with their
+tests and rerun dry runs (code commit \texttt{f361b7e}). No
+code amendment is needed for them. The runners refuse to
+start without signed freeze manifests that pin those
+analyzers \\
+December 8 amendment & Execution report, deviations, and a
+claims ledger with the exact abstract sentence for each
+registered outcome. The headline sentence carries the P2
+outcome and the qualifiers that §D requires. The amendment
+is written before unblinding. It authorizes unblinding and
+cannot select analyses after results \\
+Amendment timing & Amendment dates are targets. The
+Experiment 1 and Experiment 3 parts of the November 20
+amendment may be filed separately; each is valid if filed
+before the first outcome it governs is computed. The
+December 8 amendment may be filed per experiment \\
+Unblinding & The statistics reviewer unblinds each
+experiment from its tag, only after that experiment's part
+of the December 8 amendment is filed. Until then, run
+operators are not shown outcome values: Experiment 1 pilot
+reports show no world-model shift, and Experiment 2's runner
+at its freeze tag logs no estimated success; its run files,
+which hold per-episode judge scores, are analyzed only by
+the statistics reviewer \\
+\end{longtable}
+\endgroup
+
+\needspace{4\baselineskip}
+\hypertarget{b.-hypothesis}{%
+\section{B. Hypothesis}\label{b.-hypothesis}}
+
+Estimated success from world-model policy evaluation depends
+on the share of failures in the world model's training data,
+while policies far apart in true success are misordered
+little more often in imagined rollouts than by the same
+judge on real rollouts. Reusing training trajectories in
+evaluation lowers forecast error on those trajectories
+relative to independent events. Experiment 1 (primary) tests
+the failure-share hypothesis in closed-loop policy
+evaluation. Experiment 2 checks the open-loop evidence on
+logged robot data. Experiment 3 tests the reuse hypothesis
+in controlled 2D forecasting; its effect on policy
+evaluation is registered for a follow-up (§F).
+
+\needspace{4\baselineskip}
+\hypertarget{c.-analysis-rules-common-to-all-experiments}{%
+\section{C. Analysis rules common to all
+experiments}\label{c.-analysis-rules-common-to-all-experiments}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Unit of replication.} One training run (seed) in
+  Experiments 1--2; one block in Experiment 3. Policies,
+  pairs, frames and renders are not replicates.
+\item
+  \textbf{Outcomes.} Each claim is \emph{supported} (the
+  bound clears the threshold), \emph{absent} (the
+  equivalence interval lies inside the margin),
+  \emph{refuted} (the bound clears the threshold in the
+  opposite direction), or otherwise \emph{inconclusive}.
+  Missing a threshold never counts as absence. Decisions use
+  bounds, not point estimates.
+\item
+  \textbf{Bounds.} Support uses one-sided 95\% bounds in
+  Experiments 1--2 and the ends of two-sided 95\% intervals
+  (one-sided 2.5\%) in Experiment 3, except its detector
+  family (§F). Absence uses 90\% intervals (two one-sided
+  tests at 5\% each).
+\item
+  \textbf{Intervals.} Paired t over seeds (Experiments 1--2)
+  or blocks (Experiment 3); Welch t where Experiment 3
+  compares separate groups of blocks; a bootstrap for
+  Experiment 1's P2 and S6 (§D).
+\item
+  \textbf{Confirmatory families.} Experiment 1: headline (P1
+  and P3), P2, and eight secondaries. Experiment 2: primary
+  and ten secondary p-values. Experiment 3: primary claim,
+  seven secondaries, and the detector family H3.3--H3.5 (if
+  the November 20 amendment records their details before any
+  2D detector test outcome is scored). Each family has its
+  own error control, with no correction across families.
+  Secondary families use Holm correction.
+\item
+  \textbf{Holm families.} In every Holm family, a member
+  that is untested, descriptive, or inconclusive because of
+  an unresolved run or too few screened blocks enters with p
+  = 1, so each family keeps its registered size. A member is
+  untested when its section says so (S5's checks, a J2 that
+  fails even the 5 cm rule, a detector that fails the copy
+  gate). Where a section defines a member's p-value (S6 in
+  fallback 7; the detector family in §F), that definition
+  applies; otherwise, when all seed or block values are
+  equal, p is 0 if the common value lies beyond the
+  threshold in the claimed direction and 1 otherwise. A
+  member is declared when its Holm-adjusted p is at most the
+  familywise level.
+\item
+  \textbf{Stopping rule.} Only the scheduled counts are run.
+  There are no interim looks and no extension for
+  significance. The hard budget cap is \usd{}2,000.
+\item
+  \textbf{Exclusion criteria.} Data are excluded only under
+  frozen eligibility rules, for verified data corruption, or
+  when evaluation items duplicate training items where the
+  design does not intend it. Statistical outliers are
+  retained. No exclusion is made after outcomes are visible.
+\item
+  \textbf{Missing runs.} Each experiment's section gives its
+  retry and replacement rules and what an unresolved run
+  implies. Where a section states nothing, each missing
+  value is set to every possible value (rates from 0 to 1),
+  and a decisive claim stands only if it holds for all of
+  them; otherwise it is inconclusive.
+\item
+  \textbf{Non-confirmatory analyses.} Every analysis not
+  listed as confirmatory is labelled exploratory or
+  descriptive. An absence call means only ``no effect beyond
+  the margin for that measure''; a difference between two
+  measures (for example J1 vs J2) is read only from a paired
+  contrast with its own interval, reported descriptively.
+\item
+  \textbf{Deviations.} Each departure from this document is
+  logged with its date, reason, whether outcomes were
+  accessible, and the claims it affects. A claim affected by
+  a change made after its outcomes were accessible is
+  exploratory, and the registered analysis is also reported
+  where it can be run.
+\item
+  \textbf{Reporting.} All three experiments are reported
+  regardless of outcome.
+\end{itemize}
+
+\needspace{4\baselineskip}
+\hypertarget{d.-experiment-1-primary-closed-loop-evaluation-in-simulation}{%
+\section{D. Experiment 1 (primary): closed-loop evaluation
+in
+simulation}\label{d.-experiment-1-primary-closed-loop-evaluation-in-simulation}}
+
+\textbf{Setting.} ManiSkill3 PickCube-v1 with a Panda arm
+and one fixed horizon. The horizon is the shortest of
+50/\allowbreak 75/\allowbreak 100/\allowbreak 150/\allowbreak 200 steps at which a noiseless motion planner
+succeeds in 95\% of 1,000 episodes. Success is read at the
+final step. It requires the cube centre within 2.5 cm of the
+goal and every arm joint moving at most 0.2 rad/s. The world
+model is an action-conditioned latent transformer (width
+256, depth 4). From the last 3 frames and the action, it
+predicts the next frame's tokens and proprioception; it is
+trained with a 4-step rollout loss. Per frame, it receives
+17 frozen DINOv2-small tokens (the class token plus a 4×4
+pooled patch grid), joint positions and velocities, and the
+goal. An imagined rollout starts from one real frame, and
+the policy then acts on the model's predictions until the
+horizon.
+
+\textbf{Intervention.} Experiment 1 varies the training
+failure share φ ∈ \{0, .10, .25, .50, .65\}. Each arm draws
+3,000 episodes, a fraction φ of them failures, from fixed
+pools of 10,000 successes and 10,000 failures. Every
+settings cell in the pools contributes equal numbers of
+successes and failures. Cells below 10\% or above 90\%
+success are dropped. A classifier that predicts the pool
+from settings and start pose must have AUROC at most 0.55.
+Otherwise, each failure is paired, without replacement, with
+the nearest success in start pose within its settings cell.
+Each arm has 12 seeds, in fixed halves 1--6 and 7--12. A
+seed sets the initialization and a nested episode subsample.
+
+\textbf{Policies.} 12 fixed policies, 4 from each family:
+behaviour cloning, a PPO teacher distilled by DAgger, and
+ACT (action-chunking transformer). Policies are selected on
+true success only, before any world-model outcome. Selection
+maximizes cross-family close pairs, subject to at least two
+policies in each quarter of the success range and at least
+20 far pairs. Ties go to the set with more far pairs. Pair
+classes use each policy's 10,000-episode true success.
+
+\textbf{Judges.} J1 (primary; the learned success judge) is
+a small classifier with a fixed 0.5 threshold. It must reach
+AUROC ≥ 0.80 and expected calibration error \ensuremath{<} 0.05
+on real rollouts. J2 (check; the state-rule judge) is
+trained without success labels. It decodes the cube position
+and applies the success rule, using the world model's
+predicted joint velocities in imagined rollouts. It must
+reach median cube error \ensuremath{<} 1 cm and balanced
+accuracy ≥ 0.90. If J1's AUROC is below 0.80, or its
+expected calibration error is 0.05 or more after Platt
+scaling (fallback 2), P1--P3 and the J1-based secondaries
+are decided as registered but stated to apply only to a
+judge that failed validation. \textbf{Ground truth:} 10,000
+simulator episodes per policy. Each seed uses a fixed set of
+2,000 starts.
+
+Under the 5 cm rule (fallback 3), J2 applies the success
+rule with a 5 cm distance threshold, while truth and J1 stay
+at 2.5 cm. It passes if its balanced accuracy against true
+success on real rollouts is at least 0.90; its median cube
+error is reported and is not a pass criterion. Under this
+rule S1 concerns success at 5 cm, so the share of episodes
+whose decoded final cube distance lies between 2.5 and 5 cm
+is reported for real and imagined rollouts at φ = .10 and
+.65 (descriptive). J2's validation result fixes what S1 can
+support:
+
+\begingroup\small
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2250}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3250}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4500}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+J2 validation
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+S1
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Attribution of P1 to the world model
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Passes as registered (2.5 cm rule) & Tested as registered &
+Made if S1 is supported (declared in the Holm family) \\
+Passes only under the 5 cm rule & Tested, with its own
+p-value in the Holm family; reported as ``S1 under the
+relaxed 5 cm rule'' & Made if S1 is supported (declared in
+the Holm family), and only with that qualifier in the same
+sentence, in the abstract and the claims ledger. The
+sentence states that the check used a 5 cm threshold where
+the task uses 2.5 cm \\
+Fails under the 5 cm rule & Untested; enters the Holm family
+with p = 1 & Not made; stated as untested \\
+\end{longtable}
+\endgroup
+
+\textbf{Estimands} (percentage points; per seed, policies
+weighted equally). \emph{World-model shift:} the judge's
+estimate on imagined rollouts minus its estimate on real
+rollouts of the same policy from the same starts. The
+difference removes the judge's bias on real rollouts; judge
+error specific to imagined frames remains (see Limitations).
+\emph{Excess misordering:} the rate at which imagined
+estimates put a pair in the wrong order (ties count as
+wrong) minus the same rate for the judge on real rollouts.
+\emph{Absolute misordering:} the rate at which a set of
+estimates puts a pair in the wrong order against true
+success (ties count as wrong), computed for imagined
+rollouts and for the judge on real rollouts. \emph{Far
+pairs} differ by at least 15 points in true success;
+\emph{close pairs} by 5 to 10. \emph{Margins:} 3 points is
+the smallest consequential shift (as in Experiment 2). 5
+points is the smallest close-pair gap, so a shift of that
+size can reverse a close pair when the two policies' shifts
+differ by at least their gap (S4).
+
+\begingroup\small
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0667}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2222}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3111}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+ID
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Claim
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Supported if
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Absent or refuted if
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+P1 & Failure share moves estimates & Mean shift at φ = .10
+minus φ = .65: lower bound \ensuremath{>} 3 & Absent: 90\%
+interval inside ±3 \\
+P2 & The world-model shift is large at a 10\% failure share
+& Cross-fitted mean absolute shift at φ = .10: bootstrap
+lower bound \ensuremath{>} 5 & Absent: bootstrap upper bound
+\ensuremath{<} 2 for the mean over policies of each policy's
+absolute 12-seed mean shift \\
+P3 & Far pairs keep their order relative to the judge on
+real rollouts & Far-pair excess misordering at φ = .10:
+upper bound \ensuremath{<} 5 & Refuted: lower bound
+\ensuremath{>} 5 \\
+S1 & P1 holds with J2 & As P1, with J2 & As P1 \\
+S2 & The shift falls with φ & Per-seed slope over φ = .10,
+.25, .50: upper bound \ensuremath{<} 0 & n/a \\
+S3a & One logit offset, fitted on four anchor policies,
+fixes levels & Mean absolute error against truth on the
+other 8 policies at φ = .10, after the fit over before:
+upper bound \ensuremath{<} 0.5 & Refuted: lower bound
+\ensuremath{>} 0.5 \\
+S3b & An intercept and a slope fix levels & As S3a, with a
+logistic intercept-and-slope refit (slope \ensuremath{>} 0)
+& As S3a \\
+S4 & Close comparisons are fragile & Close-pair excess
+misordering at φ = .10: lower bound \ensuremath{>} 5 &
+Absent: 90\% upper bound \ensuremath{<} 5 \\
+S5 & P1 holds for a stochastic world model & As P1 (5
+seeds). Counts only if the competence check passes and the
+latent is used: on at least 5\% of held-out episodes, 20
+samples from the same start and actions do not all get the
+same J1 label & As P1 \\
+S6 & The shift is large with no failures & As P2, at φ = 0 &
+As P2 \\
+S7 & P1 holds in a larger model trained on more data & Shift
+at φ = .10 minus .65 for the width-512, 9,000-episode model
+(5 seeds): lower bound \ensuremath{>} 3 & As P1 \\
+\end{longtable}
+\endgroup
+
+\textbf{Decision rule.} \emph{Headline.} The headline holds
+only if P1 and P3 are both supported, each at one-sided 5\%,
+with no correction. \emph{P2.} P2 is decided separately at
+its own one-sided 5\% and reported next to the headline; the
+headline and P2 are separate claims, each controlling its
+own error, and no joint rate is claimed. The headline does
+not establish that the shift is large; only P2 does. The
+abstract and the claims ledger state the P2 outcome in the
+same sentence as the headline, in one of three fixed forms.
+Supported: the mean absolute shift at a 10\% failure share
+exceeds 5 points. Absent: it is below 2 points.
+Inconclusive: its size is not established. \emph{P3
+wording.} P3 bounds misordering in excess of the judge's on
+real rollouts, so it can be supported when that judge itself
+misorders far pairs. Absolute far-pair misordering against
+true success at φ = .10, for imagined rollouts and for J1 on
+real rollouts, is reported next to P3, each as the mean over
+the 12 seeds with a two-sided 95\% t interval (descriptive).
+Excess misordering is a difference of two rates, so the
+share of far pairs that J1 orders correctly on real rollouts
+and wrongly on imagined rollouts, and the reverse share, are
+reported with it (descriptive). If J1's absolute far-pair
+misordering on real rollouts is above zero in any of the 12
+seeds, a supported P3 and a supported headline are worded as
+limited additional ordering error in imagined rollouts. If
+it is zero in every seed, they are worded as far-pair
+misordering in imagined rollouts below 5 points against true
+success. Neither is worded as correct ranking of far pairs.
+\emph{Secondaries.} The secondary family is S1, S2, S3a,
+S3b, S4, S5, S6 and S7. Holm correction applies to their
+eight one-sided support p-values. A secondary that is
+untested or descriptive (for example S5 when its usage check
+fails, or S5 and S7 after fallback 6) enters with p = 1, so
+the family always has eight members. S6's p-value is defined
+in fallback 7. Secondary absence and refutation calls are
+unadjusted, labelled as such, and enter the claims ledger
+only as exploratory readings. \emph{Attribution and scope.}
+A supported P1 shows that the estimate from the world model
+and J1 together moves with the failure share. It is
+attributed to the world model, and not to how J1 reads
+imagined frames, only if S1 (the same test with J2) is also
+supported. When J2 passed only under the 5 cm rule, the
+attribution carries the qualifier in the Judges table. The
+bounds describe these 12 policies and make no claim about a
+population of policies.
+
+\textbf{Estimators.} Each per-seed quantity has a t interval
+over the 12 seeds (5 seeds for S5 and S7; S2: least-squares
+slope; S3a and S3b: log ratio). If all seed values are
+equal, the bound is that common value. P3 is also reported,
+descriptively, with an exact sign-flip permutation bound
+over seeds. P2 and S6 use split-seed cross-fitting. In each
+seed, each policy's shift is signed by its mean shift in the
+other half, and the signed shifts are averaged. The P2 and
+S6 bounds come from 10,000 bootstrap draws that resample,
+within each half, the seeds present in that half and
+recompute every step, at the percentiles fixed by fallback
+7. A policy whose other-half mean shift is exactly 0 gets
+sign 0. For absence, P2 and S6 use the mean over policies of
+each policy's absolute 12-seed mean shift, which is biased
+only upward. The S3 anchors are the policies nearest the
+20th, 40th, 60th and 80th percentiles of true success, each
+with 100 labelled real rollouts drawn, for each seed, from
+that seed's own real rollouts. Both fits use logit(real
+success) = a + b·logit(imagined success), by binomial
+maximum likelihood over each anchor's 100 labels: S3a fits a
+with b = 1; S3b fits a and b, with b \ensuremath{>} 0.
+Imagined success rates are clipped to {[}1/4,000,
+3,999/4,000{]} before any logit is taken.
+
+\textbf{Permitted fallbacks} (each recorded in the November
+20 amendment):
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  If the pilot competence check fails, use the 16-step
+  rollout loss first, then the 8×8 token grid (65 tokens).
+  If the behaviour-cloning check fails, use the 8×8 grid. A
+  grid change requires retraining and revalidating both
+  judges and rerunning the pilot.
+\item
+  If J1's expected calibration error is 0.05 or more, apply
+  Platt scaling.
+\item
+  If J2 fails validation, use the 8×8 grid, then the 5 cm
+  rule for J2 only. The table under Judges fixes what S1 can
+  then support.
+\item
+  Policy selection: first lower the far-pair minimum from 20
+  to 15, then allow a single policy in one success quarter.
+  If the third family is not ready when policies are
+  selected, use 8 policies from two families (two per
+  quarter, at least 10 far pairs), run S3a with 2 anchors
+  (33rd and 67th percentiles), and make S3b descriptive.
+\item
+  If a competence gate still fails at the last setting,
+  P1--P3 are decided as registered but stated to apply only
+  to a world model that failed that gate.
+\item
+  If Experiment 1 would exceed its 1,000 GPU-hour cap, drop
+  the optional PushCube-v1 replication, then the V-JEPA 2
+  encoder arm (descriptive; below), then cut S7 and S5 to 3
+  seeds, which makes them descriptive. If the main sweep
+  alone would exceed the cap, the design is amended as a
+  deviation before it runs.
+\item
+  The pilot's synthetic simulation sets the bootstrap
+  percentiles before the main sweep. It is run once, with
+  20,000 replicates per scenario, 10,000 fresh bootstrap
+  draws in each replicate, and a random seed written in the
+  script before the run.
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \emph{(a) Scenarios.} Every scenario holds the mean
+    absolute true shift at the margin (5 for support, 2 for
+    absence). Five patterns set the policies' absolute
+    shifts, as multiples of the margin: equal (every policy
+    at 1); a quarter at zero (a quarter of the policies at
+    0, the rest at 4/3); graded (policy \(k\) of \(n\) at
+    \(2(k-1)/(n-1)\)); concentrated (a quarter at 2.8, the
+    rest at 0.4); and half near zero (half at 0.1, half at
+    1.9). Each pattern is run twice: with signs alternating
+    across policies ordered by absolute shift, and with
+    every sign positive. The scenarios also vary the
+    per-policy, per-seed SD of the shift (1 and 3), the
+    cross-policy correlation ρ (0 and 0.5) and the error
+    distribution (normal and t(3)). Each error is
+    \(\mathrm{SD} \times (\sqrt{\rho}\,c + \sqrt{1-\rho}\,e)\),
+    independent across seeds, where \(c\) is shared by the
+    policies in a seed, \(e\) is specific to a policy, and
+    both are standard normal or t(3) divided by
+    \(\sqrt{3}\). That gives 80 scenarios, each run at both
+    margins; the same patterns apply to 8 policies under
+    fallback 4.
+  \item
+    \emph{(b) Pass rule.} Coverage is the share of
+    replicates in which the support lower bound is at or
+    below the margin, or the absence upper bound is at or
+    above it. Percentiles are searched on a 0.25-point grid.
+    To allow for Monte Carlo error, a percentile passes a
+    scenario only if the lower end of the one-sided 95\%
+    Clopper--Pearson interval for its coverage in that
+    scenario is at least 95\%.
+  \item
+    \emph{(c) Percentile for the bounds.} The decision uses
+    the least extreme percentile that passes every scenario;
+    it is never less extreme than the 5th (support) or 95th
+    (absence) and is capped at the 1st or 99th. A bound that
+    does not pass at the cap cannot establish support or
+    absence.
+  \item
+    \emph{(d) S6's Holm p-value.} The same simulation
+    calibrates, for each Holm level \(\alpha_j = 0.05/j\) (j
+    = 1, \ldots, 8), the least extreme percentile on the
+    grid that is no less extreme than \(100\cdot\alpha_j\),
+    is no further out than the 0.25th, and passes every
+    scenario with required coverage \(1 - \alpha_j\) (the
+    lower end of the same one-sided 95\% Clopper--Pearson
+    interval is at least \(1 - \alpha_j\)). Calibrated
+    percentiles are monotone in \(\alpha_j\); a level with
+    no such percentile is unreachable. S6's p-value is the
+    smallest reachable \(\alpha_j\) at which its lower bound
+    exceeds 5, or 1 if there is none. In a planning run the
+    0.25th percentile covered about 0.978 in the worst
+    scenario, so S6 is expected to be declarable only late
+    in the Holm sequence (Protocol §1.5).
+  \end{itemize}
+\end{enumerate}
+
+\textbf{Competence gates.} The pilot gates use open-loop
+replays averaged over 3 seeds. The decoded final cube
+distance must separate real successes from failures with
+AUROC ≥ 0.75. Predicted final stillness must reach balanced
+accuracy ≥ 0.85. A quick behaviour-cloning run must reach
+75\% success. Each world-model gate must pass at φ = .10 and
+at φ = .65 separately. S5's competence check applies the
+same gates to the stochastic model at φ = .10 and .65,
+averaged over its first 3 seeds.
+
+\textbf{Failed runs.} An infrastructure failure
+(input/output, memory, device or preemption error) at any
+stage is retried once with the identical seed: training
+resumes from the last complete checkpoint, and rollouts and
+scoring are rerun from the trained checkpoint on the same
+starts. A training failure (a non-finite loss, or a crash
+with no infrastructure cause) that is detected before any
+rollout of that run is scored reruns its seed index once, in
+every failure share of its model configuration (five for the
+main sweep and S5, two for S7), under the next unused
+reserve index (13, 14, 15 for seeds 1--6; 16, 17, 18 for
+seeds 7--12). The rerun keeps its half and that half's
+evaluation starts, and gets the same infrastructure retry.
+No other failure is replaced. Any run that remains
+unresolved, including a failed retry, a failed reserve run
+or a training failure found after scoring has started,
+leaves its index missing, and every decision that uses it is
+inconclusive. A sensitivity analysis drops every replaced
+index from all arms. If the primary analysis supports a
+claim and the sensitivity analysis does not, the claim is
+reported as ``supported (not robust to replacement)''. It
+counts as supported in the decision rules, but neither it
+nor a headline that relies on it is stated as supported in
+the abstract. Any other disagreement is reported beside the
+primary call, which stands. Invalid imagined rollouts are
+scored as failed episodes.
+
+\textbf{Descriptive encoder arm} (run only if the pilot's
+cost projection allows). The main world model at φ = .10 and
+.65 (5 seeds) runs on a frozen V-JEPA 2-L encoder. A
+readout, fitted once on the full balanced pools and not per
+arm, maps the encoder output to the 17 DINOv2-small tokens
+that policies and judges read. The arm's reference is real
+rollouts in which policies and judges read the readout's
+tokens of real frames, so the readout's error on real frames
+cancels in the shift, as the judge's bias does. This arm's
+shift is reported next to the main model's. DINOv2-small
+stays the main encoder because Experiment 2 uses it.
+
+\textbf{Replay check} (descriptive). For φ = .10 and .65,
+the action sequence of each imagined rollout on the first
+200 starts of each seed is executed open loop in the
+simulator from the same start state. We report the true
+success of these executions, the error of the imagined final
+cube position against the executed one, and J1 on the
+executed frames. The check is reported only if replaying the
+recorded actions of real rollouts reproduces their outcomes
+in at least 99\% of episodes.
+
+\textbf{Limitations stated with every result.} World-model
+error and judge error are separated only in part: the shift
+removes the judge's bias on real rollouts, and the replay
+check measures the world model's error on the action
+sequences policies produced in imagination, but judge error
+specific to imagined frames remains. Experiment 1 uses one
+small world model on frozen DINOv2-small tokens, one
+simulated task and 12 fixed policies; support would not by
+itself extend to other tasks, to larger or pixel-generative
+video world models, or to planning with a world model.
+``Failure share'' means the resampling intervention above,
+which also changes coverage. The study uses one fixed
+horizon, set by the rule in Setting (expected to be about
+100 steps). The distilled-PPO family imitates the teacher
+that generated half the training data, so it is closer to
+that data than the other families are. Results are also
+reported per family.
+
+\needspace{4\baselineskip}
+\hypertarget{e.-experiment-2-transition-matched-kuka-control}{%
+\section{E. Experiment 2: transition-matched Kuka
+control}\label{e.-experiment-2-transition-matched-kuka-control}}
+
+\textbf{Data.} Logged Kuka episodes from Open X-Embodiment,
+rebuilt from the public shards with the original pipeline's
+extractor (episode manifest \texttt{1dcb390f…}). This
+rebuilt copy is the registered data. Prior results on these
+data are known (§G). The world model and features are the
+original pipeline's, unchanged, trained for 2,000 steps per
+run. The success judge is fitted once and frozen. If its
+AUROC is below 0.75, the runs do not start and Experiment 2
+reports no confirmatory result.
+
+\textbf{Designs.} Runs use seeds 100--109, paired across
+arms. Historical seeds 0--2 are excluded. Every selection is
+certified before training.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{O:} the original 3,000-episode arms at φ = .10 and
+  .65 (20 runs).
+\item
+  \textbf{A (primary):} exactly 31,600 distinct training
+  transitions at φ ∈ \{0, .10, .25, .50, .65\} (50 runs).
+\item
+  \textbf{B:} φ = .10 and .65, with the same normalized
+  length distribution for successes and failures, at 31,600
+  transitions (20 runs).
+\item
+  \textbf{V:} a shared 1,500-success base plus further
+  successes (V+S) or failures (V+F) up to exactly 31,600
+  transitions (20 runs).
+\end{itemize}
+
+Total: 110 runs, or 130 under the B fallback.
+
+\textbf{Estimand.} For design d,
+\(\Delta_d = 100 \times (R_{d,.10} - R_{d,.65})\), averaged
+over seeds. R is the estimated success rate on evaluation
+episodes, from the judge's thresholded prediction (1 if p
+\ensuremath{>} 0.5) on each imagined episode. Episodes are
+weighted so that each retained length's total weight is
+proportional to the smaller of its shares among retained
+successes and among retained failures, and within each
+length the successes carry 0.355797 of that weight (the
+success share among all 2,760 eligible evaluation episodes)
+and the failures the rest. Length therefore carries no
+outcome information. For V,
+\(\Delta_V = 100 \times (R_{V+S} - R_{V+F})\).
+
+\begingroup\small
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2571}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3714}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3714}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Quantity
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Supported if
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Absent if
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\(\Delta_A\) (primary) & One-sided 95\% lower bound
+\ensuremath{>} 3 & 90\% interval inside (−3, 3) \\
+\(\Delta_O\), \(\Delta_B\), \(\Delta_V\) & Holm-adjusted
+support test of a drop \ensuremath{>} 3 & Holm-adjusted
+equivalence test within ±3 \\
+\(\Delta_O\) − \(\Delta_A\), \(\Delta_A\) − \(\Delta_B\) &
+Holm-adjusted support test of an attenuation \ensuremath{>}
+3 & Holm-adjusted equivalence test within ±3 \\
+\end{longtable}
+\endgroup
+
+\textbf{Decision rule.} Tests use paired t over seeds, with
+two one-sided tests for equivalence. \(\Delta_A\) is the
+primary quantity, tested at one-sided 5\%. The secondary
+family has ten p-values (support and equivalence for each of
+the five secondary quantities), with Holm correction at
+familywise 0.05. A secondary is declared when its
+Holm-adjusted p is at most 0.05. Each interval is reported
+at level \(1 - 2\alpha_j\), where \(\alpha_j\) is that
+hypothesis's Holm step level.
+
+\textbf{Eligibility and exclusions.} Only episodes of 3 to
+24 frames are eligible, within the existing shard-based
+evaluation split. A length enters the evaluation only if
+both training outcomes occur at that length and it has at
+least 20 evaluation episodes per outcome. The set of
+eligible lengths is fixed from labels and lengths before any
+new score. Difficult episodes and poor seeds are never
+excluded.
+
+\textbf{Permitted fallback.} If 31,600 transitions is
+infeasible for B, B uses the largest multiple of 1,000 not
+above 0.9 × the maximum feasible budget, and A comparators
+are added at that budget (130 runs).
+
+\textbf{Failed runs.} Infrastructure failures are retried
+once with the same seed. An unresolved run makes every
+decision that uses it inconclusive.
+
+\textbf{Descriptive analyses.} Mean-probability response,
+intermediate failure shares, Brier scores and AUROC.
+
+\needspace{4\baselineskip}
+\hypertarget{f.-experiment-3-trajectory-reuse-and-duplicate-detector-audit}{%
+\section{F. Experiment 3: trajectory reuse and
+duplicate-detector
+audit}\label{f.-experiment-3-trajectory-reuse-and-duplicate-detector-audit}}
+
+\textbf{Setting.} Two equal disks in a unit arena collide
+elastically once; the contact always falls inside the
+16-frame forecast window. A predictor sees 8 frames and
+forecasts both disks' positions for the next 16. Error is
+the mean over future disk-frames of min(1, distance), in
+arena widths. Non-finite outputs score 1 and are kept.
+
+\textbf{Block.} A base predictor trained on 512 events, then
+five matched continuations of it:
+
+\begin{itemize}
+\tightlist
+\item
+  B: independent events (control);
+\item
+  C: the 64 evaluation-source trajectories with new
+  appearances (reuse);
+\item
+  D: independent neighbors closer than any base-training
+  event;
+\item
+  D2: a distance reference (descriptive);
+\item
+  E: the exact evaluation renders (positive control).
+\end{itemize}
+
+\textbf{Screening.} A block enters the primary analysis only
+if its base model beats constant-velocity extrapolation on
+256 separate screen events. Failed screens are reported,
+with an all-block sensitivity analysis.
+
+\textbf{Estimands.} L(X, y) is the error of the model
+continued in arm X on test set y, where s = unseen new
+renders of the source trajectories, i = independent events,
+x = exact renders. Source gain S = L(B,s) − L(C,s); harm H =
+L(C,i) − L(B,i); \textbf{reuse gap G = S + H}; event
+specificity Q = {[}L(D,s) − L(C,s){]} − {[}L(D,i) −
+L(C,i){]}; exact gain E = L(B,x) − L(E,x). The quantities
+lower95 and upper95 are the ends of the two-sided 95\%
+interval over blocks.
+
+\textbf{Sample sizes.} The main confirmation has 1,600
+ConvLSTM blocks: 800 at 16 hidden channels (primary), 400 at
+64 and 400 at 256. Four axis configurations have 200 blocks
+each: a transformer that regresses future disk positions
+from frozen DINOv2-small or V-JEPA 2-L tokens (it predicts
+coordinates, not future latent states), and 16 or 256 reused
+sources. A decisive claim requires at least 720 screened
+blocks at the primary level, 360 at each larger level and
+180 per axis configuration.
+
+\textbf{Margins} (arena widths): consequential 0.010;
+negligible ±0.002; harm 0.001. \emph{Prevalence} p is the
+share of evaluation items that are reused. On a test set
+with prevalence p, C's error advantage over B is pG − H. The
+term pG is the increase in this advantage relative to an
+evaluation on independent events only. It is not C's full
+advantage. At 10\% reuse, a 0.010 gap gives an increase of
+0.001, the ranking margin we set for closely matched models.
+At 50\% reuse, a 0.002 gap gives the same increase. The
+order of C and B reverses between the two evaluations only
+if H lies strictly between 0 and pG (0 \ensuremath{<} H
+\ensuremath{<} pG when G is positive). In the claim labels
+below, ``reuse advantage'' names the gap G, not C's full
+advantage pG − H.
+
+\textbf{Primary claim} (16-channel blocks only):
+
+\begingroup\small
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Claim
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Requires
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Consequential reuse advantage & lower95(G) \ensuremath{>}
+0.010, lower95(S) \ensuremath{>} 0 and upper95(H)
+\ensuremath{<} 0.001 \\
+Prevalence-dependent reuse advantage & 0.002 \ensuremath{<}
+lower95(G) and upper95(G) ≤ 0.010, lower95(S) \ensuremath{>}
+0 and upper95(H) \ensuremath{<} 0.001 \\
+Detectable, magnitude unresolved & 0.002 \ensuremath{<}
+lower95(G) ≤ 0.010 \ensuremath{<} upper95(G), lower95(S)
+\ensuremath{>} 0 and upper95(H) \ensuremath{<} 0.001 \\
+Gap detected, safeguards not established & lower95(G)
+\ensuremath{>} 0.002 with lower95(S) ≤ 0 or upper95(H) ≥
+0.001 \\
+Negligible differential gap & 90\% interval of G inside
+(−0.002, 0.002) \textbf{and} lower95(E) \ensuremath{>}
+0.002 \\
+Negligible gap, control below the margin & Negligible G and
+0 \ensuremath{<} lower95(E) ≤ 0.002: inconclusive about
+negligibility \\
+Positive control not detected & Negligible G and lower95(E)
+≤ 0 \\
+Reverse gap & upper95(G) \ensuremath{<} −0.002 \\
+Inconclusive & Otherwise, or any unresolved
+main-confirmation block failure, or fewer screened blocks
+than the minimum \\
+\end{longtable}
+\endgroup
+
+\textbf{Secondary hypotheses.} One Holm family at familywise
+one-sided 2.5\%, always seven p-values:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Event-specific: Q \ensuremath{>} 0.010.
+\item
+  Detectable: G \ensuremath{>} 0.
+\item
+  Consequential harm: H \ensuremath{>} 0.001.
+\item
+  Capacity increase: G at 256 channels minus G at 16
+  \ensuremath{>} 0 (Welch).
+\item
+  Reuse detectable with the frozen DINOv2 encoder: G
+  \ensuremath{>} 0 in that configuration.
+\item
+  Reuse detectable with the frozen V-JEPA 2 encoder: G
+  \ensuremath{>} 0 in that configuration.
+\item
+  Dose increase: G with 16 sources minus G with 256
+  \ensuremath{>} 0 (Welch).
+\end{enumerate}
+
+Secondaries 1--3 use the screened 16-channel blocks;
+secondary 4 compares the screened 256- and 16-channel
+blocks; secondaries 5--7 use the screened blocks of their
+configurations. The primary claim never depends on an axis.
+An axis configuration with an unresolved block failure or
+too few screened blocks enters with p = 1 and is labelled
+unresolved.
+
+\textbf{Labels.} A difference is labelled \emph{capacity-}
+or \emph{dose-independent} if its 90\% interval lies inside
+±0.002 and lower95(E) \ensuremath{>} 0.002 in each compared
+configuration. A configuration is labelled \emph{negligible
+with that encoder} if its 90\% interval of G lies inside
+±0.002 and its lower95(E) \ensuremath{>} 0.002. Otherwise
+the label is unresolved.
+
+\textbf{Exploratory encoder comparison.} G with V-JEPA 2
+minus G with DINOv2 (Welch interval), outside the Holm
+family. It is reported as an encoder difference. It is not
+attributed to pretraining alone, because the two encoders
+also differ in size and in image vs video input.
+
+\textbf{Detector audit.} The calibration and test splits
+each have a 500-event gallery, 200 source trajectories under
+8 transformations, and 600 ordinary and 200 close
+independent events. The detectors are exact hash, SSCD (a
+copy-detection embedding), DINOv2, OFS-3 (optical-flow
+similarity), object-track matching, and true-state distance
+(reference only). \emph{False removal} is the share of
+independent events wrongly flagged. A detector counts only
+if it first catches ordinary re-encoded copies (AUROC ≥ 0.95
+against ordinary independent events and recall ≥ 0.80 at 5\%
+false removal). A detector that fails is reported, and every
+prediction involving it enters the family with p = 1.
+Thresholds at 1\% and 5\% false removal are set on the
+calibration split and frozen before test scoring. Intervals
+and p-values come from a 10,000-draw bootstrap over
+calibration and test source families; in each draw the
+thresholds are re-estimated on the resampled calibration
+negatives.
+
+\emph{Appearance-only rerenders} are the new-appearance
+transformation (transformation 2 of the 8). The copy gate is
+judged on the calibration split. Each prediction is tested
+with a one-sided bootstrap p-value, p = (1 + number of draws
+on the null side of the threshold) / 10,001, where a draw
+equal to the threshold counts as the null side; a compound
+prediction takes the largest of its parts' p-values.
+
+\begin{itemize}
+\tightlist
+\item
+  H3.3: SSCD and DINOv2 each catch fewer than 50\% of
+  appearance-only rerenders at 1\% false removal.
+\item
+  H3.4: object-track matching catches more than 80\% of them
+  at 1\% false removal, and more than OFS-3 does.
+\item
+  H3.5: at 1\% false removal on ordinary events,
+  object-track matching removes close independent events at
+  a higher rate than ordinary ones.
+\end{itemize}
+
+H3.3--H3.5 form one Holm family at familywise one-sided 0.05
+(not the 2.5\% of §C). They are confirmatory only if the
+November 20 amendment records exactly these details before
+any 2D detector test outcome is scored: the threshold
+quantiles and tie rule, the resampling of negative families,
+and extraction-failure handling (a failure counts as no
+match and stays in the denominator). Otherwise they are
+exploratory.
+
+\textbf{Filtering} (descriptive; no pass or fail).
+Trajectory-level filtering at the frozen 5\% false-removal
+threshold is reported only if it keeps at least 90\% of
+independent items. It is compared against random removal of
+the same size. The reuse gap among retained items is
+reported against coverage.
+
+\textbf{Failed runs.} Infrastructure failures are rerun once
+with identical seeds. Algorithmic failures are outcomes and
+are never replaced. Any unresolved main-confirmation block
+failure makes the primary claim and every secondary that
+uses main blocks inconclusive. Estimates are still reported.
+An axis failure affects only that configuration (above).
+Neither type of failure affects the detector audit.
+
+\textbf{Limitations stated with every result.} The
+Experiment 3 predictors forecast positions from frames. They
+take no actions, are not rolled out on their own
+predictions, and score no policy. Reuse enters through a
+100-update continuation, not pretraining. Results concern
+forecast error on synthetic single-collision events; they
+are not evidence about physical reasoning in general or
+about robot world-model evaluation.
+
+\textbf{Sealed 1D confirmation.} The 352-block 1D
+confirmation (run October 20) stays sealed until the 2D
+reuse outcomes are unsealed. It is then analyzed once with
+the analyzer frozen at \texttt{a25d881} and reported
+separately, regardless of outcome. Its protocol was frozen
+by the Experiment 3 lead alone and was not preregistered.
+
+\textbf{Registered for a follow-up} (not a claim of this
+study). In the Experiment 1 setup, reuse counts as
+consequential if it shifts estimated success by at least 3
+points with far-pair order kept, or if reuse that favours
+one policy reorders a pair at least 5 points apart.
+
+\needspace{4\baselineskip}
+\hypertarget{g.-prior-data-and-exposure}{%
+\section{G. Prior data and
+exposure}\label{g.-prior-data-and-exposure}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Experiment 1:} prospective. The pilot has not been
+  run.
+\item
+  \textbf{Experiment 2:} the existing data were analyzed
+  before registration. Known results: about 51\% estimated
+  success (zero-failure arm) vs 36\% recorded; length alone
+  predicts outcome about as well as the world model (AUROC
+  0.764 vs 0.761); and a 10.3-point drop from 10\% to 65\%
+  training failures. The new runs analyze previously
+  examined data prospectively and are not a replication on
+  untouched data. The registered data are the copy rebuilt
+  from the public shards (2,760 evaluation episodes, 35.58\%
+  success). This copy may differ slightly from the cache
+  behind the original result, so comparisons with the
+  historical 10.3-point drop are approximate. Experiment 2
+  is therefore a robustness check of a known effect; on its
+  own it cannot confirm the hypothesis.
+\item
+  \textbf{Experiment 3:} 1D pilots exposed dispersions and a
+  coarse positive-control flag only. Lovejesh Bangar, who
+  leads Experiment 3, has seen the 16-block 1D interim
+  effect estimates (October 19), including an exploratory
+  filtering analysis on 8 of those blocks. The 1D detector
+  benchmarks and the exploratory 1D filtering analysis
+  (which together informed H3.3--H3.5 and the descriptive
+  filtering analysis) and the memory checks with a lookup
+  predictor that memorizes training trajectories have also
+  been seen. The 1D confirmation is sealed. Every 2D pilot
+  release (October 23, October 27--28 capacity, October 28
+  architecture and dose) contained dispersions, counts,
+  runtime and one coarse positive-control pass/fail flag.
+\item
+  \textbf{Experiment 3 repository record:} the 16-block 1D
+  interim estimates and the 8-block filtering analysis were
+  published in the repository on October 19: the estimates
+  and per-block values in
+  \texttt{results/\allowbreak{}exposure\_\allowbreak{}interim\_\allowbreak{}analysis.json} and
+  \texttt{results/\allowbreak{}exposure\_\allowbreak{}interim\_\allowbreak{}raw.json}
+  (\texttt{af2c376}); the estimates, including the positive
+  control, and the filtering analysis in FINDINGS §7 and
+  \texttt{results/\allowbreak{}exposure\_\allowbreak{}interim\_\allowbreak{}filtering.json}
+  (\texttt{9fa1778}); and a README summary of both
+  (\texttt{5461ca6}). These interim results include the
+  positive-control estimate. The 1D detector benchmarks and
+  the lookup-predictor memory checks are also public. The 2D
+  pilot reports in the repository contain only dispersions,
+  counts, runtime and the coarse flag.
+\item
+  \textbf{Positive-control margin.} The 0.002 margin that
+  the positive control must clear (§F) is the negligible
+  bound fixed on October 16 (\texttt{f0e30eb}), before any
+  1D effect estimate. The requirement that the control clear
+  it comes from the October 23 design plan.
+\end{itemize}
+
+\textbf{Experiment 3 attestation.} Lovejesh Bangar, who
+leads Experiment 3, attests that:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  the only learned-model reuse-effect values he has seen, or
+  has shared with any author, are the 1D interim estimates
+  above;
+\item
+  the 352-block 1D confirmation has never been analyzed;
+\item
+  the 2D rule changes follow from design logic and not from
+  any 1D value;
+\item
+  no Experiment 3 effect value has been sent to an external
+  reviewer. The 1D interim estimates are public, so any
+  reader of the repository may have seen them.
+\end{enumerate}
+
+Anyone exposed to an interim summary is treated as informed.
+Protocol §3.8 gives the timeline with dates and commits.
+
+\textbf{Provenance.} Commits cited above: \texttt{a25d881}
+(1D analyzer freeze, October 19); \texttt{f0e30eb}
+(negligible bound, October 16); \texttt{9fa1778},
+\texttt{5461ca6}, \texttt{af2c376} (1D interim publication,
+October 19); \texttt{28e4ada} (repository base for the
+registered commit); \texttt{f361b7e} (Experiment 2 and 3
+analyzers);
+\texttt{\seqsplit{ed416e15ab9e4fd7c7b9ba4c51bdb343b4a28ce5}}
+(Experiment 2 pipeline). Experiment 2 episode manifest:
+SHA-256
+\texttt{\seqsplit{1dcb390f0f095205fb4b8d68d023b5dcdc94f378564423059e8be07dd54c09d8}}.
+
+\end{document}
